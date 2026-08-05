@@ -61,8 +61,8 @@ body{
 .hills svg{width:100%;height:100%;display:block}
 .veil{position:fixed;inset:0;z-index:2;pointer-events:none;
   background:radial-gradient(ellipse 88% 52% at 50% 46%,rgba(14,7,22,.5) 0%,rgba(14,7,22,.18) 55%,rgba(14,7,22,0) 78%)}
-.grain{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* la grana usava mix-blend-mode su un rumore SVG a schermo intero: su Safari
+   iOS costa carissima e produce sfarfallii. Tolta: il tramonto regge da solo. */
 
 /* ---------- schermate + transizioni ---------- */
 .screen{position:relative;z-index:5;width:100%;max-width:430px;text-align:center;display:none;margin:auto}
@@ -91,7 +91,6 @@ h1 em{font-style:italic;color:var(--gold)}
   background:linear-gradient(rgba(255,255,255,.09),rgba(255,255,255,.035)),rgba(24,13,36,.82);
   border:1px solid rgba(255,216,138,.42);
   box-shadow:0 26px 60px -20px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.08);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   animation:docDrop 1s var(--pop) .25s both}
 @keyframes docDrop{from{opacity:0;transform:translateY(-44px) rotate(-2.5deg) scale(.9)}
   to{opacity:1;transform:none}}
@@ -147,7 +146,6 @@ h1 em{font-style:italic;color:var(--gold)}
 
 .cta{margin-top:24px;background:var(--glass);border:1px solid rgba(255,255,255,.34);
   color:var(--ink);text-shadow:var(--sh);box-shadow:0 10px 28px -10px rgba(0,0,0,.6);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   transition:transform .2s,border-color .25s}
 .cta:active{transform:scale(.96);border-color:rgba(255,216,138,.7)}
 /* l'entrata ritardata vale SOLO per il bottone del contratto: sulla classe
@@ -194,7 +192,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   100%{transform:scale(1.14);opacity:1}}
 
 #no{background:var(--glass);color:var(--ink);border:1px solid rgba(255,255,255,.42);
-  text-shadow:var(--sh);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  text-shadow:var(--sh);
   box-shadow:0 6px 20px rgba(0,0,0,.28);
   transition:transform .12s var(--pop),filter .5s,opacity .5s}
 #no:active{transform:scale(.93)}
@@ -293,8 +291,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 
 .maint{display:none;margin-top:20px;border-radius:15px;overflow:hidden;
   border:1px solid rgba(255,216,138,.55);background:rgba(24,14,36,.86);
-  box-shadow:0 14px 34px -10px rgba(0,0,0,.6);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  box-shadow:0 14px 34px -10px rgba(0,0,0,.6)}
 .maint.on{display:block;animation:swing .8s var(--pop) both}
 @keyframes swing{0%{opacity:0;transform:translateY(-26px) rotate(-3.5deg) scale(.9)}
   58%{opacity:1;transform:translateY(4px) rotate(1.2deg) scale(1.015)}
@@ -310,7 +307,6 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   background:var(--glass);border:1px solid rgba(255,255,255,.3);border-radius:19px;
   padding:16px 34px 16px 17px;color:var(--ink);font-weight:400;font-size:1rem;text-shadow:var(--sh);
   box-shadow:0 8px 24px -10px rgba(0,0,0,.5);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   opacity:0;animation:cardIn .7s var(--ease) forwards;
   transition:transform .2s,background .25s,border-color .25s,box-shadow .25s}
 @keyframes cardIn{from{opacity:0;transform:translateY(22px) rotateX(11deg) scale(.97)}
@@ -403,7 +399,6 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .row{position:relative;display:flex;gap:14px;align-items:flex-start;background:var(--glass);
   border:1px solid rgba(255,255,255,.26);border-radius:17px;padding:13px 16px;text-shadow:var(--sh);
   box-shadow:0 8px 24px -12px rgba(0,0,0,.5);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   transition:opacity .55s,filter .55s,border-color .4s}
 /* segnalino sulla strada, uno per tappa */
 .row:before{content:'';position:absolute;left:-29px;top:20px;width:9px;height:9px;border-radius:50%;
@@ -425,7 +420,6 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   background:var(--glass);border:1px solid rgba(255,255,255,.3);color:var(--ink);
   font-size:.82rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;
   text-shadow:var(--sh);box-shadow:0 8px 22px -10px rgba(0,0,0,.6);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   transition:transform .15s var(--pop),border-color .25s,opacity .55s}
 /* l'animazione d'ingresso delle schermate finisce con transform:none e
    scentrerebbe il pedale, che è fisso e centrato via translateX(-50%) */
@@ -469,7 +463,6 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.26);
   color:var(--ink);text-shadow:var(--sh);
   box-shadow:0 6px 18px -10px rgba(0,0,0,.6);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   transition:transform .15s var(--pop),border-color .25s,background .25s}
 .back:active{transform:scale(.96);background:rgba(255,255,255,.17);
   border-color:rgba(255,216,138,.6)}
@@ -530,8 +523,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 
 /* ---------- firma ---------- */
 .firmabox{margin-top:4px;position:relative;height:170px;border-radius:16px;overflow:hidden;
-  border:1.5px dashed rgba(255,216,138,.65);background:rgba(24,14,36,.62);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  border:1.5px dashed rgba(255,216,138,.65);background:rgba(24,14,36,.76)}
 #cv{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
 .xline{position:absolute;left:16px;right:16px;bottom:28px;
   border-bottom:1.5px solid rgba(255,255,255,.35);pointer-events:none}
@@ -595,6 +587,22 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   15%{opacity:1}
   100%{opacity:0;transform:translate(var(--dx),-82vh) scale(1.25) rotate(var(--r))}}
 
+/* Il viaggio è la schermata più lunga di tutte: con quattro tappe piene
+   sforava già a 844px (iPhone 13 Pro a schermo intero). Si stringe da qui. */
+@media (max-height:900px){
+  #s3 .kicker{margin-bottom:8px}
+  #s3 h1{font-size:clamp(1.7rem,7vw,2.2rem);margin-bottom:11px}
+  #s3 .sub{margin-bottom:14px;font-size:.95rem}
+  .viaggio{margin-top:12px}
+  .plan{gap:8px}
+  .row{padding:11px 15px}
+  .row b{margin-bottom:2px}
+  .row span{font-size:.85rem;line-height:1.4}
+  .done{margin-top:10px}
+  .ps{margin-top:9px}
+  .vaifirma.on{margin-top:10px}
+  .back.on{margin-top:7px}
+}
 /* il contratto è la schermata più alta: si compatta prima delle altre,
    così il bottone resta sempre nello schermo senza dover scorrere */
 @media (max-height:810px){
@@ -703,7 +711,6 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   </svg>
 </div>
 <div class="veil"></div>
-<div class="grain"></div>
 
 <div class="say" id="say"></div>
 <span class="brum" id="brum">brum brum</span>
@@ -1082,7 +1089,9 @@ var OPZIONI = [
 
     ultimoNo=ora; raffica=0;
     buzz(30);
-    msg(ERRORI[n][0],ERRORI[n][1]);
+    /* solo il primo messaggio: serve a spiegare perché il «Sì» si spegne.
+       Dopo parla l'hacker, e due voci insieme erano solo confusione. */
+    if(n===0) msg(ERRORI[0][0],ERRORI[0][1]); else nudge.classList.remove('on');
     if(n===0){
       setTimeout(function(){ yes.classList.add('locked'); buzz([20,60,20]); },900);
       entraHacker();                       /* arriva e fa il 1° tentativo */
@@ -1092,7 +1101,7 @@ var OPZIONI = [
     if(n>=ERRORI.length){                  /* si arrende, esce, poi gli addetti */
       chiuso=true;
       hackerMolla();
-      setTimeout(scena,4900);      /* gli addetti entrano mentre lui esce */
+      setTimeout(scena,3900);      /* gli addetti entrano mentre lui esce */
     }
   });
 
@@ -1244,7 +1253,7 @@ var OPZIONI = [
     if(!hk) return;
     spegniHk();
     taci();
-    tentativo(1,1500);      /* lascia leggere il messaggio dell'assistenza */
+    tentativo(1,500);       /* niente più messaggio da leggere prima: parte subito */
   }
 
   function hackerMolla(){                              /* si arrende e va via */
@@ -1253,19 +1262,19 @@ var OPZIONI = [
     taci();
     hk.classList.remove('digita');
     if(cavo) cavo.classList.remove('on');
-    hkT(function(){ hk.classList.add('nega'); parla(HACKER[2][0],hkCx,hkTop); },1500);
-    hkT(function(){ parla(HACKER[2][1],hkCx,hkTop); },3100);
-    hkT(function(){ taci(); },4600);
+    hkT(function(){ hk.classList.add('nega'); parla(HACKER[2][0],hkCx,hkTop); },500);
+    hkT(function(){ parla(HACKER[2][1],hkCx,hkTop); },2100);
+    hkT(function(){ taci(); },3600);
     hkT(function(){                                   /* se ne va da dov'è venuto */
       hk.classList.remove('nega');
       hk.classList.add('cammina');
       hk.style.transform='scaleX(-1)';
       hk.style.left='-140px';
-    },4750);
+    },3750);
     hkT(function(){
       if(hk){ hk.remove(); hk=null; }
       if(cavo){ cavo.remove(); cavo=null; }
-    },5950);
+    },4950);
   }
 
   /* ---------- la scena degli operai ---------- */
