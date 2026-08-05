@@ -262,17 +262,64 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 /* ---------- il viaggio: strada, macchina, tappe ---------- */
 .viaggio{position:relative;margin-top:22px;padding-left:46px}
 .strada{position:absolute;left:20px;top:8px;bottom:8px;width:3px;border-radius:2px;
-  background:repeating-linear-gradient(rgba(255,216,138,.5) 0 9px,rgba(255,216,138,0) 9px 18px)}
+  background:repeating-linear-gradient(rgba(255,216,138,.5) 0 9px,rgba(255,216,138,0) 9px 18px);
+  background-size:100% 18px}
+/* la segnaletica scorre: dà il senso della velocità */
+.viaggio.inmoto .strada{animation:scorre .34s linear infinite}
+@keyframes scorre{to{background-position-y:18px}}
 /* la parte di strada già percorsa si accende */
 .fatta{position:absolute;left:20px;top:8px;width:3px;height:0;border-radius:2px;
   background:linear-gradient(rgba(255,216,138,.95),rgba(255,170,110,.85));
   box-shadow:0 0 10px rgba(255,216,138,.6);transition:height .95s cubic-bezier(.4,0,.25,1)}
-.auto{position:absolute;left:7px;top:0;font-size:1.75rem;line-height:1;z-index:3;
-  filter:drop-shadow(0 5px 9px rgba(0,0,0,.55));
-  transition:top .95s cubic-bezier(.4,0,.25,1)}
-.auto .mezzo{display:block}
-.auto.guida .mezzo{animation:sobbalzo .26s ease-in-out infinite}
-@keyframes sobbalzo{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(-4deg)}}
+/* ---- la macchina: 12 principi ---- */
+.auto{position:absolute;left:4px;top:0;width:35px;z-index:3;
+  transition:top var(--dur,1s) cubic-bezier(.45,0,.3,1)}
+.telaio{position:relative;transform-origin:50% 62%}
+.carro{display:block;width:100%;height:auto;
+  filter:drop-shadow(0 7px 11px rgba(0,0,0,.6));transform-origin:50% 62%}
+.scocca{fill:url(#vernice)}
+.tetto{fill:#2a1a38;opacity:.9}
+.vetro{fill:#1b1026;opacity:.85}
+.ruota{fill:#160d20}
+.faroL{fill:#ffeaa8;opacity:.45;transition:opacity .2s}
+.stopL{fill:#7a2030;transition:fill .15s}
+/* cono di luce davanti */
+.fascio{position:absolute;left:50%;top:96%;width:52px;height:70px;margin-left:-26px;
+  background:linear-gradient(rgba(255,234,168,.32),rgba(255,234,168,0) 72%);
+  clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);
+  opacity:0;transition:opacity .3s;pointer-events:none}
+
+/* 1 · ANTICIPAZIONE — si carica indietro prima di partire */
+.auto.carica .carro{animation:carica .22s cubic-bezier(.4,0,.6,1) both}
+@keyframes carica{to{transform:translateY(-4px) scaleY(.84) scaleX(1.14)}}
+
+/* 2 · SQUASH & STRETCH + ARCO — parte stirata e ondeggia in corsa */
+.auto.guida .carro{animation:lancio .3s cubic-bezier(.2,.8,.4,1) both,
+                             sbanda .42s ease-in-out .3s infinite}
+@keyframes lancio{from{transform:translateY(-4px) scaleY(.84) scaleX(1.14)}
+  to{transform:translateY(0) scaleY(1.16) scaleX(.9)}}
+@keyframes sbanda{
+  0%,100%{transform:translateX(-2px) rotate(-2.5deg) scaleY(1.08) scaleX(.95)}
+  50%    {transform:translateX(2px)  rotate(2.5deg)  scaleY(1.08) scaleX(.95)}}
+.auto.guida .faroL{opacity:1}
+.auto.guida .fascio{opacity:1}
+
+/* 3 · FOLLOW THROUGH — frena, si schiaccia e rimbalza fino a fermarsi */
+.auto.frena .carro{animation:frena .62s cubic-bezier(.3,.9,.4,1) both}
+@keyframes frena{
+  0%  {transform:translateY(4px) scaleY(.76) scaleX(1.2)}
+  32% {transform:translateY(-4px) scaleY(1.12) scaleX(.91)}
+  56% {transform:translateY(1px) scaleY(.95) scaleX(1.04)}
+  78% {transform:translateY(-1px) scaleY(1.03) scaleX(.98)}
+  100%{transform:none}}
+.auto.frena .stopL{fill:#ff5568}
+
+/* 4 · AZIONE SECONDARIA — sbuffi di scarico dietro la macchina */
+.puff{position:absolute;border-radius:50%;pointer-events:none;z-index:2;
+  background:radial-gradient(rgba(255,255,255,.5),rgba(255,255,255,0) 70%);
+  animation:puff .8s ease-out forwards}
+@keyframes puff{0%{opacity:.6;transform:scale(.35)}
+  100%{opacity:0;transform:scale(2.4) translateY(-18px)}}
 .brum{position:absolute;left:100%;top:50%;white-space:nowrap;
   background:#fffdf8;color:#241531;font-size:.62rem;font-weight:800;letter-spacing:.06em;
   padding:4px 8px;border-radius:9px;box-shadow:0 6px 14px rgba(0,0,0,.4);
@@ -341,7 +388,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .field{padding:7px 0}.field dd{font-size:.88rem}
   .cta{margin-top:18px;padding:15px 30px}
   .opts{gap:9px}.opt{padding:13px 30px 13px 15px}.opt .em{font-size:1.5rem}.opt span{font-size:.82rem}
-  .viaggio{margin-top:16px;padding-left:40px}.strada,.fatta{left:16px}.auto{left:3px;font-size:1.55rem}
+  .viaggio{margin-top:16px;padding-left:42px}.strada,.fatta{left:17px}.auto{left:1px;width:31px}
   .plan{gap:9px}.row{padding:12px 15px}.row span{font-size:.83rem}.row:before{left:-26px;top:17px}
   .ps{margin-top:15px}.maint p{padding:12px 14px;font-size:.85rem}
 }
@@ -436,7 +483,33 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   <div class="viaggio">
     <div class="strada"></div>
     <div class="fatta" id="fatta"></div>
-    <div class="auto" id="auto"><span class="mezzo">🚗</span><span class="brum" id="brum">brum brum</span></div>
+    <div class="auto" id="auto">
+      <div class="telaio">
+        <div class="fascio"></div>
+        <svg class="carro" viewBox="0 0 44 64" aria-hidden="true">
+          <defs>
+            <linearGradient id="vernice" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#ff9a6b"/>
+              <stop offset="0.55" stop-color="#ff6b8a"/>
+              <stop offset="1" stop-color="#c9436a"/>
+            </linearGradient>
+          </defs>
+          <rect class="ruota" x="0.5" y="11" width="6" height="14" rx="3"/>
+          <rect class="ruota" x="37.5" y="11" width="6" height="14" rx="3"/>
+          <rect class="ruota" x="0.5" y="39" width="6" height="14" rx="3"/>
+          <rect class="ruota" x="37.5" y="39" width="6" height="14" rx="3"/>
+          <rect class="scocca" x="4.5" y="1.5" width="35" height="61" rx="13"/>
+          <rect class="stopL" x="9" y="4" width="8" height="3" rx="1.5"/>
+          <rect class="stopL" x="27" y="4" width="8" height="3" rx="1.5"/>
+          <path class="vetro" d="M11 15 h22 l-2.5 8.5 h-17 z"/>
+          <rect class="tetto" x="10.5" y="25" width="23" height="13" rx="4.5"/>
+          <path class="vetro" d="M12 40 h20 l-2.5 8 h-15 z"/>
+          <circle class="faroL" cx="12.5" cy="57.5" r="3.2"/>
+          <circle class="faroL" cx="31.5" cy="57.5" r="3.2"/>
+        </svg>
+      </div>
+      <span class="brum" id="brum">brum brum</span>
+    </div>
     <div class="plan" id="p-rows"></div>
   </div>
   <button class="cta avanti" id="avanti">Si parte 🚗</button>
@@ -753,18 +826,36 @@ var OPZIONI = [
   /* ---------- il viaggio a tappe ---------- */
   var auto=document.getElementById('auto'), brum=document.getElementById('brum'),
       fatta=document.getElementById('fatta'), avanti=document.getElementById('avanti'),
-      done=document.getElementById('done'), ps=document.getElementById('p-ps');
+      done=document.getElementById('done'), ps=document.getElementById('p-ps'),
+      viaggio=document.querySelector('.viaggio');
   var tappa=-1, inViaggio=false;
   var VERSI=['brum brum','vrooom','brum!','ci siamo quasi'];
 
   function resetViaggio(){
     tappa=-1; inViaggio=false;
-    auto.style.top='0px'; auto.classList.remove('guida');
+    auto.style.top='0px'; auto.classList.remove('guida','carica','frena');
+    viaggio.classList.remove('inmoto');
+    Array.prototype.forEach.call(viaggio.querySelectorAll('.puff'),function(p){p.remove();});
     brum.classList.remove('on');
+    fatta.style.transitionDuration='';
     fatta.style.height='0px';
     avanti.style.display='';
     avanti.innerHTML='Si parte 🚗';
     done.classList.remove('on'); ps.classList.remove('on');
+  }
+
+  /* 9 · TIMING — ogni tratta ha la sua durata, non sono tutte uguali */
+  var DURATE=[1150,950,1000,1300];
+
+  function sbuffo(y){
+    var p=document.createElement('div');
+    var d=7+Math.random()*7;
+    p.className='puff';
+    p.style.width=d+'px'; p.style.height=d+'px';
+    p.style.left=(14+Math.random()*8)+'px';
+    p.style.top=(y-2+Math.random()*6)+'px';
+    viaggio.appendChild(p);
+    setTimeout(function(){ p.remove(); },850);
   }
 
   function vaiAllaTappa(){
@@ -776,30 +867,54 @@ var OPZIONI = [
     inViaggio=true;
 
     var row=rows[tappa];
-    var base=document.querySelector('.viaggio').getBoundingClientRect();
-    var r=row.getBoundingClientRect();
-    var y=Math.round(r.top-base.top+16);          /* all'altezza del segnalino */
-
-    auto.classList.add('guida');
-    auto.style.top=y+'px';
-    fatta.style.height=Math.max(0,y+6)+'px';
-    brum.textContent=VERSI[Math.min(tappa,VERSI.length-1)];
-    brum.classList.add('on');
-    buzz(12);
+    var base=viaggio.getBoundingClientRect();
+    var y0=parseFloat(auto.style.top)||0;
+    var y=Math.round(row.getBoundingClientRect().top-base.top+16);
+    var dur=DURATE[Math.min(tappa,DURATE.length-1)];
 
     avanti.innerHTML='In viaggio...';
-    setTimeout(function(){                        /* arrivo */
-      auto.classList.remove('guida');
-      brum.classList.remove('on');
-      row.classList.remove('locked');
-      row.classList.add('qui','visto','arrivo');
-      setTimeout(function(){ row.classList.remove('arrivo'); },700);
-      buzz([8,40,8]);
-      inViaggio=false;
-      avanti.innerHTML = (tappa>=rows.length-1)
-        ? 'Siamo arrivati 🥂'
-        : 'Avanti <span class="frec">→</span>';
-    },1000);
+    buzz(12);
+
+    /* 1 · anticipazione: si carica indietro */
+    auto.classList.add('carica');
+
+    setTimeout(function(){
+      auto.classList.remove('carica');
+      auto.classList.add('guida');
+      viaggio.classList.add('inmoto');
+      auto.style.setProperty('--dur',dur+'ms');
+      auto.style.top=y+'px';
+      fatta.style.transitionDuration=dur+'ms';
+      fatta.style.height=Math.max(0,y+6)+'px';
+      brum.textContent=VERSI[Math.min(tappa,VERSI.length-1)];
+      brum.classList.add('on');
+
+      /* 8 · azione secondaria: gli sbuffi seguono la macchina lungo il tragitto */
+      for(var i=1;i<=6;i++){
+        (function(k){ setTimeout(function(){
+          if(inViaggio) sbuffo(y0+(y-y0)*(k/7));
+        }, dur*k/7); })(i);
+      }
+
+      /* 3 · follow through: arriva, frena, si schiaccia e si assesta */
+      setTimeout(function(){
+        auto.classList.remove('guida');
+        viaggio.classList.remove('inmoto');
+        auto.classList.add('frena');
+        brum.classList.remove('on');
+        row.classList.remove('locked');
+        row.classList.add('qui','visto','arrivo');
+        buzz([8,40,8]);
+        setTimeout(function(){
+          auto.classList.remove('frena');
+          row.classList.remove('arrivo');
+        },660);
+        inViaggio=false;
+        avanti.innerHTML = (tappa>=rows.length-1)
+          ? 'Siamo arrivati 🥂'
+          : 'Avanti <span class="frec">→</span>';
+      },dur);
+    },220);
   }
 
   function finale(){
