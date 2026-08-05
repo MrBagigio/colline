@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#241531">
+<meta name="robots" content="noindex, nofollow">
+<title>Una domanda per te</title>
+<meta property="og:title" content="Ho una domanda per te...">
+<meta property="og:description" content="Apri. Ci vuole un secondo.">
+<style>
+:root{
+  --sky-1:#1d1030; --sky-2:#472456; --sky-3:#8d4468; --sky-4:#df7156; --sky-5:#f7b95f;
+  --hill-1:#5a3a60; --hill-2:#3c2547; --hill-3:#241630; --hill-4:#150d1e;
+  --ink:#ffffff; --gold:#ffd88a; --rose:#ff7a92;
+  --glass:linear-gradient(rgba(255,255,255,.11),rgba(255,255,255,.045)),rgba(28,16,42,.72);
+  --sh:0 1px 3px rgba(0,0,0,.6), 0 2px 20px rgba(0,0,0,.4);
+  --ease:cubic-bezier(.22,.9,.28,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{overflow-x:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+  color:var(--ink);
+  background:linear-gradient(180deg,var(--sky-1) 0%,var(--sky-2) 30%,var(--sky-3) 55%,var(--sky-4) 76%,var(--sky-5) 100%);
+  background-attachment:fixed;
+  min-height:100vh;min-height:100dvh;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow-x:hidden;overscroll-behavior-y:none;
+  padding:calc(26px + env(safe-area-inset-top)) 20px calc(52px + env(safe-area-inset-bottom));
+  user-select:none;-webkit-user-select:none;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- cielo ---------- */
+.star{position:fixed;border-radius:50%;background:#fff;z-index:0;pointer-events:none;
+  animation:tw 4s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:var(--o)}50%{opacity:calc(var(--o) * .25)}}
+.sun{position:fixed;left:50%;bottom:25vh;width:150px;height:150px;margin-left:-75px;border-radius:50%;
+  background:radial-gradient(circle,#fff3cf 0%,#ffca75 42%,rgba(247,185,95,.35) 62%,rgba(247,185,95,0) 74%);
+  z-index:0;animation:sunPulse 7s ease-in-out infinite}
+@keyframes sunPulse{0%,100%{transform:scale(1);opacity:.92}50%{transform:scale(1.07);opacity:1}}
+.hills{position:fixed;inset:auto 0 0 0;height:46vh;z-index:1;pointer-events:none}
+.hills svg{width:100%;height:100%;display:block}
+.veil{position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(ellipse 88% 52% at 50% 46%,rgba(14,7,22,.5) 0%,rgba(14,7,22,.18) 55%,rgba(14,7,22,0) 78%)}
+/* grana: toglie la plasticosità dei gradienti */
+.grain{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ---------- schermate ---------- */
+.screen{position:relative;z-index:5;width:100%;max-width:430px;text-align:center;display:none;margin:auto}
+.screen.on{display:block}
+/* entrata scaglionata degli elementi */
+.screen.on > *{animation:rise .7s var(--ease) both}
+.screen.on > *:nth-child(1){animation-delay:.05s}
+.screen.on > *:nth-child(2){animation-delay:.14s}
+.screen.on > *:nth-child(3){animation-delay:.23s}
+.screen.on > *:nth-child(4){animation-delay:.32s}
+.screen.on > *:nth-child(5){animation-delay:.41s}
+.screen.on > *:nth-child(6){animation-delay:.5s}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+.kicker{font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;opacity:.9;
+  margin-bottom:18px;text-shadow:var(--sh);font-weight:600}
+h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(2rem,8.8vw,2.9rem);
+  line-height:1.12;letter-spacing:-.01em;text-shadow:var(--sh);margin-bottom:15px}
+h1 em{font-style:italic;color:var(--gold)}
+.sub{font-size:1.03rem;line-height:1.58;opacity:.96;margin-bottom:32px;text-shadow:var(--sh)}
+
+/* ---------- bottoni ---------- */
+.btns{display:flex;gap:14px;justify-content:center;align-items:center;min-height:66px}
+button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36px;font-weight:600;
+  font-size:1.06rem;letter-spacing:.01em}
+#yes{position:relative;overflow:hidden;color:#fff;
+  background:linear-gradient(115deg,#ff8f66 0%,#ff6b8a 42%,#ffc09e 52%,#ff6b8a 62%,#ff8f66 100%);
+  background-size:320% 100%;animation:sheen 5s ease-in-out infinite;
+  box-shadow:0 12px 34px -6px rgba(255,107,138,.6),inset 0 1px 0 rgba(255,255,255,.25);
+  transition:transform .6s cubic-bezier(.34,1.25,.5,1),background-color .7s,color .4s,box-shadow .5s,opacity .5s}
+@keyframes sheen{0%,100%{background-position:100% 0}50%{background-position:0 0}}
+#yes:active{transform:scale(.95)}
+
+/* --- il Sì disattivato dall'"assistenza" --- */
+#yes.locked{color:transparent;background:linear-gradient(135deg,#4b3b55,#332741);background-size:auto;
+  animation:jolt .5s cubic-bezier(.36,.07,.19,.97);
+  box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06);
+  pointer-events:none;cursor:default}
+#yes.locked::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(45deg,rgba(0,0,0,.5) 0 9px,rgba(255,255,255,.07) 9px 18px);
+  animation:fadeIn .5s ease-out both}
+#yes.locked::after{content:'🔒';position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-size:1.4rem;animation:lockPop .5s cubic-bezier(.34,1.7,.5,1) .15s both}
+@keyframes jolt{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(3px)}
+  30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes lockPop{from{opacity:0;transform:scale(.3) rotate(-25deg)}to{opacity:1;transform:none}}
+#yes.away{transform:translateX(-180%) scale(.84);opacity:0}
+
+#no{background:var(--glass);color:var(--ink);border:1px solid rgba(255,255,255,.42);
+  text-shadow:var(--sh);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:0 6px 20px rgba(0,0,0,.28)}
+#no.broken{filter:grayscale(.7);opacity:.85}
+#no.center{position:fixed;z-index:8;margin:0;
+  transition:left .85s cubic-bezier(.34,1.1,.45,1),top .85s cubic-bezier(.34,1.1,.45,1),
+             transform .55s cubic-bezier(.34,1.4,.5,1),box-shadow .6s}
+#no.held{box-shadow:0 20px 30px -10px rgba(0,0,0,.6)}
+#no.carried{transition:transform 1.05s cubic-bezier(.5,0,.72,.9)}
+#no.shake{animation:jolt .42s cubic-bezier(.36,.07,.19,.97)}
+
+/* alone caldo dietro al bottone guasto */
+.spot{position:fixed;z-index:7;pointer-events:none;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,216,138,.34) 0%,rgba(255,150,110,.15) 45%,rgba(255,216,138,0) 72%);
+  opacity:0;transform:scale(.7);transition:opacity .7s,transform .9s var(--ease)}
+.spot.on{opacity:1;transform:scale(1)}
+
+/* durante la scena il testo sopra si abbassa */
+#s1.dim .kicker,#s1.dim h1,#s1.dim .sub{opacity:.24}
+#s1 .kicker,#s1 h1,#s1 .sub{transition:opacity .7s}
+
+/* messaggi dell'assistenza */
+.nudge{font-size:1rem;margin-top:24px;min-height:4.4em;line-height:1.5;text-shadow:var(--sh);
+  opacity:0;transform:translateY(-4px);transition:opacity .3s,transform .3s;font-style:italic}
+.nudge.on{opacity:1;transform:none}
+.nudge .sys{display:block;margin-top:8px;font-size:.9rem;font-style:normal;opacity:.9}
+
+/* ---------- operai ---------- */
+.worker{position:fixed;z-index:9;font-size:3.1rem;line-height:1;
+  filter:drop-shadow(0 8px 16px rgba(0,0,0,.55));
+  transition:left 1.15s cubic-bezier(.35,0,.35,1),transform 1.05s cubic-bezier(.5,0,.72,.9),opacity .4s}
+.worker .body{display:block}
+.worker.walk .body{animation:bob .4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-6px) rotate(-5deg)}}
+
+.say{position:fixed;z-index:11;background:#fffdf8;color:#241531;
+  font-size:1rem;font-weight:700;line-height:1.35;padding:12px 16px;border-radius:17px;
+  max-width:76vw;text-align:center;box-shadow:0 12px 30px rgba(0,0,0,.5);
+  opacity:0;transform:translate(-50%,8px) scale(.72);transform-origin:bottom center;
+  transition:opacity .25s,transform .34s cubic-bezier(.34,1.55,.5,1)}
+.say.on{opacity:1;transform:translate(-50%,0) scale(1)}
+.say:after{content:'';position:absolute;top:100%;left:var(--tx,50%);margin-left:-8px;
+  border:8px solid transparent;border-top-color:#fffdf8}
+
+/* cartello manutenzione */
+.maint{display:none;margin-top:20px;border-radius:15px;overflow:hidden;
+  border:1px solid rgba(255,216,138,.55);background:rgba(24,14,36,.86);
+  box-shadow:0 14px 34px -10px rgba(0,0,0,.6);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.maint.on{display:block;animation:swing .7s cubic-bezier(.34,1.45,.5,1) both}
+@keyframes swing{0%{opacity:0;transform:translateY(-22px) rotate(-3deg) scale(.92)}
+  60%{opacity:1;transform:translateY(3px) rotate(1deg) scale(1.01)}
+  100%{opacity:1;transform:none}}
+.tape{height:10px;background:repeating-linear-gradient(45deg,#ffd88a 0 9px,#241531 9px 18px)}
+.maint p{padding:14px 16px;font-size:.9rem;line-height:1.52;text-shadow:var(--sh)}
+.maint b{display:block;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:6px}
+
+/* ---------- card opzioni ---------- */
+.opts{display:flex;flex-direction:column;gap:11px}
+.opt{position:relative;display:flex;gap:15px;align-items:center;width:100%;text-align:left;
+  background:var(--glass);border:1px solid rgba(255,255,255,.3);border-radius:19px;
+  padding:16px 34px 16px 17px;color:var(--ink);font-weight:400;font-size:1rem;text-shadow:var(--sh);
+  box-shadow:0 8px 24px -10px rgba(0,0,0,.5);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  opacity:0;transform:translateY(16px);animation:rowIn .6s var(--ease) forwards;
+  transition:transform .2s,background .25s,border-color .25s,box-shadow .25s}
+.opt:nth-child(1){animation-delay:.12s}.opt:nth-child(2){animation-delay:.24s}
+.opt:nth-child(3){animation-delay:.36s}.opt:nth-child(4){animation-delay:.48s}
+.opt:after{content:'›';position:absolute;right:16px;top:50%;transform:translateY(-52%);
+  font-size:1.5rem;opacity:.45;font-weight:300}
+.opt:active{transform:scale(.972);border-color:rgba(255,216,138,.7);
+  box-shadow:0 4px 14px -6px rgba(0,0,0,.5);
+  background:linear-gradient(rgba(255,255,255,.2),rgba(255,255,255,.12)),rgba(28,16,42,.72)}
+.opt .em{font-size:1.75rem;line-height:1;flex-shrink:0;text-shadow:none;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
+.opt b{display:block;font-weight:600;font-size:1rem;margin-bottom:3px}
+.opt span{display:block;font-size:.86rem;opacity:.94;line-height:1.42}
+
+/* ---------- programma ---------- */
+.plan{margin-top:24px;text-align:left;display:flex;flex-direction:column;gap:11px}
+.row{position:relative;display:flex;gap:14px;align-items:flex-start;background:var(--glass);
+  border:1px solid rgba(255,255,255,.26);border-radius:17px;padding:15px 17px;text-shadow:var(--sh);
+  box-shadow:0 8px 24px -12px rgba(0,0,0,.5);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  opacity:0;transform:translateY(14px);animation:rowIn .6s var(--ease) forwards}
+.row:nth-child(1){animation-delay:.2s}.row:nth-child(2){animation-delay:.34s}
+.row:nth-child(3){animation-delay:.48s}.row:nth-child(4){animation-delay:.62s}
+/* filo che collega le tappe */
+.row:not(:last-child):after{content:'';position:absolute;left:27px;top:100%;height:11px;width:2px;
+  background:linear-gradient(rgba(255,216,138,.55),rgba(255,216,138,.15))}
+@keyframes rowIn{to{opacity:1;transform:none}}
+.row .ic{font-size:1.35rem;line-height:1.25;flex-shrink:0;text-shadow:none;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
+.row b{display:block;font-size:.97rem;margin-bottom:3px}
+.row span{font-size:.88rem;opacity:.94;line-height:1.46}
+.ps{margin-top:24px;font-size:.88rem;opacity:.9;font-style:italic;text-shadow:var(--sh)}
+.back{margin-top:14px;font-size:.87rem;opacity:.8;text-decoration:underline;text-underline-offset:3px;
+  background:none;border:0;color:var(--ink);padding:10px;font-weight:400;text-shadow:var(--sh)}
+
+/* ---------- indicatore passi ---------- */
+.steps{position:fixed;left:50%;transform:translateX(-50%);z-index:6;display:flex;gap:7px;
+  bottom:calc(18px + env(safe-area-inset-bottom))}
+.steps i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.28);
+  transition:background .45s var(--ease),width .45s var(--ease)}
+.steps i.on{background:var(--gold);width:20px;border-radius:3px}
+
+/* ---------- coriandoli ---------- */
+.heart{position:fixed;z-index:12;pointer-events:none;font-size:22px;animation:fly 2.7s ease-out forwards}
+@keyframes fly{0%{opacity:1;transform:translateY(0) scale(.5) rotate(0)}
+  100%{opacity:0;transform:translateY(-78vh) scale(1.3) rotate(var(--r))}}
+
+@media (max-height:720px){
+  .kicker{margin-bottom:12px}
+  h1{font-size:clamp(1.65rem,7.2vw,2.25rem)}
+  .sub{margin-bottom:23px;font-size:.95rem}
+  .nudge{font-size:.95rem;margin-top:19px}
+  .opts{gap:9px}.opt{padding:13px 30px 13px 15px}.opt .em{font-size:1.5rem}.opt span{font-size:.82rem}
+  .plan{margin-top:17px;gap:9px}.row{padding:12px 15px}.row span{font-size:.83rem}
+  .ps{margin-top:15px}.maint p{padding:12px 14px;font-size:.85rem}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="sun"></div>
+<div class="hills">
+  <svg viewBox="0 0 400 200" preserveAspectRatio="none">
+    <path fill="var(--hill-1)" d="M0,88 C58,52 108,100 164,74 C224,44 274,96 330,66 C360,50 386,64 400,58 L400,200 L0,200 Z"/>
+    <path fill="var(--hill-2)" d="M0,120 C54,92 104,134 160,110 C220,84 268,128 325,105 C358,92 384,108 400,100 L400,200 L0,200 Z"/>
+    <path fill="var(--hill-3)" d="M0,152 C68,131 118,165 184,148 C244,132 294,162 350,145 C375,138 390,145 400,141 L400,200 L0,200 Z"/>
+    <!-- filari in prospettiva sulla collina in primo piano -->
+    <g opacity=".2" stroke="#fff" stroke-width=".6" fill="none">
+      <path d="M0,163 C68,142 118,176 184,159 C244,143 294,173 350,156 C375,149 390,156 400,152"/>
+      <path d="M0,172 C68,151 118,185 184,168 C244,152 294,182 350,165 C375,158 390,165 400,161"/>
+      <path d="M0,182 C68,161 118,195 184,178 C244,162 294,192 350,175 C375,168 390,175 400,171"/>
+      <path d="M0,193 C68,172 118,206 184,189 C244,173 294,203 350,186 C375,179 390,186 400,182"/>
+    </g>
+    <g opacity=".13" stroke="#fff" stroke-width=".5">
+      <path d="M40,200 L52,158"/><path d="M110,200 L118,166"/><path d="M190,200 L194,152"/>
+      <path d="M268,200 L272,164"/><path d="M340,200 L344,148"/>
+    </g>
+    <path fill="var(--hill-4)" d="M0,186 C80,176 150,196 220,184 C290,172 350,190 400,180 L400,200 L0,200 Z"/>
+  </svg>
+</div>
+<div class="veil"></div>
+<div class="grain"></div>
+
+<div class="say" id="say"></div>
+
+<!-- ============ 1. LA DOMANDA ============ -->
+<section class="screen on" id="s1">
+  <p class="kicker">Ho una proposta</p>
+  <h1>Lunedì usciamo <em>insieme</em>?</h1>
+  <p class="sub">Ti porto fuori provincia.<br>Torniamo per cena. Devi solo scegliere.</p>
+  <div class="btns" id="btns">
+    <button id="yes">Sì ✨</button>
+    <button id="no">No</button>
+  </div>
+  <p class="nudge" id="nudge"></p>
+  <div class="maint" id="maint">
+    <div class="tape"></div>
+    <p><b>🚧 Avviso di servizio</b>Il pulsante «No» è stato rimosso per manutenzione.<br>Tempo stimato di ripristino: <em>mai</em>.</p>
+    <div class="tape"></div>
+  </div>
+</section>
+
+<!-- ============ 2. LA SCELTA ============ -->
+<section class="screen" id="s2">
+  <p class="kicker">Lo sapevo</p>
+  <h1>Ora <em>scegli tu</em>.</h1>
+  <p class="sub">Quattro posti. Uno solo, lunedì.<br>Tocca quello che ti ispira di più.</p>
+  <div class="opts" id="opts"></div>
+</section>
+
+<!-- ============ 3. IL PROGRAMMA ============ -->
+<section class="screen" id="s3">
+  <p class="kicker">Lunedì 10</p>
+  <h1 id="p-title"></h1>
+  <p class="sub" id="p-sub"></p>
+  <div class="plan" id="p-rows"></div>
+  <p class="ps" id="p-ps"></p>
+  <button class="back" id="back">no aspetta, fammi vedere le altre</button>
+</section>
+
+<div class="steps" id="steps"><i class="on"></i><i></i><i></i></div>
+
+<script>
+/* =========================================================================
+   ⚙️  1) COSA DICE L'ASSISTENZA A OGNI TOCCO SUL "NO"
+       Al 1° tocco disattiva il Sì. Al 3° arrivano gli operai.
+   ========================================================================= */
+var ERRORI = [
+  ['Mmm... strano, non è andato.',
+   'Deve esserci un conflitto. Ti disattivo un attimo il «Sì» per capire se si risolve.'],
+  ['Niente, il tocco non passa ancora.',
+   'Riprova, sto rifacendo il test.'],
+  ['No, mi sa che è proprio rotto. Aspetta...',
+   'Apro un ticket. Mando qualcuno a controllare.']
+];
+
+/* ⚙️  2) COSA DICONO GLI OPERAI (uno alla volta) */
+var BATTUTE = ['Vai Gianni, portiamolo via!', 'È rotto, non c\'è niente da fare.'];
+
+/* =========================================================================
+   ⚙️  3) LE 4 OPZIONI E IL PROGRAMMA DI OGNUNA
+   ========================================================================= */
+var OPZIONI = [
+  {
+    em:'🍇', nome:'Le colline del Prosecco',
+    teaser:'Vigneti terrazzati e un tramonto che non ti aspetti',
+    titolo:'Colline del <em>Prosecco</em>.',
+    sub:'Valdobbiadene. Un\'ora di strada, un altro mondo.',
+    ps:'P.S. — il bottone "No" non è mai stato riparato. Era voluto.',
+    tappe:[
+      ['🚗','Ti vengo a prendere','Un\'ora verso nord. Si sale tra le colline, si smette di vedere case.'],
+      ['🍇','Tra i filari','Vigneti terrazzati, patrimonio UNESCO. Camminata dentro le vigne.'],
+      ['🌅','Colle Colesel','Panchine di legno affacciate sulla valle del Cartizze. Per il tramonto.'],
+      ['🥂','Per chiudere','Un calice e due cose buone, con le colline ancora davanti.']
+    ]
+  },
+  {
+    em:'🔦', nome:'La strada delle 52 gallerie',
+    teaser:'Sette chilometri scavati nella montagna, con la torcia',
+    titolo:'Le <em>52 gallerie</em>.',
+    sub:'Pasubio. Una strada scavata a mano dentro la roccia.',
+    ps:'P.S. — porta scarpe comode. Al resto penso io.',
+    tappe:[
+      ['🚗','Partenza','Quaranta minuti e siamo alle Piccole Dolomiti.'],
+      ['🔦','Dentro la montagna','52 gallerie scavate nella Grande Guerra. Buio, poi luce, poi buio.'],
+      ['⛰️','In cima','Pausa al rifugio. Da lassù si vede mezzo Veneto.'],
+      ['🍲','Ritorno','Discesa con calma e qualcosa di caldo prima di tornare.']
+    ]
+  },
+  {
+    em:'🕯️', nome:'Il borgo segreto',
+    teaser:'Grotte sotto le ville, quasi nessuno ci va',
+    titolo:'Il borgo <em>segreto</em>.',
+    sub:'Costozza. A mezz\'ora da qui e non lo conosce nessuno.',
+    ps:'P.S. — scommetto che non ne hai mai sentito parlare.',
+    tappe:[
+      ['🚗','Partenza','Mezz\'ora verso i Colli Berici.'],
+      ['🏛️','Il borgo','Ville del Cinquecento e un paese fermo nel tempo.'],
+      ['🕳️','I ventidotti','Grotte scavate nella roccia che raffreddavano le ville. Il frigorifero dei nobili.'],
+      ['🍷','Sotto la villa','Un bicchiere in cantina, dove l\'aria arriva dalla grotta.']
+    ]
+  },
+  {
+    em:'🌉', nome:'Scacchi, ponte e fiume',
+    teaser:'Un castello, un ponte di legno e il tramonto sul Brenta',
+    titolo:'Marostica e <em>Bassano</em>.',
+    sub:'Due borghi in una giornata, con il fiume in mezzo.',
+    ps:'P.S. — la partita a scacchi la giochiamo su una piazza vera.',
+    tappe:[
+      ['🚗','Partenza','Trentacinque minuti verso il Brenta.'],
+      ['♟️','Marostica','La piazza degli scacchi e le mura che salgono al castello.'],
+      ['🌉','Ponte degli Alpini','Bassano nel pomeriggio, il ponte di legno sospeso sul fiume.'],
+      ['🥃','Al tramonto','Un goccio di grappa affacciati sull\'acqua e si torna.']
+    ]
+  }
+];
+/* ===================== fine personalizzazione ===================== */
+
+(function(){
+  var no=document.getElementById('no'), yes=document.getElementById('yes'),
+      nudge=document.getElementById('nudge'), say=document.getElementById('say'),
+      maint=document.getElementById('maint'), steps=document.getElementById('steps'),
+      s1=document.getElementById('s1'), s2=document.getElementById('s2'), s3=document.getElementById('s3');
+  var n=0, chiuso=false;
+
+  /* ---------- stelle nel cielo alto ---------- */
+  (function stelle(){
+    var frag=document.createDocumentFragment();
+    for(var i=0;i<44;i++){
+      var s=document.createElement('div');
+      s.className='star';
+      var y=Math.random()*46;                       /* solo nella parte alta */
+      var o=(1-y/50)*0.85+0.1;                      /* più in alto = più brillante */
+      var d=1+Math.random()*1.6;
+      s.style.left=(Math.random()*100)+'vw';
+      s.style.top=y+'vh';
+      s.style.width=d+'px'; s.style.height=d+'px';
+      s.style.setProperty('--o',o.toFixed(2));
+      s.style.animationDelay=(Math.random()*4)+'s';
+      frag.appendChild(s);
+    }
+    document.body.appendChild(frag);
+  })();
+
+  function msg(l1,l2){
+    nudge.classList.remove('on');
+    setTimeout(function(){
+      nudge.innerHTML=l1+'<span class="sys">'+l2+'</span>';
+      nudge.classList.add('on');
+    },140);
+  }
+
+  /* ---------- tap sul NO ---------- */
+  no.addEventListener('click',function(e){
+    e.preventDefault();
+    if(chiuso) return;
+    if(navigator.vibrate) navigator.vibrate(30);
+    no.classList.remove('shake'); void no.offsetWidth; no.classList.add('shake');
+    msg(ERRORI[n][0],ERRORI[n][1]);
+
+    if(n===0){                                    /* 1° tocco: disattiva il Sì */
+      setTimeout(function(){
+        yes.classList.add('locked');
+        if(navigator.vibrate) navigator.vibrate([20,60,20]);
+      },900);
+    }
+    if(n>=1) no.classList.add('broken');
+    n++;
+    if(n>=ERRORI.length){ chiuso=true; setTimeout(scena,850); }
+  });
+
+  /* ---------- nuvoletta condivisa ---------- */
+  function parla(testo,tailPerc,topY){
+    say.textContent=testo;
+    say.style.setProperty('--tx',tailPerc+'%');
+    say.style.left=Math.round(window.innerWidth/2)+'px';
+    say.style.top=Math.round(topY)+'px';
+    void say.offsetWidth;
+    var r=say.getBoundingClientRect();
+    if(r.left<8)  say.style.left=Math.round(r.width/2+8)+'px';
+    if(r.right>window.innerWidth-8) say.style.left=Math.round(window.innerWidth-r.width/2-8)+'px';
+    say.classList.add('on');
+  }
+  function taci(){ say.classList.remove('on'); }
+
+  /* ---------- la scena degli operai ---------- */
+  function scena(){
+    s1.classList.add('dim');
+    yes.classList.add('away');
+
+    /* il No esce dal flusso e si centra SULLA RIGA DEI PULSANTI */
+    var r0=no.getBoundingClientRect();
+    document.body.appendChild(no);
+    no.style.left=r0.left+'px'; no.style.top=r0.top+'px';
+    no.classList.remove('shake'); no.classList.add('center');
+
+    var cx=Math.round((window.innerWidth-r0.width)/2);
+    var cy=Math.round(r0.top);
+    void no.offsetWidth;
+    setTimeout(function(){ no.style.left=cx+'px'; no.style.top=cy+'px'; },350);
+
+    var spot=document.createElement('div');
+    spot.className='spot';
+    spot.style.width='300px'; spot.style.height='190px';
+    spot.style.left=Math.round(cx+r0.width/2-150)+'px';
+    spot.style.top =Math.round(cy+r0.height/2-95)+'px';
+    document.body.appendChild(spot);
+    setTimeout(function(){ spot.classList.add('on'); },700);
+
+    var wl,wr;
+    setTimeout(function(){
+      function operaio(lato){
+        var w=document.createElement('div');
+        w.className='worker '+lato;
+        w.innerHTML='<span class="body">'+(lato==='l'?'👷':'👷‍♀️')+'</span>';
+        w.style.top=(cy+r0.height/2-30)+'px';
+        w.style.left=(lato==='l'? -110 : window.innerWidth+60)+'px';
+        document.body.appendChild(w);
+        return w;
+      }
+      wl=operaio('l'); wr=operaio('r');
+      void wl.offsetWidth; void wr.offsetWidth;
+      wl.classList.add('walk');
+      wl.style.left=Math.max(6, cx-72)+'px';
+      setTimeout(function(){
+        wr.classList.add('walk');
+        wr.style.left=Math.min(window.innerWidth-66, cx+r0.width+16)+'px';
+      },160);
+    },1100);
+
+    var bubbleY=cy-72;
+
+    setTimeout(function(){ if(wl) wl.classList.remove('walk'); if(wr) wr.classList.remove('walk'); },2250);
+    setTimeout(function(){ parla(BATTUTE[0],26,bubbleY); },2350);
+    setTimeout(function(){ taci(); },3700);
+    setTimeout(function(){ parla(BATTUTE[1],74,bubbleY); },3900);
+    setTimeout(function(){ taci(); },5250);
+
+    setTimeout(function(){                        /* lo sollevano */
+      no.classList.add('held');
+      no.style.transform='translateY(-18px) rotate(-8deg)';
+      if(wl) wl.style.transform='translateY(-7px)';
+      if(wr) wr.style.transform='translateY(-7px)';
+      spot.classList.remove('on');
+      if(navigator.vibrate) navigator.vibrate(20);
+    },5450);
+
+    setTimeout(function(){                        /* se lo portano via */
+      var via=window.innerWidth+200;
+      if(wl){ wl.classList.add('walk'); wl.style.transform='translateX('+via+'px) translateY(-7px)'; }
+      if(wr){ wr.classList.add('walk'); wr.style.transform='translateX('+via+'px) translateY(-7px)'; }
+      no.classList.add('carried');
+      no.style.transform='translateX('+via+'px) translateY(-18px) rotate(-8deg)';
+    },6000);
+
+    setTimeout(function(){                        /* il Sì torna, arriva il cartello */
+      no.remove(); if(wl) wl.remove(); if(wr) wr.remove(); spot.remove();
+      nudge.classList.remove('on');
+      s1.classList.remove('dim');
+      yes.classList.remove('locked','away');
+      yes.style.transform='scale(1.14)';
+      maint.classList.add('on');
+      if(navigator.vibrate) navigator.vibrate([10,70,10]);
+    },7050);
+  }
+
+  /* ---------- coriandoli ---------- */
+  function hearts(){
+    var set=['💛','🥂','🌅','✨','🧡','💫'];
+    for(var i=0;i<26;i++){
+      setTimeout(function(){
+        var el=document.createElement('div');
+        el.className='heart'; el.textContent=set[Math.floor(Math.random()*set.length)];
+        el.style.left=(Math.random()*92+4)+'vw'; el.style.top=(Math.random()*22+72)+'vh';
+        el.style.setProperty('--r',(Math.random()*120-60)+'deg');
+        el.style.fontSize=(16+Math.random()*20)+'px';
+        document.body.appendChild(el);
+        setTimeout(function(){el.remove();},2800);
+      }, i*52);
+    }
+  }
+
+  function show(el,idx){
+    [s1,s2,s3].forEach(function(s){s.classList.remove('on');});
+    el.classList.add('on');
+    var dots=steps.children;
+    for(var i=0;i<dots.length;i++) dots[i].classList.toggle('on', i===idx);
+    window.scrollTo(0,0);
+  }
+
+  /* ---------- SÌ → schermata scelta ---------- */
+  yes.addEventListener('click',function(){
+    if(yes.classList.contains('locked')) return;
+    if(navigator.vibrate) navigator.vibrate([14,50,14]);
+    hearts();
+    setTimeout(function(){ show(s2,1); },380);
+  });
+
+  /* ---------- le 4 card ---------- */
+  var box=document.getElementById('opts');
+  OPZIONI.forEach(function(o){
+    var b=document.createElement('button');
+    b.className='opt';
+    b.innerHTML='<div class="em">'+o.em+'</div><div><b>'+o.nome+'</b><span>'+o.teaser+'</span></div>';
+    b.addEventListener('click',function(){ scegli(o); });
+    box.appendChild(b);
+  });
+
+  /* ---------- scelta → programma ---------- */
+  function scegli(o){
+    if(navigator.vibrate) navigator.vibrate(18);
+    document.getElementById('p-title').innerHTML=o.titolo;
+    document.getElementById('p-sub').textContent=o.sub;
+    document.getElementById('p-ps').textContent=o.ps;
+    var rows=document.getElementById('p-rows'); rows.innerHTML='';
+    o.tappe.forEach(function(t){
+      var d=document.createElement('div'); d.className='row';
+      d.innerHTML='<div class="ic">'+t[0]+'</div><div><b>'+t[1]+'</b><span>'+t[2]+'</span></div>';
+      rows.appendChild(d);
+    });
+    show(s3,2); hearts();
+  }
+
+  document.getElementById('back').addEventListener('click',function(){ show(s2,1); });
+})();
+</script>
+</body>
+</html>
