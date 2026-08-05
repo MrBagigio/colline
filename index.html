@@ -346,9 +346,35 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .row.arrivo{animation:arriva .6s var(--pop);border-color:rgba(255,216,138,.6)}
 @keyframes arriva{0%{transform:scale(1)}42%{transform:scale(1.04)}100%{transform:scale(1)}}
 
-.hint{margin-top:16px;font-size:.78rem;opacity:.5;font-style:italic;text-shadow:var(--sh);
-  transition:opacity .6s}
-.hint.via{opacity:0}
+/* ---- pedale dell'acceleratore ----
+   fisso in basso: deve restare sotto il pollice anche sugli schermi corti,
+   dove la schermata del viaggio non ci sta tutta */
+.pedale{position:fixed;left:50%;bottom:calc(52px + env(safe-area-inset-bottom));z-index:7;
+  transform:translateX(-50%);margin:0;display:inline-flex;align-items:center;gap:10px;
+  padding:9px 20px 9px 12px;border-radius:100px;
+  background:var(--glass);border:1px solid rgba(255,255,255,.3);color:var(--ink);
+  font-size:.82rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;
+  text-shadow:var(--sh);box-shadow:0 8px 22px -10px rgba(0,0,0,.6);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  transition:transform .15s var(--pop),border-color .25s,opacity .55s}
+/* l'animazione d'ingresso delle schermate finisce con transform:none e
+   scentrerebbe il pedale, che è fisso e centrato via translateX(-50%) */
+.screen.on > .pedale{animation:none}
+.pedale.via{opacity:0;pointer-events:none;transform:translateX(-50%) scale(.9)}
+.pedale:active{transform:translateX(-50%) scale(.95);border-color:rgba(255,216,138,.75)}
+.ped{width:22px;height:29px;display:block;flex-shrink:0}
+.ped-terra{fill:rgba(255,255,255,.28)}
+.ped-piatto{fill:#3a2a48;stroke:rgba(255,216,138,.85);stroke-width:1.4;
+  transform-origin:50% 10%;animation:invito 2.6s ease-in-out infinite}
+.ped-righe{stroke:rgba(255,216,138,.8);stroke-width:1.4;stroke-linecap:round}
+.ped-gruppo{transform-origin:50% 10%;transition:transform .16s var(--pop)}
+.pedale:active .ped-gruppo{transform:rotate(19deg) translateY(1px)}
+.pedale:active .ped-piatto{animation:none}
+/* ogni tanto il pedale accenna una premuta, per farsi notare */
+@keyframes invito{0%,84%,100%{transform:rotate(0)}90%{transform:rotate(10deg)}}
+/* scie di velocità che scattano alla pressione */
+.scie{opacity:0;transition:opacity .12s}
+.pedale:active .scie{opacity:1}
 .row .ic{font-size:1.35rem;line-height:1.25;flex-shrink:0;text-shadow:none;
   filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
 .row b{display:block;font-size:.97rem;margin-bottom:3px}
@@ -365,8 +391,20 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .done span{font-size:.95rem;letter-spacing:0}
 .ps{margin-top:18px;font-size:.88rem;opacity:.9;font-style:italic;text-shadow:var(--sh);display:none}
 .ps.on{display:block;animation:rise .6s var(--ease) .25s both}
-.back{margin-top:14px;font-size:.87rem;opacity:.8;text-decoration:underline;text-underline-offset:3px;
-  background:none;border:0;color:var(--ink);padding:10px;font-weight:400;text-shadow:var(--sh)}
+/* durante il viaggio sta nascosto: finirebbe sotto il pedale fisso */
+.back{display:none}
+.back.on{margin-top:15px;display:inline-flex;align-items:center;gap:8px;
+  animation:rise .6s var(--ease) .4s both;
+  padding:13px 22px;border-radius:100px;font-size:.85rem;font-weight:500;
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.26);
+  color:var(--ink);text-shadow:var(--sh);
+  box-shadow:0 6px 18px -10px rgba(0,0,0,.6);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  transition:transform .15s var(--pop),border-color .25s,background .25s}
+.back:active{transform:scale(.96);background:rgba(255,255,255,.17);
+  border-color:rgba(255,216,138,.6)}
+.back .frecciaind{transition:transform .2s var(--pop)}
+.back:active .frecciaind{transform:translateX(-4px)}
 
 /* ---------- indicatore passi ---------- */
 .steps{position:fixed;left:50%;transform:translateX(-50%);z-index:6;display:flex;gap:7px;
@@ -436,7 +474,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .foot{margin-top:9px;font-size:.6rem;padding-right:104px}
   .cta{margin-top:10px;padding:13px 26px;font-size:.98rem}
   .viaggio{margin-top:12px}.row{padding:10px 13px}
-  .hint{margin-top:11px;font-size:.72rem}
+  .pedale{bottom:calc(40px + env(safe-area-inset-bottom));padding:7px 16px 7px 10px;font-size:.75rem}
+  .ped{width:19px;height:25px}
+  .back{margin-top:11px;padding:11px 18px;font-size:.8rem}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
   .doc,.field,.stamp,.cta,.opt,.row,body,.steps{opacity:1!important}}
@@ -558,10 +598,28 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
     </div>
     <div class="plan" id="p-rows"></div>
   </div>
-  <p class="hint" id="hint">tocca per andare avanti più in fretta</p>
+  <button class="pedale" id="pedale" aria-label="accelera">
+    <svg class="ped" viewBox="0 0 30 40" aria-hidden="true">
+      <g class="scie" stroke="rgba(255,216,138,.9)" stroke-width="1.6" stroke-linecap="round">
+        <line x1="27" y1="12" x2="30" y2="12"/>
+        <line x1="27" y1="19" x2="30" y2="19"/>
+        <line x1="27" y1="26" x2="30" y2="26"/>
+      </g>
+      <rect class="ped-terra" x="2" y="35" width="26" height="4" rx="2"/>
+      <g class="ped-gruppo">
+        <rect class="ped-piatto" x="6" y="2.5" width="17" height="31" rx="4.5"/>
+        <g class="ped-righe">
+          <line x1="10" y1="11" x2="19" y2="11"/>
+          <line x1="10" y1="18" x2="19" y2="18"/>
+          <line x1="10" y1="25" x2="19" y2="25"/>
+        </g>
+      </g>
+    </svg>
+    Accelera
+  </button>
   <div class="done" id="done"><span>✓</span> Art. 5 accettato, allegato A compilato — contratto firmato</div>
   <p class="ps" id="p-ps"></p>
-  <button class="back" id="back">no aspetta, fammi vedere le altre</button>
+  <button class="back" id="back"><span class="frecciaind">←</span> fammi vedere le altre</button>
 </section>
 
 <div class="steps" id="steps"><i class="on"></i><i></i><i></i><i></i></div>
@@ -890,7 +948,7 @@ var OPZIONI = [
 
   /* ---------- il viaggio a tappe ---------- */
   var auto=document.getElementById('auto'), brum=document.getElementById('brum'),
-      fatta=document.getElementById('fatta'), hint=document.getElementById('hint'),
+      fatta=document.getElementById('fatta'), pedale=document.getElementById('pedale'),
       done=document.getElementById('done'), ps=document.getElementById('p-ps'),
       viaggio=document.querySelector('.viaggio');
   var tappa=-1, inViaggio=false;
@@ -912,8 +970,9 @@ var OPZIONI = [
     brum.classList.remove('on');
     fatta.style.transitionDuration='';
     fatta.style.height='0px';
-    hint.classList.remove('via');
+    pedale.classList.remove('via');
     done.classList.remove('on'); ps.classList.remove('on');
+    document.getElementById('back').classList.remove('on');
   }
 
   /* 9 · TIMING — ogni tratta ha la sua durata, non sono tutte uguali */
@@ -992,20 +1051,22 @@ var OPZIONI = [
     },220);
   }
 
-  /* toccare il viaggio salta la sosta e riparte subito */
+  /* il pedale (o un tocco sul viaggio) salta la sosta e riparte subito */
   function accelera(){
     if(inViaggio || !attesa) return;
     clearTimeout(attesa); attesa=null;
-    hint.classList.add('via');
+    buzz(14);
     vaiAllaTappa();
   }
+  pedale.addEventListener('click',accelera);
   viaggio.addEventListener('click',accelera);
 
   function finale(){
     inViaggio=false;
-    hint.classList.add('via');
+    pedale.classList.add('via');
     done.classList.add('on');
     ps.classList.add('on');
+    document.getElementById('back').classList.add('on');
     hearts(); buzz([10,70,10]);
   }
 
