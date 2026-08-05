@@ -479,11 +479,13 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 /* ---------- il brindisi ---------- */
 .tavolo{position:relative;height:230px;margin-top:6px;touch-action:none}
 .calice{position:absolute;bottom:14px;width:96px;height:150px;
-  filter:drop-shadow(0 10px 18px rgba(0,0,0,.55))}
+  filter:drop-shadow(0 10px 18px rgba(0,0,0,.55));
+  transition:transform .38s var(--pop),opacity .25s}
 .calice svg{width:100%;height:100%;display:block}
-#calA{left:6%}
-#calB{right:6%;cursor:grab}
-#calB.presa{cursor:grabbing}
+#calA{left:16%}
+#calB{right:16%;cursor:grab}
+#calB.presa{cursor:grabbing;transition:none}
+.calice.rotto{opacity:0;transform:scale(.9)!important}
 .vetro-c{fill:rgba(255,255,255,.16);stroke:rgba(255,255,255,.5);stroke-width:2}
 .vino{fill:url(#bollicine)}
 .stelo,.piede{fill:rgba(255,255,255,.34)}
@@ -491,9 +493,26 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 #calB.attesa{animation:invitoCalice 2.2s ease-in-out infinite}
 @keyframes invitoCalice{0%,100%{transform:translateX(0) rotate(0)}
   50%{transform:translateX(-14px) rotate(-7deg)}}
-.manina{position:absolute;right:6%;bottom:-4px;font-size:1.5rem;opacity:.75;
+.manina{position:absolute;right:calc(16% + 96px);bottom:74px;font-size:1.6rem;opacity:.8;
   animation:invitoCalice 2.2s ease-in-out infinite;pointer-events:none}
 .tavolo.fatto .manina{display:none}
+
+/* --- cocci e vino rovesciato --- */
+.coccio{position:absolute;width:0;height:0;pointer-events:none;
+  border-left:6px solid transparent;border-right:6px solid transparent;
+  border-bottom:13px solid rgba(255,255,255,.62);
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+  animation:coccioVia 1s cubic-bezier(.3,.7,.5,1) forwards}
+@keyframes coccioVia{
+  0%  {opacity:1;transform:translate(0,0) rotate(0) scale(1)}
+  100%{opacity:0;transform:translate(var(--cx),var(--cy)) rotate(var(--cr)) scale(.5)}}
+.pozza{position:absolute;pointer-events:none;height:12px;border-radius:50%;
+  background:radial-gradient(rgba(255,154,107,.6),rgba(255,107,138,.15));
+  transform:translateX(-50%) scaleX(.2);opacity:0;
+  animation:pozzaVia .8s ease-out forwards}
+@keyframes pozzaVia{to{opacity:1;transform:translateX(-50%) scaleX(1)}}
+.riprova{display:none}
+.riprova.on{display:inline-flex;margin-top:8px;animation:rise .5s var(--ease) .35s both}
 /* scintille del cin */
 .cin{position:absolute;pointer-events:none;font-weight:800;color:var(--gold);
   font-size:1.4rem;text-shadow:0 2px 10px rgba(0,0,0,.5);
@@ -655,6 +674,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .sigblock{margin-top:9px}.sigimg{height:38px}
   .art5{margin-top:8px;padding:8px 10px}.art5 dd{font-size:.82rem}
   .tavolo{height:168px;margin-top:2px}.calice{width:72px;height:114px;bottom:10px}
+  .manina{right:calc(16% + 74px);bottom:56px;font-size:1.35rem}
   .vaifirma2.on{margin-top:4px;padding:12px 22px;font-size:.9rem}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
@@ -827,8 +847,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
         <rect class="piede" x="26" y="128" width="44" height="7" rx="3.5"/>
       </svg>
     </div>
-    <span class="manina">👆</span>
+    <span class="manina">👈</span>
   </div>
+  <button class="ghostbtn riprova" id="riprova">Rimettiamo a posto 🧹</button>
   <button class="cta vaifirma2" id="vaifirma2">Firma il contratto ✍️</button>
 </section>
 
@@ -1543,73 +1564,147 @@ var OPZIONI = [
   var tavolo=document.getElementById('tavolo'), calA=document.getElementById('calA'),
       calB=document.getElementById('calB'), bsub=document.getElementById('b-sub'),
       vaifirma2=document.getElementById('vaifirma2');
-  var trascino=false, dx0=0, fatto=false;
+  var riprova=document.getElementById('riprova');
+  var trascino=false, dx0=0, fatto=false, rotto=false, campioni=[];
+  var TROPPO=1.75;      /* px/ms: oltre questa foga i calici si rompono */
+  /* i tempi della rottura vanno spenti al ripristino, altrimenti i cocci
+     spuntavano dopo aver rimesso a posto */
+  var bTimer=[];
+  function bT(fn,ms){ var id=setTimeout(fn,ms); bTimer.push(id); return id; }
+  function spegniB(){ bTimer.forEach(clearTimeout); bTimer=[]; }
 
   function brindisiReset(){
-    fatto=false; trascino=false;
-    calB.style.transform=''; calB.classList.add('attesa');
-    calA.style.transform='';
+    spegniB();
+    fatto=false; rotto=false; trascino=false; campioni=[];
+    calB.style.transform=''; calB.classList.remove('rotto','presa'); calB.classList.add('attesa');
+    calA.style.transform=''; calA.classList.remove('rotto');
     tavolo.classList.remove('fatto');
     bsub.textContent='Trascina il tuo calice sul mio.';
     vaifirma2.classList.remove('on');
-    Array.prototype.forEach.call(tavolo.querySelectorAll('.cin,.scintilla'),function(e){e.remove();});
+    riprova.classList.remove('on');
+    Array.prototype.forEach.call(tavolo.querySelectorAll('.cin,.scintilla,.coccio,.pozza'),
+      function(e){e.remove();});
+  }
+  riprova.addEventListener('click',function(){ buzz(10); brindisiReset(); });
+
+  /* velocità misurata su una finestra di campioni: con un solo delta i
+     movimenti ravvicinati darebbero valori assurdi */
+  function velocita(){
+    if(campioni.length<2) return 0;
+    var a=campioni[0], b=campioni[campioni.length-1];
+    var dt=b.t-a.t, dx=Math.abs(b.x-a.x);
+    if(dt>=12) return dx/dt;
+    /* una sbracciata fulminea produce pochissimi eventi e una finestra di
+       tempo troppo corta per essere misurata: la si riconosce dallo scatto */
+    return dx>70 ? 99 : 0;
   }
 
   calB.addEventListener('pointerdown',function(e){
-    if(fatto) return;
+    if(fatto||rotto) return;
     e.preventDefault();
     try{ calB.setPointerCapture(e.pointerId); }catch(_){}
     trascino=true; calB.classList.remove('attesa'); calB.classList.add('presa');
     tavolo.classList.add('fatto');           /* via la manina */
-    dx0=e.clientX;
+    dx0=e.clientX; campioni=[{x:e.clientX,t:performance.now()}];
     buzz(6);
   });
   calB.addEventListener('pointermove',function(e){
-    if(!trascino||fatto) return;
+    if(!trascino||fatto||rotto) return;
+    campioni.push({x:e.clientX,t:performance.now()});
+    if(campioni.length>7) campioni.shift();
     var d=Math.min(0,e.clientX-dx0);         /* si muove solo verso sinistra */
     calB.style.transform='translateX('+d+'px) rotate('+Math.max(-16,d/9)+'deg)';
-    var a=calA.getBoundingClientRect(), b=calB.getBoundingClientRect();
-    if(b.left < a.right-18) cin();
+    /* contatto calcolato sul layout + lo spostamento noto, non sui rettangoli */
+    if(calB.offsetLeft+d < calA.offsetLeft+calA.offsetWidth-18){
+      if(velocita()>TROPPO) rompi(); else cin();
+    }
   });
   ['pointerup','pointercancel'].forEach(function(ev){
     calB.addEventListener(ev,function(){
       trascino=false; calB.classList.remove('presa');
-      if(!fatto){ calB.style.transform=''; calB.classList.add('attesa'); }
+      if(!fatto&&!rotto){ calB.style.transform=''; calB.classList.add('attesa'); }
     });
   });
-  /* ripiego: se non trascina, un tocco su un calice fa comunque cin */
-  calA.addEventListener('click',function(){ if(!fatto) cin(); });
+  /* ripiego: se non trascina, un tocco sul calice fa comunque cin */
+  calA.addEventListener('click',function(){ if(!fatto&&!rotto) cin(); });
+
+  /* Tutta la geometria in coordinate di layout (offsetLeft/offsetWidth):
+     getBoundingClientRect include le trasformazioni, e cambiare transform non
+     invalida il layout — misurando così i calici non si incontravano mai. */
+  function avvicina(){
+    var W=tavolo.clientWidth, centro=W/2;
+    var aFine=calA.offsetLeft+calA.offsetWidth, bInizio=calB.offsetLeft;
+    calA.style.transform='translateX('+Math.round(centro-5-aFine)+'px) rotate(11deg)';
+    calB.style.transform='translateX('+Math.round(centro+5-bInizio)+'px) rotate(-15deg)';
+    return {x:Math.round(centro), y:Math.round(calA.offsetTop+12)};
+  }
 
   function cin(){
-    if(fatto) return;
+    if(fatto||rotto) return;
     fatto=true; trascino=false;
     calB.classList.remove('attesa','presa');
-    var a=calA.getBoundingClientRect(), t=tavolo.getBoundingClientRect();
-    calB.style.transform='translateX(-'+Math.round(calB.getBoundingClientRect().left-a.right+22)+'px) rotate(-15deg)';
-    calA.style.transform='rotate(11deg)';
+    var p=avvicina();
     buzz([18,50,18]);
 
-    var cx=Math.round(a.right-t.left+4), cy=Math.round(a.top-t.top+8);
     var e=document.createElement('div');
     e.className='cin'; e.textContent='cin!';
-    e.style.left=cx+'px'; e.style.top=cy+'px';
+    e.style.left=p.x+'px'; e.style.top=p.y+'px';
     tavolo.appendChild(e);
     for(var i=0;i<12;i++){
       (function(k){
         var s=document.createElement('div'); s.className='scintilla';
         var ang=(-30-k*10)*Math.PI/180, r=40+Math.random()*46;
-        s.style.left=cx+'px'; s.style.top=(cy+12)+'px';
+        s.style.left=p.x+'px'; s.style.top=(p.y+12)+'px';
         s.style.setProperty('--sx',Math.round(Math.cos(ang)*r)+'px');
         s.style.setProperty('--sy',Math.round(Math.sin(ang)*r)+'px');
         s.style.animationDelay=(k*18)+'ms';
         tavolo.appendChild(s);
-        setTimeout(function(){ s.remove(); },1100);
+        setTimeout(function(){ s.remove(); },1200);
       })(i);
     }
     setTimeout(function(){ e.remove(); },1000);
     hearts();
     bsub.textContent='Ecco. Ora è ufficiale.';
     setTimeout(function(){ vaifirma2.classList.add('on'); },500);
+  }
+
+  /* troppa foga: si rompono */
+  function rompi(){
+    if(fatto||rotto) return;
+    rotto=true; trascino=false;
+    calB.classList.remove('attesa','presa');
+    var p=avvicina();
+    buzz([40,30,40,30,60]);
+
+    bT(function(){
+      calA.classList.add('rotto'); calB.classList.add('rotto');
+      var e=document.createElement('div');
+      e.className='cin'; e.textContent='crac!';
+      e.style.left=p.x+'px'; e.style.top=p.y+'px';
+      tavolo.appendChild(e);
+      bT(function(){ e.remove(); },1000);
+
+      for(var i=0;i<16;i++){
+        (function(k){
+          var c=document.createElement('div'); c.className='coccio';
+          var ang=(-160+k*20)*Math.PI/180, r=50+Math.random()*70;
+          c.style.left=p.x+'px'; c.style.top=(p.y+26)+'px';
+          c.style.setProperty('--cx',Math.round(Math.cos(ang)*r)+'px');
+          c.style.setProperty('--cy',Math.round(Math.abs(Math.sin(ang))*r*0.5+50)+'px');
+          c.style.setProperty('--cr',Math.round(-260+Math.random()*520)+'deg');
+          c.style.animationDelay=(k*12)+'ms';
+          tavolo.appendChild(c);
+          bT(function(){ c.remove(); },1400);
+        })(i);
+      }
+      var pz=document.createElement('div');
+      pz.className='pozza';
+      pz.style.left=p.x+'px'; pz.style.bottom='12px'; pz.style.width='150px';
+      tavolo.appendChild(pz);
+
+      bsub.textContent='Ops. Un po\' troppo entusiasmo.';
+      bT(function(){ riprova.classList.add('on'); },600);
+    },220);
   }
 
   /* ---------- la firma col dito ---------- */
