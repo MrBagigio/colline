@@ -344,9 +344,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .row.arrivo{animation:arriva .6s var(--pop);border-color:rgba(255,216,138,.6)}
 @keyframes arriva{0%{transform:scale(1)}42%{transform:scale(1.04)}100%{transform:scale(1)}}
 
-.avanti{margin-top:20px;position:relative}
-.avanti .frec{display:inline-block;animation:frecc 1.1s ease-in-out infinite}
-@keyframes frecc{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+.hint{margin-top:16px;font-size:.78rem;opacity:.5;font-style:italic;text-shadow:var(--sh);
+  transition:opacity .6s}
+.hint.via{opacity:0}
 .row .ic{font-size:1.35rem;line-height:1.25;flex-shrink:0;text-shadow:none;
   filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
 .row b{display:block;font-size:.97rem;margin-bottom:3px}
@@ -512,7 +512,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
     </div>
     <div class="plan" id="p-rows"></div>
   </div>
-  <button class="cta avanti" id="avanti">Si parte 🚗</button>
+  <p class="hint" id="hint">tocca per andare avanti più in fretta</p>
   <div class="done" id="done"><span>✓</span> Art. 5 accettato, allegato A compilato — contratto firmato</div>
   <p class="ps" id="p-ps"></p>
   <button class="back" id="back">no aspetta, fammi vedere le altre</button>
@@ -825,13 +825,21 @@ var OPZIONI = [
 
   /* ---------- il viaggio a tappe ---------- */
   var auto=document.getElementById('auto'), brum=document.getElementById('brum'),
-      fatta=document.getElementById('fatta'), avanti=document.getElementById('avanti'),
+      fatta=document.getElementById('fatta'), hint=document.getElementById('hint'),
       done=document.getElementById('done'), ps=document.getElementById('p-ps'),
       viaggio=document.querySelector('.viaggio');
   var tappa=-1, inViaggio=false;
   var VERSI=['brum brum','vrooom','brum!','ci siamo quasi'];
 
+  /* tutti i timer del viaggio in un registro: cambiando meta a metà strada
+     vanno spenti, altrimenti continuano a scattare sul viaggio nuovo */
+  var timers=[], attesa=null;
+  function T(fn,ms){ var id=setTimeout(fn,ms); timers.push(id); return id; }
+  function spegniTimer(){ timers.forEach(clearTimeout); timers=[]; attesa=null; }
+  function pausa(fn,ms){ attesa=T(function(){ attesa=null; fn(); },ms); }
+
   function resetViaggio(){
+    spegniTimer();
     tappa=-1; inViaggio=false;
     auto.style.top='0px'; auto.classList.remove('guida','carica','frena');
     viaggio.classList.remove('inmoto');
@@ -839,8 +847,7 @@ var OPZIONI = [
     brum.classList.remove('on');
     fatta.style.transitionDuration='';
     fatta.style.height='0px';
-    avanti.style.display='';
-    avanti.innerHTML='Si parte 🚗';
+    hint.classList.remove('via');
     done.classList.remove('on'); ps.classList.remove('on');
   }
 
@@ -858,27 +865,31 @@ var OPZIONI = [
     setTimeout(function(){ p.remove(); },850);
   }
 
+  var SOSTA=1900;                 /* quanto resta ferma su ogni tappa, per leggerla */
+
   function vaiAllaTappa(){
     if(inViaggio) return;
     var rows=document.querySelectorAll('#p-rows .row');
+    if(!rows.length) return;
+    var base=viaggio.getBoundingClientRect();
+    if(base.height===0){ T(vaiAllaTappa,200); return; }   /* schermata non ancora in pagina */
+
     if(tappa>=0 && rows[tappa]) rows[tappa].classList.remove('qui');
     tappa++;
     if(tappa>=rows.length){ finale(); return; }
     inViaggio=true;
 
     var row=rows[tappa];
-    var base=viaggio.getBoundingClientRect();
     var y0=parseFloat(auto.style.top)||0;
     var y=Math.round(row.getBoundingClientRect().top-base.top+16);
     var dur=DURATE[Math.min(tappa,DURATE.length-1)];
 
-    avanti.innerHTML='In viaggio...';
     buzz(12);
 
     /* 1 · anticipazione: si carica indietro */
     auto.classList.add('carica');
 
-    setTimeout(function(){
+    T(function(){
       auto.classList.remove('carica');
       auto.classList.add('guida');
       viaggio.classList.add('inmoto');
@@ -891,13 +902,13 @@ var OPZIONI = [
 
       /* 8 · azione secondaria: gli sbuffi seguono la macchina lungo il tragitto */
       for(var i=1;i<=6;i++){
-        (function(k){ setTimeout(function(){
+        (function(k){ T(function(){
           if(inViaggio) sbuffo(y0+(y-y0)*(k/7));
         }, dur*k/7); })(i);
       }
 
       /* 3 · follow through: arriva, frena, si schiaccia e si assesta */
-      setTimeout(function(){
+      T(function(){
         auto.classList.remove('guida');
         viaggio.classList.remove('inmoto');
         auto.classList.add('frena');
@@ -905,28 +916,33 @@ var OPZIONI = [
         row.classList.remove('locked');
         row.classList.add('qui','visto','arrivo');
         buzz([8,40,8]);
-        setTimeout(function(){
+        T(function(){
           auto.classList.remove('frena');
           row.classList.remove('arrivo');
         },660);
         inViaggio=false;
-        avanti.innerHTML = (tappa>=rows.length-1)
-          ? 'Siamo arrivati 🥂'
-          : 'Avanti <span class="frec">→</span>';
+        /* sosta per leggere la tappa, poi riparte da sola */
+        pausa(vaiAllaTappa, SOSTA);
       },dur);
     },220);
   }
 
+  /* toccare il viaggio salta la sosta e riparte subito */
+  function accelera(){
+    if(inViaggio || !attesa) return;
+    clearTimeout(attesa); attesa=null;
+    hint.classList.add('via');
+    vaiAllaTappa();
+  }
+  viaggio.addEventListener('click',accelera);
+
   function finale(){
-    avanti.style.display='none';
+    inViaggio=false;
+    hint.classList.add('via');
     done.classList.add('on');
     ps.classList.add('on');
     hearts(); buzz([10,70,10]);
   }
-
-  avanti.addEventListener('click',vaiAllaTappa);
-  /* si può anche toccare la macchina per farla partire */
-  auto.addEventListener('click',function(){ if(tappa<0) vaiAllaTappa(); });
 
   function scegli(o){
     buzz(18);
@@ -941,6 +957,7 @@ var OPZIONI = [
     });
     resetViaggio();
     show(s3); hearts();
+    T(vaiAllaTappa,950);          /* parte da sola appena la schermata è entrata */
   }
 
   document.getElementById('back').addEventListener('click',function(){ show(s2); });
