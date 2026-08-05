@@ -23,7 +23,7 @@
   --hill-1:#5a3a60; --hill-2:#3c2547; --hill-3:#241630; --hill-4:#150d1e;
   --ink:#ffffff; --gold:#ffd88a; --rose:#ff7a92;
   --glass:linear-gradient(rgba(255,255,255,.11),rgba(255,255,255,.045)),rgba(28,16,42,.72);
-  --sh:0 1px 3px rgba(0,0,0,.6), 0 2px 20px rgba(0,0,0,.4);
+  --sh:0 1px 2px rgba(0,0,0,.7), 0 2px 10px rgba(0,0,0,.45);
   --ease:cubic-bezier(.22,.9,.28,1);
   --pop:cubic-bezier(.34,1.5,.5,1);
 }
@@ -45,6 +45,9 @@ body{
 @keyframes pageIn{from{opacity:0}to{opacity:1}}
 
 /* ---------- cielo ---------- */
+/* lo strato immobile: un solo elemento, tante stelle disegnate come ombre */
+.cielofisso{position:fixed;left:0;top:0;width:1.6px;height:1.6px;border-radius:50%;
+  z-index:0;pointer-events:none}
 .star{position:fixed;border-radius:50%;background:#fff;z-index:0;pointer-events:none;
   animation:tw 4s ease-in-out infinite}
 @keyframes tw{0%,100%{opacity:var(--o)}50%{opacity:calc(var(--o) * .22)}}
@@ -207,11 +210,12 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .spot{position:fixed;z-index:7;pointer-events:none;border-radius:50%;
   background:radial-gradient(circle,rgba(255,216,138,.34) 0%,rgba(255,150,110,.15) 45%,rgba(255,216,138,0) 72%);
   opacity:0;transform:scale(.7);transition:opacity .7s,transform .9s var(--ease)}
+/* respira con l'opacità, non con un filtro: animare `filter` fa ridisegnare */
 .spot.on{opacity:1;transform:scale(1);animation:spotBreathe 2.4s ease-in-out infinite}
-@keyframes spotBreathe{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4)}}
+@keyframes spotBreathe{0%,100%{opacity:.75}50%{opacity:1}}
 
-#s1.dim .kicker,#s1.dim h1,#s1.dim .sub{opacity:.24;filter:blur(1.5px)}
-#s1 .kicker,#s1 h1,#s1 .sub{transition:opacity .7s,filter .7s}
+#s1.dim .kicker,#s1.dim h1,#s1.dim .sub{opacity:.22}
+#s1 .kicker,#s1 h1,#s1 .sub{transition:opacity .7s}
 
 /* niente animazione d'ingresso qui: il suo fotogramma finale (opacity:1) con
    fill-mode:both vince sulla classe .on e il messaggio non si spegneva più,
@@ -337,8 +341,10 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   background:linear-gradient(rgba(255,216,138,.95),rgba(255,170,110,.85));
   box-shadow:0 0 10px rgba(255,216,138,.6);transition:height .95s cubic-bezier(.4,0,.25,1)}
 /* ---- la macchina: 12 principi ---- */
+/* si sposta con transform, non con `top`: animare `top` rifà il layout a ogni
+   fotogramma ed è la causa principale degli scatti sul telefono */
 .auto{position:absolute;left:4px;top:0;width:35px;z-index:3;
-  transition:top var(--dur,1s) cubic-bezier(.45,0,.3,1)}
+  transition:transform var(--dur,1s) cubic-bezier(.45,0,.3,1)}
 .telaio{position:relative;transform-origin:50% 62%}
 .carro{display:block;width:100%;height:auto;
   filter:drop-shadow(0 7px 11px rgba(0,0,0,.6));transform-origin:50% 62%}
@@ -404,7 +410,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .row:before{content:'';position:absolute;left:-29px;top:20px;width:9px;height:9px;border-radius:50%;
   background:rgba(255,255,255,.3);box-shadow:0 0 0 3px rgba(28,16,42,.75);
   transition:background .45s,transform .45s var(--pop)}
-.row.locked{opacity:.26;filter:grayscale(1) blur(1.3px)}
+/* niente blur: sfocare quattro schede e poi animarne la transizione è una
+   delle cose che iOS fatica di più a comporre. Grigio + trasparenza bastano. */
+.row.locked{opacity:.24;filter:grayscale(1)}
 .row.qui:before{background:var(--gold);transform:scale(1.45);
   box-shadow:0 0 0 3px rgba(28,16,42,.75),0 0 12px rgba(255,216,138,.9)}
 .row.visto:before{background:var(--gold)}
@@ -966,16 +974,16 @@ var OPZIONI = [
     ]
   },
   {
-    em:'🏛️', nome:'Verona, senza fretta',
-    teaser:'L\'Arena, i vicoli, il tramonto dall\'alto sull\'Adige',
-    titolo:'Verona, <em>senza fretta</em>.',
-    sub:'Un\'ora e dieci. Una città vera, non un giro turistico.',
-    ps:'P.S. — la scalinata la saliamo piano, promesso.',
+    em:'🌉', nome:'Il ponte sul Brenta',
+    teaser:'Bassano, il ponte di legno, e poi si sconfina al tramonto',
+    titolo:'Il <em>ponte</em> sul Brenta.',
+    sub:'Bassano, e per il tramonto si passa il confine verso Possagno.',
+    ps:'P.S. — un goccio si può. Tanto guido io.',
     tappe:[
-      ['🚗','Ti vengo a prendere','Un\'ora e dieci verso ovest, si arriva che è ancora pieno giorno.'],
-      ['🏛️','L\'Arena e le vie','Piazza Bra, i vicoli di pietra, le vetrine. Camminare e basta.'],
-      ['🌉','Castel San Pietro','Si sale sopra i tetti: la città sotto e l\'Adige che gira.'],
-      ['🍷','Per chiudere','Un calice in centro mentre si accendono le luci.']
+      ['🚗','Ti vengo a prendere','Trentacinque minuti e siamo sul Brenta.'],
+      ['🌉','Il Ponte degli Alpini','Il ponte di legno di Palladio, il fiume sotto, le botteghe intorno.'],
+      ['🥃','Le grapperie','Due passi fra le distillerie storiche, giusto per dire di averlo fatto.'],
+      ['🌄','Possagno al tramonto','Si sconfina in Treviso: il tempio sul colle e tutta la pianura sotto.']
     ]
   },
   {
@@ -1008,15 +1016,31 @@ var OPZIONI = [
   function buzz(p){ if(navigator.vibrate){ try{ navigator.vibrate(p); }catch(e){} } }
 
   /* ---------- stelle ---------- */
+  /* Cinquanta stelle con cinquanta animazioni infinite tenevano occupato il
+     compositore tutto il tempo. Ora il grosso è un unico strato immobile
+     (una sola ombra multipla) e solo poche scintillano davvero. */
   (function stelle(){
+    /* in vw/vh: leggere innerHeight al caricamento poteva dare 0, il calcolo
+       finiva a NaN e il browser scartava tutta la regola — cielo senza stelle */
+    var ombre=[];
+    for(var i=0;i<38;i++){
+      var xp=(Math.random()*100).toFixed(1), yp=(Math.random()*46).toFixed(1);
+      var o=((1-yp/50)*0.7+0.12).toFixed(2);
+      ombre.push(xp+'vw '+yp+'vh 0 rgba(255,255,255,'+o+')');
+    }
+    var fisse=document.createElement('div');
+    fisse.className='cielofisso';
+    fisse.style.boxShadow=ombre.join(',');
+    document.body.appendChild(fisse);
+
     var frag=document.createDocumentFragment();
-    for(var i=0;i<50;i++){
+    for(var k=0;k<8;k++){
       var s=document.createElement('div');
       s.className='star';
-      var y=Math.random()*46, o=(1-y/50)*0.85+0.1, d=1+Math.random()*1.7;
-      s.style.left=(Math.random()*100)+'vw'; s.style.top=y+'vh';
+      var yy=Math.random()*40, d=1.4+Math.random()*1.4;
+      s.style.left=(Math.random()*100)+'vw'; s.style.top=yy+'vh';
       s.style.width=d+'px'; s.style.height=d+'px';
-      s.style.setProperty('--o',o.toFixed(2));
+      s.style.setProperty('--o',((1-yy/46)*0.85+0.15).toFixed(2));
       s.style.animationDelay=(Math.random()*4)+'s';
       frag.appendChild(s);
     }
@@ -1425,7 +1449,7 @@ var OPZIONI = [
       fatta=document.getElementById('fatta'), pedale=document.getElementById('pedale'),
       done=document.getElementById('done'), ps=document.getElementById('p-ps'),
       viaggio=document.querySelector('.viaggio');
-  var tappa=-1, inViaggio=false;
+  var tappa=-1, inViaggio=false, posAuto=0;
   var VERSI=['brum brum','vrooom','brum!','ci siamo quasi'];
 
   /* tutti i timer del viaggio in un registro: cambiando meta a metà strada
@@ -1437,8 +1461,8 @@ var OPZIONI = [
 
   function resetViaggio(){
     spegniTimer();
-    tappa=-1; inViaggio=false;
-    auto.style.top='0px'; auto.classList.remove('guida','carica','frena');
+    tappa=-1; inViaggio=false; posAuto=0;
+    auto.style.transform='translateY(0px)'; auto.classList.remove('guida','carica','frena');
     viaggio.classList.remove('inmoto');
     Array.prototype.forEach.call(viaggio.querySelectorAll('.puff'),function(p){p.remove();});
     brum.classList.remove('on');
@@ -1479,7 +1503,7 @@ var OPZIONI = [
     inViaggio=true;
 
     var row=rows[tappa];
-    var y0=parseFloat(auto.style.top)||0;
+    var y0=posAuto;
     var y=Math.round(row.getBoundingClientRect().top-base.top+16);
     var dur=DURATE[Math.min(tappa,DURATE.length-1)];
 
@@ -1493,7 +1517,7 @@ var OPZIONI = [
       auto.classList.add('guida');
       viaggio.classList.add('inmoto');
       auto.style.setProperty('--dur',dur+'ms');
-      auto.style.top=y+'px';
+      auto.style.transform='translateY('+y+'px)'; posAuto=y;
       fatta.style.transitionDuration=dur+'ms';
       fatta.style.height=Math.max(0,y+6)+'px';
       brum.textContent=VERSI[Math.min(tappa,VERSI.length-1)];
