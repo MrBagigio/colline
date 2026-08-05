@@ -101,16 +101,19 @@ h1 em{font-style:italic;color:var(--gold)}
 .field dt{flex:0 0 76px;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
   opacity:.62;font-weight:700}
 .field dd{font-size:.95rem;line-height:1.4}
-.fields .field:nth-child(1){animation-delay:.95s}
-.fields .field:nth-child(2){animation-delay:1.15s}
-.fields .field:nth-child(3){animation-delay:1.35s}
-.fields .field:nth-child(4){animation-delay:1.55s}
+.fields .field:nth-child(1){animation-delay:.9s}
+.fields .field:nth-child(2){animation-delay:1.06s}
+.fields .field:nth-child(3){animation-delay:1.22s}
+.fields .field:nth-child(4){animation-delay:1.38s}
+.fields .field:nth-child(5){animation-delay:1.54s}
+.menu{display:block;margin-top:3px;font-size:.72rem;line-height:1.4;font-style:normal;
+  opacity:.62;font-family:ui-monospace,Menlo,Consolas,monospace}
 @keyframes typein{from{opacity:0;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
 
 /* --- la clausola che manca: è tutto il gioco --- */
 .missing{margin-top:14px;border:1.5px dashed rgba(255,216,138,.62);border-radius:12px;
   padding:11px 13px;background:rgba(255,216,138,.07);
-  opacity:0;animation:rise .6s var(--ease) 1.85s both, pulse 2.6s ease-in-out 2.6s infinite}
+  opacity:0;animation:rise .6s var(--ease) 1.8s both, pulse 2.6s ease-in-out 2.6s infinite}
 @keyframes pulse{0%,100%{border-color:rgba(255,216,138,.45);background:rgba(255,216,138,.05)}
   50%{border-color:rgba(255,216,138,.9);background:rgba(255,216,138,.13)}}
 .missing dt{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
@@ -352,20 +355,22 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   <div class="doc">
     <div class="top"></div>
     <div class="inner">
-      <p class="prot">Prot. 10/08 — copia unica</p>
-      <h2>Contratto di gita</h2>
+      <p class="prot">Prot. 10/08 — copia per la controparte</p>
+      <h2>Contratto di baratto</h2>
       <div class="rule"></div>
       <dl class="fields">
         <div class="field"><dt>Oggetto</dt><dd>Una giornata fuori provincia</dd></div>
-        <div class="field"><dt>Data</dt><dd>Lunedì 10, dal pomeriggio</dd></div>
-        <div class="field"><dt>Parti</dt><dd>Io e te</dd></div>
-        <div class="field"><dt>Rientro</dt><dd>Per cena — con facoltà di prolungare a cena inclusa</dd></div>
+        <div class="field"><dt>Quando</dt><dd>Lunedì 10 — l'unico giorno che ti lasciano</dd></div>
+        <div class="field"><dt>Rientro</dt><dd>Per cena, con facoltà di prolungare a cena inclusa</dd></div>
+        <div class="field"><dt>In cambio</dt><dd>Una colazione serale
+          <em class="menu">uova con ketchup · toast bacon e maionese · cappuccino con caffè in bottiglia</em></dd></div>
+        <div class="field"><dt>Extra</dt><dd>Rapimento a scopo ricreativo — compreso nel prezzo</dd></div>
       </dl>
       <dl class="missing">
         <dt>Art. 5 — manca</dt>
-        <dd>da definire<span class="caret"></span></dd>
+        <dd>la destinazione<span class="caret"></span></dd>
       </dl>
-      <p class="foot">Letto per collazione serale.<br>Pronto per la firma, salvo la clausola mancante.</p>
+      <p class="foot">Visto dall'avvocato.<br>Pronto per la firma, salvo la clausola mancante.</p>
       <div class="stamp">Manca<small>1 clausola</small></div>
     </div>
   </div>
@@ -376,7 +381,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 <section class="screen" id="s1">
   <p class="kicker">Art. 5 — la clausola mancante</p>
   <h1>Lunedì, <em>fuori provincia</em>.</h1>
-  <p class="sub">Rientro per cena, salvo prolungare.<br>Manca solo la tua firma.</p>
+  <p class="sub">Il baratto regge. Manca solo la tua firma.</p>
   <div class="btns" id="btns">
     <button id="yes">Sì ✨</button>
     <button id="no">No</button>
