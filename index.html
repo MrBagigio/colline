@@ -67,6 +67,7 @@ body{
 .screen.on > *:nth-child(4){animation-delay:.33s}
 .screen.on > *:nth-child(5){animation-delay:.42s}
 .screen.on > *:nth-child(6){animation-delay:.51s}
+.screen.on > *:nth-child(7){animation-delay:.6s}
 @keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
 
 .kicker{font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;opacity:.9;
@@ -106,11 +107,28 @@ h1 em{font-style:italic;color:var(--gold)}
 .fields .field:nth-child(4){animation-delay:1.55s}
 @keyframes typein{from{opacity:0;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
 
+/* --- la clausola che manca: è tutto il gioco --- */
+.missing{margin-top:14px;border:1.5px dashed rgba(255,216,138,.62);border-radius:12px;
+  padding:11px 13px;background:rgba(255,216,138,.07);
+  opacity:0;animation:rise .6s var(--ease) 1.85s both, pulse 2.6s ease-in-out 2.6s infinite}
+@keyframes pulse{0%,100%{border-color:rgba(255,216,138,.45);background:rgba(255,216,138,.05)}
+  50%{border-color:rgba(255,216,138,.9);background:rgba(255,216,138,.13)}}
+.missing dt{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gold);font-weight:700;margin-bottom:5px}
+.missing dd{font-size:.95rem;opacity:.72;font-style:italic}
+.caret{display:inline-block;width:2px;height:.95em;vertical-align:-2px;margin-left:3px;
+  background:var(--gold);animation:blink 1.05s steps(1) infinite}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+.foot{margin-top:14px;padding-right:112px;font-size:.68rem;line-height:1.5;
+  color:rgba(255,255,255,.6);font-family:ui-monospace,Menlo,Consolas,monospace;
+  opacity:0;animation:rise .6s var(--ease) 2.1s both}
+
 .stamp{position:absolute;right:14px;bottom:11px;
   border:2px solid rgba(255,122,146,.85);border-radius:9px;padding:5px 10px;
   color:#ffa9b9;font-size:.58rem;font-weight:800;letter-spacing:.18em;text-align:center;
   box-shadow:inset 0 0 0 1px rgba(255,122,146,.35);text-transform:uppercase;line-height:1.3;
-  opacity:0;animation:slam .55s cubic-bezier(.3,1.5,.5,1) 2s forwards}
+  opacity:0;animation:slam .55s cubic-bezier(.3,1.5,.5,1) 2.35s forwards}
 .stamp small{display:block;font-size:.48rem;opacity:.75;letter-spacing:.1em}
 @keyframes slam{0%{opacity:0;transform:rotate(-34deg) scale(3)}
   55%{opacity:1;transform:rotate(-11deg) scale(.92)}
@@ -119,7 +137,7 @@ h1 em{font-style:italic;color:var(--gold)}
 .cta{margin-top:24px;background:var(--glass);border:1px solid rgba(255,255,255,.34);
   color:var(--ink);text-shadow:var(--sh);box-shadow:0 10px 28px -10px rgba(0,0,0,.6);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  opacity:0;animation:rise .7s var(--ease) 2.5s both;transition:transform .2s,border-color .25s}
+  opacity:0;animation:rise .7s var(--ease) 2.85s both;transition:transform .2s,border-color .25s}
 .cta:active{transform:scale(.96);border-color:rgba(255,216,138,.7)}
 
 /* ---------- bottoni ---------- */
@@ -260,7 +278,16 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
 .row b{display:block;font-size:.97rem;margin-bottom:3px}
 .row span{font-size:.88rem;opacity:.94;line-height:1.46}
-.ps{margin-top:24px;font-size:.88rem;opacity:.9;font-style:italic;text-shadow:var(--sh)}
+/* contratto completo */
+.done{display:inline-flex;align-items:center;gap:8px;margin-top:22px;
+  border:1.5px solid rgba(255,216,138,.7);border-radius:11px;padding:8px 13px;
+  background:rgba(255,216,138,.1);font-size:.68rem;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gold);text-shadow:none;
+  opacity:0;animation:stampIn .6s cubic-bezier(.3,1.5,.5,1) 1.15s both}
+@keyframes stampIn{0%{opacity:0;transform:scale(2.2)}
+  55%{opacity:1;transform:scale(.94)}100%{opacity:1;transform:none}}
+.done span{font-size:.95rem;letter-spacing:0}
+.ps{margin-top:18px;font-size:.88rem;opacity:.9;font-style:italic;text-shadow:var(--sh)}
 .back{margin-top:14px;font-size:.87rem;opacity:.8;text-decoration:underline;text-underline-offset:3px;
   background:none;border:0;color:var(--ink);padding:10px;font-weight:400;text-shadow:var(--sh)}
 
@@ -332,19 +359,24 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
         <div class="field"><dt>Oggetto</dt><dd>Una giornata fuori provincia</dd></div>
         <div class="field"><dt>Data</dt><dd>Lunedì 10, dal pomeriggio</dd></div>
         <div class="field"><dt>Parti</dt><dd>Io e te</dd></div>
-        <div class="field"><dt>Clausola</dt><dd>Rientro previsto per cena</dd></div>
+        <div class="field"><dt>Rientro</dt><dd>Per cena — con facoltà di prolungare a cena inclusa</dd></div>
       </dl>
-      <div class="stamp">Da firmare<small>in fondo</small></div>
+      <dl class="missing">
+        <dt>Art. 5 — manca</dt>
+        <dd>da definire<span class="caret"></span></dd>
+      </dl>
+      <p class="foot">Letto per collazione serale.<br>Pronto per la firma, salvo la clausola mancante.</p>
+      <div class="stamp">Manca<small>1 clausola</small></div>
     </div>
   </div>
-  <button class="cta" id="apri">Leggi la proposta →</button>
+  <button class="cta" id="apri">Aggiungi la clausola →</button>
 </section>
 
 <!-- ============ 1. LA DOMANDA ============ -->
 <section class="screen" id="s1">
-  <p class="kicker">Articolo unico</p>
+  <p class="kicker">Art. 5 — la clausola mancante</p>
   <h1>Lunedì, <em>fuori provincia</em>.</h1>
-  <p class="sub">Ti porto dove non sei mai stata.<br>Torniamo per cena. Devi solo firmare.</p>
+  <p class="sub">Rientro per cena, salvo prolungare.<br>Manca solo la tua firma.</p>
   <div class="btns" id="btns">
     <button id="yes">Sì ✨</button>
     <button id="no">No</button>
@@ -359,9 +391,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 
 <!-- ============ 2. LA SCELTA ============ -->
 <section class="screen" id="s2">
-  <p class="kicker">Firmato</p>
+  <p class="kicker">Firmato — resta la destinazione</p>
   <h1>Ora <em>scegli tu</em>.</h1>
-  <p class="sub">Quattro posti. Uno solo, lunedì.<br>Tocca quello che ti ispira di più.</p>
+  <p class="sub">Quattro posti. Uno solo, lunedì.<br>Quello che tocchi diventa l'articolo 5.</p>
   <div class="opts" id="opts"></div>
 </section>
 
@@ -371,6 +403,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   <h1 id="p-title"></h1>
   <p class="sub" id="p-sub"></p>
   <div class="plan" id="p-rows"></div>
+  <div class="done"><span>✓</span> Art. 5 compilato — contratto valido</div>
   <p class="ps" id="p-ps"></p>
   <button class="back" id="back">no aspetta, fammi vedere le altre</button>
 </section>
@@ -480,19 +513,29 @@ var OPZIONI = [
     document.body.appendChild(frag);
   })();
 
-  /* ---------- transizione tra schermate ---------- */
+  /* ---------- transizione tra schermate ----------
+     Il body è un flex row: se due schermate restassero visibili insieme si
+     dividerebbero la larghezza e il layout collasserebbe. Quindi:
+     1) i tocchi durante la transizione vengono ignorati
+     2) entrando si spegne SEMPRE tutto, non solo la schermata di partenza    */
+  var inTransizione=false, inCoda=null;
   function show(el){
+    if(inTransizione){ inCoda=el; return; }   /* non si perde: vince l'ultimo tocco */
     var idx=SCHERMI.indexOf(el);
     var cur=document.querySelector('.screen.on');
     function entra(){
+      SCHERMI.forEach(function(s){ s.classList.remove('on','out'); });
       el.classList.add('on');
       var dots=steps.children;
       for(var i=0;i<dots.length;i++) dots[i].classList.toggle('on', i===idx);
       window.scrollTo(0,0);
+      inTransizione=false;
+      if(inCoda){ var prox=inCoda; inCoda=null; if(prox!==el) show(prox); }
     }
     if(cur && cur!==el){
+      inTransizione=true;
       cur.classList.add('out');
-      setTimeout(function(){ cur.classList.remove('on','out'); entra(); },330);
+      setTimeout(entra,330);
     } else entra();
   }
 
