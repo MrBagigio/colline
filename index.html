@@ -259,23 +259,47 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .opt b{display:block;font-weight:600;font-size:1rem;margin-bottom:3px}
 .opt span{display:block;font-size:.86rem;opacity:.94;line-height:1.42}
 
-/* ---------- programma ---------- */
-.plan{margin-top:24px;text-align:left;display:flex;flex-direction:column;gap:11px}
+/* ---------- il viaggio: strada, macchina, tappe ---------- */
+.viaggio{position:relative;margin-top:22px;padding-left:46px}
+.strada{position:absolute;left:20px;top:8px;bottom:8px;width:3px;border-radius:2px;
+  background:repeating-linear-gradient(rgba(255,216,138,.5) 0 9px,rgba(255,216,138,0) 9px 18px)}
+/* la parte di strada già percorsa si accende */
+.fatta{position:absolute;left:20px;top:8px;width:3px;height:0;border-radius:2px;
+  background:linear-gradient(rgba(255,216,138,.95),rgba(255,170,110,.85));
+  box-shadow:0 0 10px rgba(255,216,138,.6);transition:height .95s cubic-bezier(.4,0,.25,1)}
+.auto{position:absolute;left:7px;top:0;font-size:1.75rem;line-height:1;z-index:3;
+  filter:drop-shadow(0 5px 9px rgba(0,0,0,.55));
+  transition:top .95s cubic-bezier(.4,0,.25,1)}
+.auto .mezzo{display:block}
+.auto.guida .mezzo{animation:sobbalzo .26s ease-in-out infinite}
+@keyframes sobbalzo{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(-4deg)}}
+.brum{position:absolute;left:100%;top:50%;white-space:nowrap;
+  background:#fffdf8;color:#241531;font-size:.62rem;font-weight:800;letter-spacing:.06em;
+  padding:4px 8px;border-radius:9px;box-shadow:0 6px 14px rgba(0,0,0,.4);
+  opacity:0;transform:translate(7px,-50%) scale(.5);transform-origin:left center;
+  transition:opacity .2s,transform .3s var(--pop)}
+.brum.on{opacity:1;transform:translate(7px,-50%) scale(1)}
+
+.plan{text-align:left;display:flex;flex-direction:column;gap:11px}
 .row{position:relative;display:flex;gap:14px;align-items:flex-start;background:var(--glass);
   border:1px solid rgba(255,255,255,.26);border-radius:17px;padding:15px 17px;text-shadow:var(--sh);
   box-shadow:0 8px 24px -12px rgba(0,0,0,.5);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  opacity:0;animation:rowIn .7s var(--ease) forwards}
-@keyframes rowIn{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
-.row:nth-child(1){animation-delay:.22s}.row:nth-child(2){animation-delay:.4s}
-.row:nth-child(3){animation-delay:.58s}.row:nth-child(4){animation-delay:.76s}
-/* il filo tra le tappe si allunga da solo */
-.row:not(:last-child):after{content:'';position:absolute;left:27px;top:100%;width:2px;height:0;
-  background:linear-gradient(rgba(255,216,138,.6),rgba(255,216,138,.15));
-  animation:link .35s ease-out forwards}
-.row:nth-child(1):after{animation-delay:.62s}.row:nth-child(2):after{animation-delay:.8s}
-.row:nth-child(3):after{animation-delay:.98s}
-@keyframes link{to{height:11px}}
+  transition:opacity .55s,filter .55s,border-color .4s}
+/* segnalino sulla strada, uno per tappa */
+.row:before{content:'';position:absolute;left:-29px;top:20px;width:9px;height:9px;border-radius:50%;
+  background:rgba(255,255,255,.3);box-shadow:0 0 0 3px rgba(28,16,42,.75);
+  transition:background .45s,transform .45s var(--pop)}
+.row.locked{opacity:.26;filter:grayscale(1) blur(1.3px)}
+.row.qui:before{background:var(--gold);transform:scale(1.45);
+  box-shadow:0 0 0 3px rgba(28,16,42,.75),0 0 12px rgba(255,216,138,.9)}
+.row.visto:before{background:var(--gold)}
+.row.arrivo{animation:arriva .6s var(--pop);border-color:rgba(255,216,138,.6)}
+@keyframes arriva{0%{transform:scale(1)}42%{transform:scale(1.04)}100%{transform:scale(1)}}
+
+.avanti{margin-top:20px;position:relative}
+.avanti .frec{display:inline-block;animation:frecc 1.1s ease-in-out infinite}
+@keyframes frecc{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
 .row .ic{font-size:1.35rem;line-height:1.25;flex-shrink:0;text-shadow:none;
   filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
 .row b{display:block;font-size:.97rem;margin-bottom:3px}
@@ -285,11 +309,13 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   border:1.5px solid rgba(255,216,138,.7);border-radius:11px;padding:8px 13px;
   background:rgba(255,216,138,.1);font-size:.68rem;font-weight:800;letter-spacing:.14em;
   text-transform:uppercase;color:var(--gold);text-shadow:none;
-  opacity:0;animation:stampIn .6s cubic-bezier(.3,1.5,.5,1) 1.15s both}
+  display:none}
+.done.on{display:inline-flex;animation:stampIn .6s cubic-bezier(.3,1.5,.5,1) both}
 @keyframes stampIn{0%{opacity:0;transform:scale(2.2)}
   55%{opacity:1;transform:scale(.94)}100%{opacity:1;transform:none}}
 .done span{font-size:.95rem;letter-spacing:0}
-.ps{margin-top:18px;font-size:.88rem;opacity:.9;font-style:italic;text-shadow:var(--sh)}
+.ps{margin-top:18px;font-size:.88rem;opacity:.9;font-style:italic;text-shadow:var(--sh);display:none}
+.ps.on{display:block;animation:rise .6s var(--ease) .25s both}
 .back{margin-top:14px;font-size:.87rem;opacity:.8;text-decoration:underline;text-underline-offset:3px;
   background:none;border:0;color:var(--ink);padding:10px;font-weight:400;text-shadow:var(--sh)}
 
@@ -315,7 +341,8 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .field{padding:7px 0}.field dd{font-size:.88rem}
   .cta{margin-top:18px;padding:15px 30px}
   .opts{gap:9px}.opt{padding:13px 30px 13px 15px}.opt .em{font-size:1.5rem}.opt span{font-size:.82rem}
-  .plan{margin-top:17px;gap:9px}.row{padding:12px 15px}.row span{font-size:.83rem}
+  .viaggio{margin-top:16px;padding-left:40px}.strada,.fatta{left:16px}.auto{left:3px;font-size:1.55rem}
+  .plan{gap:9px}.row{padding:12px 15px}.row span{font-size:.83rem}.row:before{left:-26px;top:17px}
   .ps{margin-top:15px}.maint p{padding:12px 14px;font-size:.85rem}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
@@ -406,8 +433,14 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   <p class="kicker">Lunedì 10</p>
   <h1 id="p-title"></h1>
   <p class="sub" id="p-sub"></p>
-  <div class="plan" id="p-rows"></div>
-  <div class="done"><span>✓</span> Art. 5 accettato, allegato A compilato — contratto firmato</div>
+  <div class="viaggio">
+    <div class="strada"></div>
+    <div class="fatta" id="fatta"></div>
+    <div class="auto" id="auto"><span class="mezzo">🚗</span><span class="brum" id="brum">brum brum</span></div>
+    <div class="plan" id="p-rows"></div>
+  </div>
+  <button class="cta avanti" id="avanti">Si parte 🚗</button>
+  <div class="done" id="done"><span>✓</span> Art. 5 accettato, allegato A compilato — contratto firmato</div>
   <p class="ps" id="p-ps"></p>
   <button class="back" id="back">no aspetta, fammi vedere le altre</button>
 </section>
@@ -717,17 +750,81 @@ var OPZIONI = [
     box.appendChild(b);
   });
 
+  /* ---------- il viaggio a tappe ---------- */
+  var auto=document.getElementById('auto'), brum=document.getElementById('brum'),
+      fatta=document.getElementById('fatta'), avanti=document.getElementById('avanti'),
+      done=document.getElementById('done'), ps=document.getElementById('p-ps');
+  var tappa=-1, inViaggio=false;
+  var VERSI=['brum brum','vrooom','brum!','ci siamo quasi'];
+
+  function resetViaggio(){
+    tappa=-1; inViaggio=false;
+    auto.style.top='0px'; auto.classList.remove('guida');
+    brum.classList.remove('on');
+    fatta.style.height='0px';
+    avanti.style.display='';
+    avanti.innerHTML='Si parte 🚗';
+    done.classList.remove('on'); ps.classList.remove('on');
+  }
+
+  function vaiAllaTappa(){
+    if(inViaggio) return;
+    var rows=document.querySelectorAll('#p-rows .row');
+    if(tappa>=0 && rows[tappa]) rows[tappa].classList.remove('qui');
+    tappa++;
+    if(tappa>=rows.length){ finale(); return; }
+    inViaggio=true;
+
+    var row=rows[tappa];
+    var base=document.querySelector('.viaggio').getBoundingClientRect();
+    var r=row.getBoundingClientRect();
+    var y=Math.round(r.top-base.top+16);          /* all'altezza del segnalino */
+
+    auto.classList.add('guida');
+    auto.style.top=y+'px';
+    fatta.style.height=Math.max(0,y+6)+'px';
+    brum.textContent=VERSI[Math.min(tappa,VERSI.length-1)];
+    brum.classList.add('on');
+    buzz(12);
+
+    avanti.innerHTML='In viaggio...';
+    setTimeout(function(){                        /* arrivo */
+      auto.classList.remove('guida');
+      brum.classList.remove('on');
+      row.classList.remove('locked');
+      row.classList.add('qui','visto','arrivo');
+      setTimeout(function(){ row.classList.remove('arrivo'); },700);
+      buzz([8,40,8]);
+      inViaggio=false;
+      avanti.innerHTML = (tappa>=rows.length-1)
+        ? 'Siamo arrivati 🥂'
+        : 'Avanti <span class="frec">→</span>';
+    },1000);
+  }
+
+  function finale(){
+    avanti.style.display='none';
+    done.classList.add('on');
+    ps.classList.add('on');
+    hearts(); buzz([10,70,10]);
+  }
+
+  avanti.addEventListener('click',vaiAllaTappa);
+  /* si può anche toccare la macchina per farla partire */
+  auto.addEventListener('click',function(){ if(tappa<0) vaiAllaTappa(); });
+
   function scegli(o){
     buzz(18);
     document.getElementById('p-title').innerHTML=o.titolo;
     document.getElementById('p-sub').textContent=o.sub;
-    document.getElementById('p-ps').textContent=o.ps;
+    ps.textContent=o.ps;
     var rows=document.getElementById('p-rows'); rows.innerHTML='';
     o.tappe.forEach(function(t){
-      var d=document.createElement('div'); d.className='row';
+      var d=document.createElement('div'); d.className='row locked';
       d.innerHTML='<div class="ic">'+t[0]+'</div><div><b>'+t[1]+'</b><span>'+t[2]+'</span></div>';
       rows.appendChild(d);
     });
+    resetViaggio();
     show(s3); hearts();
   }
 
