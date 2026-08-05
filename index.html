@@ -182,7 +182,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 
 #no{background:var(--glass);color:var(--ink);border:1px solid rgba(255,255,255,.42);
   text-shadow:var(--sh);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  box-shadow:0 6px 20px rgba(0,0,0,.28)}
+  box-shadow:0 6px 20px rgba(0,0,0,.28);
+  transition:transform .12s var(--pop),filter .5s,opacity .5s}
+#no:active{transform:scale(.93)}
 #no.broken{filter:grayscale(.7);opacity:.85}
 #no.center{position:fixed;z-index:8;margin:0;
   transition:left .85s cubic-bezier(.34,1.1,.45,1),top .85s cubic-bezier(.34,1.1,.45,1),
@@ -379,6 +381,23 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   15%{opacity:1}
   100%{opacity:0;transform:translate(var(--dx),-82vh) scale(1.25) rotate(var(--r))}}
 
+/* il contratto è la schermata più alta: si compatta prima delle altre,
+   così il bottone resta sempre nello schermo senza dover scorrere */
+@media (max-height:810px){
+  .doc .inner{padding:16px 17px 48px}
+  .doc h2{font-size:1.2rem}
+  .doc .prot{margin-bottom:7px}
+  .doc .rule{margin:9px 0 11px}
+  .field{padding:6px 0}
+  .field dd{font-size:.9rem}
+  .menu{font-size:.68rem;margin-top:2px}
+  .missing{margin-top:10px;padding:9px 12px}
+  .missing dd{font-size:.9rem}
+  .foot{margin-top:11px;font-size:.65rem}
+  .stamp{padding:4px 8px;font-size:.55rem}
+  .cta{margin-top:17px;padding:15px 30px}
+  #s0 .kicker{margin-bottom:12px}
+}
 @media (max-height:720px){
   .kicker{margin-bottom:12px}
   h1{font-size:clamp(1.65rem,7.2vw,2.25rem)}
@@ -391,6 +410,33 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .viaggio{margin-top:16px;padding-left:42px}.strada,.fatta{left:17px}.auto{left:1px;width:31px}
   .plan{gap:9px}.row{padding:12px 15px}.row span{font-size:.83rem}.row:before{left:-26px;top:17px}
   .ps{margin-top:15px}.maint p{padding:12px 14px;font-size:.85rem}
+}
+/* telefoni piccoli: tutto deve stare comunque in una schermata */
+@media (max-height:665px){
+  body{padding:calc(16px + env(safe-area-inset-top)) 16px calc(38px + env(safe-area-inset-bottom))}
+  .steps{bottom:calc(7px + env(safe-area-inset-bottom))}
+  .kicker{margin-bottom:8px;font-size:.67rem;letter-spacing:.2em}
+  h1{font-size:clamp(1.42rem,6.3vw,1.85rem);margin-bottom:9px}
+  .sub{margin-bottom:15px;font-size:.87rem;line-height:1.42}
+  .opts{gap:7px}
+  .opt{padding:10px 26px 10px 12px;border-radius:15px}
+  .opt .em{font-size:1.28rem}
+  .opt b{font-size:.91rem;margin-bottom:1px}
+  .opt span{font-size:.75rem;line-height:1.3}
+  .doc .inner{padding:13px 14px 34px}
+  .doc h2{font-size:1.06rem}
+  .stamp{right:11px;bottom:8px;padding:3px 7px;font-size:.52rem}
+  .doc .rule{margin:7px 0 9px}
+  .field{padding:5px 0}
+  .field dt{flex-basis:66px;font-size:.57rem}
+  .field dd{font-size:.83rem}
+  .menu{font-size:.62rem}
+  .missing{margin-top:8px;padding:7px 10px}
+  .missing dd{font-size:.85rem}
+  .foot{margin-top:9px;font-size:.6rem;padding-right:104px}
+  .cta{margin-top:10px;padding:13px 26px;font-size:.98rem}
+  .viaggio{margin-top:12px}.row{padding:10px 13px}
+  .hint{margin-top:11px;font-size:.72rem}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
   .doc,.field,.stamp,.cta,.opt,.row,body,.steps{opacity:1!important}}
@@ -662,12 +708,31 @@ var OPZIONI = [
     },140);
   }
 
-  /* ---------- tap sul NO ---------- */
+  /* ---------- tap sul NO ----------
+     Con lo spam a raffica i tre messaggi passavano in mezzo secondo e la scena
+     partiva subito: la battuta si perdeva. Ora fra un tocco valido e l'altro
+     c'è un tempo minimo; i tocchi in mezzo fanno solo traballare il bottone. */
+  var RITARDO=1150, ultimoNo=0, raffica=0;
   no.addEventListener('click',function(e){
     e.preventDefault();
     if(chiuso) return;
-    buzz(30);
+
     no.classList.remove('shake'); void no.offsetWidth; no.classList.add('shake');
+
+    var ora=Date.now();
+    if(ora-ultimoNo<RITARDO){                    /* sta martellando */
+      raffica++;
+      buzz(8);
+      if(raffica===4){
+        msg('Ok, ho capito: stai insistendo.','Ma il pulsante resta rotto lo stesso.');
+      }else if(raffica===9){
+        msg('Continua pure, ho tempo.','Il sistema non registra comunque.');
+      }
+      return;
+    }
+
+    ultimoNo=ora; raffica=0;
+    buzz(30);
     msg(ERRORI[n][0],ERRORI[n][1]);
     if(n===0){
       setTimeout(function(){ yes.classList.add('locked'); buzz([20,60,20]); },900);
