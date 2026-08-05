@@ -139,8 +139,12 @@ h1 em{font-style:italic;color:var(--gold)}
 .cta{margin-top:24px;background:var(--glass);border:1px solid rgba(255,255,255,.34);
   color:var(--ink);text-shadow:var(--sh);box-shadow:0 10px 28px -10px rgba(0,0,0,.6);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  opacity:0;animation:rise .7s var(--ease) 2.85s both;transition:transform .2s,border-color .25s}
+  transition:transform .2s,border-color .25s}
 .cta:active{transform:scale(.96);border-color:rgba(255,216,138,.7)}
+/* l'entrata ritardata vale SOLO per il bottone del contratto: sulla classe
+   .cta rendeva invisibili per 2,85s anche "Applica la firma" e "Manda la
+   conferma", che compaiono su schermate diverse */
+#apri{opacity:0;animation:rise .7s var(--ease) 2.85s both}
 
 /* ---------- bottoni ---------- */
 .btns{display:flex;gap:14px;justify-content:center;align-items:center;min-height:66px}
@@ -202,6 +206,10 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 #s1.dim .kicker,#s1.dim h1,#s1.dim .sub{opacity:.24;filter:blur(1.5px)}
 #s1 .kicker,#s1 h1,#s1 .sub{transition:opacity .7s,filter .7s}
 
+/* niente animazione d'ingresso qui: il suo fotogramma finale (opacity:1) con
+   fill-mode:both vince sulla classe .on e il messaggio non si spegneva più,
+   restando sotto alle nuvolette dei personaggi */
+.screen.on > .nudge{animation:none}
 .nudge{font-size:1rem;margin-top:24px;min-height:4.4em;line-height:1.5;text-shadow:var(--sh);
   opacity:0;transform:translateY(-6px);transition:opacity .3s,transform .3s;font-style:italic}
 .nudge.on{opacity:1;transform:none}
@@ -312,7 +320,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .opt span{display:block;font-size:.86rem;opacity:.94;line-height:1.42}
 
 /* ---------- il viaggio: strada, macchina, tappe ---------- */
-.viaggio{position:relative;margin-top:22px;padding-left:46px}
+.viaggio{position:relative;margin-top:16px;padding-left:46px}
 .strada{position:absolute;left:20px;top:8px;bottom:8px;width:3px;border-radius:2px;
   background:repeating-linear-gradient(rgba(255,216,138,.5) 0 9px,rgba(255,216,138,0) 9px 18px);
   background-size:100% 18px}
@@ -372,16 +380,19 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   animation:puff .8s ease-out forwards}
 @keyframes puff{0%{opacity:.6;transform:scale(.35)}
   100%{opacity:0;transform:scale(2.4) translateY(-18px)}}
-.brum{position:absolute;left:100%;top:50%;white-space:nowrap;
-  background:#fffdf8;color:#241531;font-size:.62rem;font-weight:800;letter-spacing:.06em;
-  padding:4px 8px;border-radius:9px;box-shadow:0 6px 14px rgba(0,0,0,.4);
-  opacity:0;transform:translate(7px,-50%) scale(.5);transform-origin:left center;
-  transition:opacity .2s,transform .3s var(--pop)}
-.brum.on{opacity:1;transform:translate(7px,-50%) scale(1)}
+/* attaccata alla macchina finiva sopra al testo delle tappe: sta fissa in
+   basso, sopra il pedale, dove non copre niente */
+.brum{position:fixed;left:50%;bottom:calc(106px + env(safe-area-inset-bottom));z-index:7;
+  white-space:nowrap;background:#fffdf8;color:#241531;font-size:.7rem;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase;
+  padding:5px 11px;border-radius:10px;box-shadow:0 8px 18px rgba(0,0,0,.45);
+  opacity:0;transform:translateX(-50%) translateY(8px) scale(.6);
+  transition:opacity .2s,transform .32s var(--pop)}
+.brum.on{opacity:1;transform:translateX(-50%) scale(1)}
 
-.plan{text-align:left;display:flex;flex-direction:column;gap:11px}
+.plan{text-align:left;display:flex;flex-direction:column;gap:9px}
 .row{position:relative;display:flex;gap:14px;align-items:flex-start;background:var(--glass);
-  border:1px solid rgba(255,255,255,.26);border-radius:17px;padding:15px 17px;text-shadow:var(--sh);
+  border:1px solid rgba(255,255,255,.26);border-radius:17px;padding:13px 16px;text-shadow:var(--sh);
   box-shadow:0 8px 24px -12px rgba(0,0,0,.5);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   transition:opacity .55s,filter .55s,border-color .4s}
@@ -430,7 +441,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .row b{display:block;font-size:.97rem;margin-bottom:3px}
 .row span{font-size:.88rem;opacity:.94;line-height:1.46}
 /* contratto completo */
-.done{display:inline-flex;align-items:center;gap:8px;margin-top:22px;
+.done{display:inline-flex;align-items:center;gap:8px;margin-top:14px;
   border:1.5px solid rgba(255,216,138,.7);border-radius:11px;padding:8px 13px;
   background:rgba(255,216,138,.1);font-size:.68rem;font-weight:800;letter-spacing:.14em;
   text-transform:uppercase;color:var(--gold);text-shadow:none;
@@ -439,11 +450,11 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 @keyframes stampIn{0%{opacity:0;transform:scale(2.2)}
   55%{opacity:1;transform:scale(.94)}100%{opacity:1;transform:none}}
 .done span{font-size:.95rem;letter-spacing:0}
-.ps{margin-top:18px;font-size:.88rem;opacity:.9;font-style:italic;text-shadow:var(--sh);display:none}
+.ps{margin-top:12px;font-size:.88rem;opacity:.9;font-style:italic;text-shadow:var(--sh);display:none}
 .ps.on{display:block;animation:rise .6s var(--ease) .25s both}
 /* durante il viaggio sta nascosto: finirebbe sotto il pedale fisso */
 .back{display:none}
-.back.on{margin-top:15px;display:inline-flex;align-items:center;gap:8px;
+.back.on{margin-top:9px;display:inline-flex;align-items:center;gap:8px;
   animation:rise .6s var(--ease) .4s both;
   padding:13px 22px;border-radius:100px;font-size:.85rem;font-weight:500;
   background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.26);
@@ -475,8 +486,11 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   text-shadow:var(--sh);transition:transform .15s var(--pop)}
 .ghostbtn:active{transform:scale(.95)}
 .cta.spenta{opacity:.38;pointer-events:none}
+/* quando la firma c'è, il bottone si accende col bordo dorato */
+#applica:not(.spenta){border-color:rgba(255,216,138,.75);
+  box-shadow:0 10px 28px -10px rgba(0,0,0,.6),0 0 0 1px rgba(255,216,138,.25)}
 .vaifirma{display:none}
-.vaifirma.on{display:inline-flex;margin-top:16px;animation:rise .6s var(--ease) .25s both}
+.vaifirma.on{display:inline-flex;margin-top:12px;animation:rise .6s var(--ease) .25s both}
 
 /* ---------- recap firmato ---------- */
 .art5{margin-top:11px;border:1.5px solid rgba(255,216,138,.78);border-radius:12px;
@@ -489,11 +503,18 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   text-align:left;line-height:1.5}
 .sigimg{height:54px;max-width:56%;object-fit:contain;object-position:right bottom;
   filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))}
-.stampok{position:absolute;right:13px;top:34px;border:2px solid rgba(125,255,168,.8);
+/* in alto a destra copriva il titolo e il protocollo: sta nello spazio
+   libero in fondo, fra la dicitura a sinistra e la firma a destra */
+.stampok{position:absolute;left:50%;bottom:18px;border:2px solid rgba(125,255,168,.8);
   border-radius:9px;padding:5px 10px;color:#a9ffc6;font-size:.6rem;font-weight:800;
-  letter-spacing:.2em;text-transform:uppercase;
+  letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;
   box-shadow:inset 0 0 0 1px rgba(125,255,168,.35);
-  animation:slam .55s cubic-bezier(.3,1.5,.5,1) .5s both}
+  transform:translateX(-50%) rotate(-11deg);
+  animation:slamCentro .55s cubic-bezier(.3,1.5,.5,1) .5s both}
+@keyframes slamCentro{
+  0%  {opacity:0;transform:translateX(-50%) rotate(-32deg) scale(2.8)}
+  55% {opacity:1;transform:translateX(-50%) rotate(-9deg) scale(.93)}
+  100%{opacity:1;transform:translateX(-50%) rotate(-11deg) scale(1)}}
 .toast{position:fixed;left:50%;bottom:76px;z-index:30;background:#fffdf8;color:#241531;
   font-weight:700;font-size:.9rem;padding:11px 17px;border-radius:13px;
   box-shadow:0 12px 30px rgba(0,0,0,.5);opacity:0;pointer-events:none;
@@ -575,6 +596,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .cta{margin-top:8px;padding:12px 24px;font-size:.96rem}
   .viaggio{margin-top:12px}.row{padding:10px 13px}
   .pedale{bottom:calc(40px + env(safe-area-inset-bottom));padding:7px 16px 7px 10px;font-size:.75rem}
+  .brum{bottom:calc(88px + env(safe-area-inset-bottom));font-size:.64rem;padding:4px 9px}
   .ped{width:19px;height:25px}
   .back.on{margin-top:7px;padding:9px 14px;font-size:.72rem}
   #s3 .ps{display:none}
@@ -619,6 +641,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 <div class="grain"></div>
 
 <div class="say" id="say"></div>
+<span class="brum" id="brum">brum brum</span>
 
 <!-- ============ 0. IL CONTRATTO ============ -->
 <section class="screen on" id="s0">
@@ -706,7 +729,6 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
           <circle class="faroL" cx="31.5" cy="57.5" r="3.2"/>
         </svg>
       </div>
-      <span class="brum" id="brum">brum brum</span>
     </div>
     <div class="plan" id="p-rows"></div>
   </div>
@@ -729,7 +751,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
     </svg>
     Accelera
   </button>
-  <div class="done" id="done"><span>✓</span> Allegato A compilato — manca solo la firma</div>
+  <div class="done" id="done"><span>✓</span> Allegato A compilato</div>
   <p class="ps" id="p-ps"></p>
   <button class="cta vaifirma" id="vaifirma">Firma il contratto ✍️</button>
   <button class="back" id="back"><span class="frecciaind">←</span> altre mete</button>
@@ -973,7 +995,7 @@ var OPZIONI = [
     if(n>=ERRORI.length){                  /* si arrende, esce, poi gli addetti */
       chiuso=true;
       hackerMolla();
-      setTimeout(scena,4300);
+      setTimeout(scena,4900);      /* gli addetti entrano mentre lui esce */
     }
   });
 
@@ -1092,7 +1114,8 @@ var OPZIONI = [
     var LARGO=92;
     var topH=Math.round(Math.min(window.innerHeight-150, r.bottom+112)); hkTop=topH;
     var meta=Math.max(8,Math.round(window.innerWidth*0.13));
-    hkCx=meta+LARGO/2;                                /* centro noto, per la nuvoletta */
+    hkCx=meta+24;         /* la codina punta alla TESTA, non al centro dell'svg
+                             (la metà destra è occupata dal portatile) */
     void hk.offsetWidth;
     hk.classList.add('cammina');
     hk.style.left=meta+'px';
@@ -1124,7 +1147,7 @@ var OPZIONI = [
     if(!hk) return;
     spegniHk();
     taci();
-    tentativo(1,900);
+    tentativo(1,1500);      /* lascia leggere il messaggio dell'assistenza */
   }
 
   function hackerMolla(){                              /* si arrende e va via */
@@ -1133,19 +1156,19 @@ var OPZIONI = [
     taci();
     hk.classList.remove('digita');
     if(cavo) cavo.classList.remove('on');
-    hkT(function(){ hk.classList.add('nega'); parla(HACKER[2][0],hkCx,hkTop); },900);
-    hkT(function(){ parla(HACKER[2][1],hkCx,hkTop); },2500);
-    hkT(function(){ taci(); },4000);
+    hkT(function(){ hk.classList.add('nega'); parla(HACKER[2][0],hkCx,hkTop); },1500);
+    hkT(function(){ parla(HACKER[2][1],hkCx,hkTop); },3100);
+    hkT(function(){ taci(); },4600);
     hkT(function(){                                   /* se ne va da dov'è venuto */
       hk.classList.remove('nega');
       hk.classList.add('cammina');
       hk.style.transform='scaleX(-1)';
       hk.style.left='-140px';
-    },4150);
+    },4750);
     hkT(function(){
       if(hk){ hk.remove(); hk=null; }
       if(cavo){ cavo.remove(); cavo=null; }
-    },5350);
+    },5950);
   }
 
   /* ---------- la scena degli operai ---------- */
@@ -1498,16 +1521,48 @@ var OPZIONI = [
     toastEl.textContent=t; toastEl.classList.add('on');
     clearTimeout(toastT); toastT=setTimeout(function(){ toastEl.classList.remove('on'); },2600);
   }
+  /* catena con ripieghi: se una via fallisce si passa alla successiva, e un
+     riscontro a schermo c'è SEMPRE. Senza il .catch sulla clipboard il tasto
+     sembrava morto quando la copia veniva rifiutata dal browser. */
+  function copiaVecchioStile(testo){
+    try{
+      var ta=document.createElement('textarea');
+      ta.value=testo;
+      ta.setAttribute('readonly','');
+      ta.style.cssText='position:fixed;top:-1000px;opacity:0';
+      document.body.appendChild(ta);
+      ta.select(); ta.setSelectionRange(0,99999);
+      var ok=document.execCommand('copy');
+      ta.remove();
+      return ok;
+    }catch(e){ return false; }
+  }
+  function consegna(testo){
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(testo).then(function(){
+        toast('Copiato! Incollalo in chat 💬');
+      }).catch(function(){
+        toast(copiaVecchioStile(testo) ? 'Copiato! Incollalo in chat 💬'
+                                       : 'Fammi uno screenshot e mandamelo 📸');
+      });
+    }else{
+      toast(copiaVecchioStile(testo) ? 'Copiato! Incollalo in chat 💬'
+                                     : 'Fammi uno screenshot e mandamelo 📸');
+    }
+  }
   document.getElementById('conferma').addEventListener('click',function(){
     buzz([14,60,14]);
     var o=sceltaCorrente||OPZIONI[0];
     var testo='✍️ Contratto firmato!\nArt. 5 — Lunedì 10, fuori provincia: '+o.nome+
               '.\nRientro per cena… salvo prolungare 😏';
     if(navigator.share){
-      navigator.share({text:testo}).then(function(){ toast('Inviata 💛'); }).catch(function(){});
-    }else if(navigator.clipboard&&navigator.clipboard.writeText){
-      navigator.clipboard.writeText(testo).then(function(){ toast('Copiato! Incollalo in chat 💬'); });
-    }else toast('Scrivimi in chat cosa hai scelto 💬');
+      navigator.share({text:testo}).then(function(){
+        toast('Inviata 💛');
+      }).catch(function(err){
+        if(err && err.name==='AbortError') return;   /* ha chiuso lei: nessun avviso */
+        consegna(testo);
+      });
+    }else consegna(testo);
   });
 })();
 </script>
