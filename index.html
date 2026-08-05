@@ -207,19 +207,66 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .nudge.on{opacity:1;transform:none}
 .nudge .sys{display:block;margin-top:8px;font-size:.9rem;font-style:normal;opacity:.9}
 
-/* ---------- operai ---------- */
-.worker{position:fixed;z-index:9;font-size:3.1rem;line-height:1;
+/* ---------- personaggi ---------- */
+.pers{position:fixed;z-index:9;
   filter:drop-shadow(0 8px 16px rgba(0,0,0,.55));
-  transition:left 1.15s cubic-bezier(.35,0,.35,1),transform 1.05s cubic-bezier(.5,0,.72,.9),opacity .4s}
-.worker .body{display:block}
-.worker.walk .body{animation:bob .4s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-6px) rotate(-5deg)}}
+  transition:left 1.05s cubic-bezier(.35,0,.35,1),transform 1.05s cubic-bezier(.5,0,.72,.9),opacity .45s}
+.pers svg{display:block;height:auto}
+.corpo{transform-origin:50% 100%}
+.pers.cammina .corpo{animation:passo .42s ease-in-out infinite}
+@keyframes passo{0%,100%{transform:translateY(0) rotate(-2.5deg)}50%{transform:translateY(-5px) rotate(2.5deg)}}
+.braccio{transform-origin:82% 62%;transform-box:fill-box}
+.pers.cammina .braccio{animation:bracciata .42s ease-in-out infinite alternate}
+@keyframes bracciata{from{transform:rotate(-16deg)}to{transform:rotate(16deg)}}
+/* nega con la testa */
+.pers.nega .testagruppo{animation:nega .5s ease-in-out 3}
+@keyframes nega{0%,100%{transform:rotate(0)}25%{transform:rotate(-11deg)}75%{transform:rotate(11deg)}}
+.testagruppo{transform-origin:50% 78%;transform-box:fill-box}
 
+/* --- operai --- */
+.elmetto{fill:#ffc93c}
+.elmetto-b{fill:#e0a91c}
+.faccia{fill:#f0c39a}
+.tuta{fill:var(--tuta,#ff8f4d)}
+.tuta-scura{fill:rgba(0,0,0,.22)}
+.cinghia{fill:rgba(0,0,0,.28)}
+.occhio{fill:#241531}
+.attrezzo{fill:#cfd6e0}
+
+/* --- hacker --- */
+.felpa{fill:#3b3350}
+.felpa-scura{fill:#2b2440}
+.cappuccio{fill:#4a3f63}
+.occhiali{fill:#12301f;stroke:#7dffa8;stroke-width:1.1}
+.pc-scocca{fill:#2a2338}
+.pc-base{fill:#3a3150}
+.pc-schermo{fill:#08160f}
+.codice rect{fill:#7dffa8}
+.pers.digita .codice rect{animation:codice .55s steps(4) infinite}
+@keyframes codice{0%{opacity:.25}50%{opacity:1}100%{opacity:.25}}
+.codice rect:nth-child(2){animation-delay:.14s}
+.codice rect:nth-child(3){animation-delay:.28s}
+.codice rect:nth-child(4){animation-delay:.42s}
+.pers.digita .manopc{animation:tasti .28s ease-in-out infinite alternate}
+@keyframes tasti{from{transform:translateY(0)}to{transform:translateY(-1.6px)}}
+.manopc{transform-box:fill-box}
+
+/* cavo dal portatile al pulsante */
+.cavo{position:fixed;z-index:8;pointer-events:none;overflow:visible;opacity:0;
+  transition:opacity .4s}
+.cavo.on{opacity:1}
+.cavo path{fill:none;stroke:#7dffa8;stroke-width:2.4;stroke-linecap:round;
+  stroke-dasharray:7 6;animation:scorreCavo .7s linear infinite;
+  filter:drop-shadow(0 0 4px rgba(125,255,168,.7))}
+@keyframes scorreCavo{to{stroke-dashoffset:-13}}
+
+/* ---------- nuvoletta ---------- */
 .say{position:fixed;z-index:11;background:#fffdf8;color:#241531;
-  font-size:1rem;font-weight:700;line-height:1.35;padding:12px 16px;border-radius:17px;
-  max-width:76vw;text-align:center;box-shadow:0 12px 30px rgba(0,0,0,.5);
-  opacity:0;transform:translate(-50%,10px) scale(.7);transform-origin:bottom center;
-  transition:opacity .25s,transform .38s var(--pop)}
+  font-size:.98rem;font-weight:700;line-height:1.34;padding:11px 15px;border-radius:16px;
+  max-width:72vw;text-align:center;box-shadow:0 14px 32px rgba(0,0,0,.55);
+  opacity:0;transform:translate(-50%,12px) scale(.55);
+  transform-origin:var(--tx,50%) 100%;
+  transition:opacity .2s,transform .42s var(--pop)}
 .say.on{opacity:1;transform:translate(-50%,0) scale(1)}
 .say:after{content:'';position:absolute;top:100%;left:var(--tx,50%);margin-left:-8px;
   border:8px solid transparent;border-top-color:#fffdf8}
@@ -638,7 +685,8 @@ var ERRORI = [
    'Apro un ticket. Mando qualcuno a controllare.']
 ];
 
-/* ⚙️  2) COSA DICONO GLI OPERAI (uno alla volta) */
+/* ⚙️  2) COSA DICE L'HACKER (1° e 2° tocco) E COSA DICONO GLI OPERAI (3°) */
+var HACKER  = ['Fermi tutti, ci penso io.', 'No no. Qua è marcio dentro, io mollo.'];
 var BATTUTE = ['Vai Gianni, portiamolo via!', 'È rotto, non c\'è niente da fare.'];
 
 /* =========================================================================
@@ -794,27 +842,161 @@ var OPZIONI = [
     msg(ERRORI[n][0],ERRORI[n][1]);
     if(n===0){
       setTimeout(function(){ yes.classList.add('locked'); buzz([20,60,20]); },900);
+      entraHacker();
     }
-    if(n>=1) no.classList.add('broken');
+    if(n===1){ no.classList.add('broken'); hackerMolla(); }
     n++;
-    if(n>=ERRORI.length){ chiuso=true; setTimeout(scena,850); }
+    if(n>=ERRORI.length){ chiuso=true; setTimeout(scena,1000); }
   });
 
-  function parla(testo,tailPerc,topY){
+  /* ---------- nuvoletta: si aggancia a chi parla ----------
+     Prima era sempre al centro dello schermo con la codina a percentuale fissa:
+     su schermi stretti la codina finiva a indicare il vuoto. Ora la nuvoletta
+     è centrata sul personaggio, rientra nei bordi se sborda, e la codina viene
+     ricalcolata per puntare comunque a lui. */
+  /* cx è la coordinata NOTA del personaggio, non letta dal DOM: leggendo il
+     rect mentre sta ancora camminando la nuvoletta finiva fuori schermo e la
+     codina puntava al vuoto. */
+  function parla(testo,cx,topY){
     say.textContent=testo;
-    say.style.setProperty('--tx',tailPerc+'%');
-    say.style.left=Math.round(window.innerWidth/2)+'px';
+    say.style.left=Math.round(cx)+'px';
     say.style.top=Math.round(topY)+'px';
+    say.style.setProperty('--tx','50%');
     void say.offsetWidth;
-    var r=say.getBoundingClientRect();
-    if(r.left<8)  say.style.left=Math.round(r.width/2+8)+'px';
-    if(r.right>window.innerWidth-8) say.style.left=Math.round(window.innerWidth-r.width/2-8)+'px';
+
+    var r=say.getBoundingClientRect(), dx=0;
+    if(r.left<8) dx=8-r.left;
+    else if(r.right>window.innerWidth-8) dx=window.innerWidth-8-r.right;
+    if(dx){ say.style.left=Math.round(cx+dx)+'px'; void say.offsetWidth; }
+
+    var f=say.getBoundingClientRect();
+    var perc=f.width ? ((cx-f.left)/f.width)*100 : 50;
+    say.style.setProperty('--tx',Math.max(12,Math.min(88,perc)).toFixed(1)+'%');
     say.classList.add('on');
   }
   function taci(){ say.classList.remove('on'); }
 
+  /* ---------- personaggi disegnati ---------- */
+  function svgHacker(){
+    return '<svg viewBox="0 0 92 66" width="92">'+
+      '<g class="corpo">'+
+        '<path class="felpa" d="M6 64 V44 a17 17 0 0 1 34 0 v20 z"/>'+
+        '<path class="felpa-scura" d="M6 64 v-8 h34 v8 z"/>'+
+        '<g class="testagruppo">'+
+          '<circle class="faccia" cx="23" cy="27" r="13"/>'+
+          '<path class="cappuccio" d="M8 29 a15 15 0 0 1 30 0 q-6 -7 -15 -7 t-15 7z"/>'+
+          '<g class="occhiali"><rect x="14" y="25" width="8" height="6" rx="2"/>'+
+            '<rect x="24" y="25" width="8" height="6" rx="2"/></g>'+
+        '</g>'+
+        '<path class="manopc felpa" d="M38 47 q9 0 13 5 l-3 4 q-6 -4 -12 -3z"/>'+
+      '</g>'+
+      '<g class="pc">'+
+        '<rect class="pc-scocca" x="52" y="28" width="34" height="27" rx="3"/>'+
+        '<rect class="pc-schermo" x="54.5" y="30.5" width="29" height="22" rx="1.5"/>'+
+        '<g class="codice">'+
+          '<rect x="57" y="33" width="15" height="2"/>'+
+          '<rect x="57" y="38" width="22" height="2"/>'+
+          '<rect x="57" y="43" width="12" height="2"/>'+
+          '<rect x="57" y="48" width="18" height="2"/>'+
+        '</g>'+
+        '<path class="pc-base" d="M50 55 h38 l4 6 h-46 z"/>'+
+      '</g></svg>';
+  }
+  function svgOperaio(tuta,attrezzo){
+    var mano = attrezzo==='chiave'
+      ? '<path class="attrezzo" d="M41 44 l11 -9 3 4 -11 9z"/><circle class="attrezzo" cx="54" cy="34" r="4.5"/>'
+      : '<rect class="attrezzo" x="41" y="34" width="13" height="16" rx="2"/><rect class="occhio" x="44" y="38" width="7" height="1.6"/><rect class="occhio" x="44" y="42" width="7" height="1.6"/>';
+    return '<svg viewBox="0 0 62 66" width="62" style="--tuta:'+tuta+'">'+
+      '<g class="corpo">'+
+        '<path class="tuta" d="M7 64 V44 a15 15 0 0 1 30 0 v20 z"/>'+
+        '<path class="tuta-scura" d="M7 64 v-7 h30 v7 z"/>'+
+        '<rect class="cinghia" x="13" y="42" width="4" height="16" rx="2"/>'+
+        '<rect class="cinghia" x="27" y="42" width="4" height="16" rx="2"/>'+
+        '<g class="testagruppo">'+
+          '<circle class="faccia" cx="22" cy="28" r="12"/>'+
+          '<circle class="occhio" cx="18" cy="27" r="1.7"/>'+
+          '<circle class="occhio" cx="26" cy="27" r="1.7"/>'+
+          '<path class="elmetto" d="M9 24 a13 13 0 0 1 26 0z"/>'+
+          '<rect class="elmetto-b" x="6" y="23" width="32" height="4" rx="2"/>'+
+        '</g>'+
+        '<path class="braccio tuta" d="M35 46 q8 -2 11 -6 l4 4 q-5 7 -14 8z"/>'+
+        mano +
+      '</g></svg>';
+  }
+
+  /* ---------- l'hacker ---------- */
+  var hk=null, cavo=null, hkTimer=[], hkCx=0, hkTop=0;
+  function hkT(fn,ms){ var id=setTimeout(fn,ms); hkTimer.push(id); return id; }
+  function spegniHk(){ hkTimer.forEach(clearTimeout); hkTimer=[]; }
+
+  function entraHacker(){
+    spegniHk();
+    var r=no.getBoundingClientRect();
+    hk=document.createElement('div');
+    hk.className='pers hacker';
+    hk.innerHTML=svgHacker();
+    /* sotto la riga dei pulsanti: di fianco al No coprirebbe il Sì bloccato,
+       che è metà della battuta */
+    hk.style.top=Math.round(Math.min(window.innerHeight-150, r.bottom+112))+'px';
+    hk.style.left='-130px';
+    document.body.appendChild(hk);
+
+    cavo=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    cavo.setAttribute('class','cavo');
+    cavo.style.left='0'; cavo.style.top='0';
+    cavo.setAttribute('width',window.innerWidth);
+    cavo.setAttribute('height',window.innerHeight);
+    cavo.innerHTML='<path d=""/>';
+    document.body.appendChild(cavo);
+
+    var LARGO=92;
+    var topH=Math.round(Math.min(window.innerHeight-150, r.bottom+112)); hkTop=topH;
+    var meta=Math.max(8,Math.round(window.innerWidth*0.13));
+    hkCx=meta+LARGO/2;                                /* centro noto, per la nuvoletta */
+    void hk.offsetWidth;
+    hk.classList.add('cammina');
+    hk.style.left=meta+'px';
+
+    hkT(function(){                                   /* arrivato: collega il PC */
+      hk.classList.remove('cammina');
+      hk.classList.add('digita');
+      var x1=meta+LARGO-8,  y1=topH+40;               /* dal portatile... */
+      var x2=r.left+16,     y2=r.bottom-6;            /* ...su fino al No */
+      cavo.querySelector('path').setAttribute('d',
+        'M'+x1+' '+y1+' C'+(x1+70)+' '+(y1+16)+' '+(x2+26)+' '+(y2+58)+' '+x2+' '+y2);
+      cavo.classList.add('on');
+      buzz(12);
+    },1150);
+    hkT(function(){ parla(HACKER[0],hkCx,topH-14); },1550);
+    hkT(function(){ taci(); },3600);
+  }
+
+  function hackerMolla(){
+    if(!hk) return;
+    spegniHk();
+    hk.classList.remove('digita');
+    hk.classList.add('nega');
+    parla(HACKER[1],hkCx,hkTop-14);
+    if(cavo) cavo.classList.remove('on');
+    hkT(function(){ taci(); },1900);
+    hkT(function(){                                   /* se ne va da dov'è venuto */
+      hk.classList.remove('nega');
+      hk.classList.add('cammina');
+      hk.style.transform='scaleX(-1)';
+      hk.style.left='-140px';
+    },2100);
+    hkT(function(){
+      if(hk){ hk.remove(); hk=null; }
+      if(cavo){ cavo.remove(); cavo=null; }
+    },3300);
+  }
+
   /* ---------- la scena degli operai ---------- */
   function scena(){
+    /* se l'hacker è ancora in giro (tocchi ravvicinati) sparisce qui */
+    spegniHk();
+    if(hk){ hk.remove(); hk=null; }
+    if(cavo){ cavo.remove(); cavo=null; }
     s1.classList.add('dim');
     yes.classList.remove('back'); yes.classList.add('away');
 
@@ -838,45 +1020,50 @@ var OPZIONI = [
 
     var wl,wr;
     setTimeout(function(){
-      function operaio(lato){
+      function operaio(lato,tuta,attrezzo){
         var w=document.createElement('div');
-        w.className='worker '+lato;
-        w.innerHTML='<span class="body">'+(lato==='l'?'👷':'👷‍♀️')+'</span>';
-        w.style.top=(cy+r0.height/2-30)+'px';
-        w.style.left=(lato==='l'? -110 : window.innerWidth+60)+'px';
+        w.className='pers operaio '+lato;
+        w.innerHTML=svgOperaio(tuta,attrezzo);
+        w.style.top=(cy+r0.height/2-40)+'px';
+        w.style.left=(lato==='l'? -90 : window.innerWidth+50)+'px';
         document.body.appendChild(w);
         return w;
       }
-      wl=operaio('l'); wr=operaio('r');
+      wl=operaio('l','#ff8f4d','chiave');
+      wr=operaio('r','#4d8bff','blocco');
+      wr.style.transform='scaleX(-1)';             /* si guardano in faccia */
       void wl.offsetWidth; void wr.offsetWidth;
-      wl.classList.add('walk');
-      wl.style.left=Math.max(6, cx-72)+'px';
+      wl.classList.add('cammina');
+      wl.style.left=metaL+'px';
       setTimeout(function(){
-        wr.classList.add('walk');
-        wr.style.left=Math.min(window.innerWidth-66, cx+r0.width+16)+'px';
-      },160);
+        wr.classList.add('cammina');
+        wr.style.left=metaR+'px';
+      },170);
     },1100);
 
-    var bubbleY=cy-72;
-    setTimeout(function(){ if(wl) wl.classList.remove('walk'); if(wr) wr.classList.remove('walk'); },2250);
-    setTimeout(function(){ parla(BATTUTE[0],26,bubbleY); },2350);
+    /* posizioni note in anticipo: le nuvolette non devono leggere il DOM
+       mentre gli operai sono ancora in cammino */
+    var metaL=Math.max(4, cx-74), metaR=Math.min(window.innerWidth-66, cx+r0.width+12);
+    var bubbleY=cy-58;
+    setTimeout(function(){ if(wl) wl.classList.remove('cammina'); if(wr) wr.classList.remove('cammina'); },2250);
+    setTimeout(function(){ if(wl) parla(BATTUTE[0],metaL+31,bubbleY); },2350);
     setTimeout(function(){ taci(); },3700);
-    setTimeout(function(){ parla(BATTUTE[1],74,bubbleY); },3900);
-    setTimeout(function(){ taci(); },5250);
+    setTimeout(function(){ if(wr){ wr.classList.add('nega'); parla(BATTUTE[1],metaR+31,bubbleY); } },3900);
+    setTimeout(function(){ taci(); if(wr) wr.classList.remove('nega'); },5250);
 
     setTimeout(function(){
       no.classList.add('held');
       no.style.transform='translateY(-18px) rotate(-8deg)';
       if(wl) wl.style.transform='translateY(-7px)';
-      if(wr) wr.style.transform='translateY(-7px)';
+      if(wr) wr.style.transform='scaleX(-1) translateY(-7px)';
       spot.classList.remove('on');
       buzz(20);
     },5450);
 
     setTimeout(function(){
       var via=window.innerWidth+200;
-      if(wl){ wl.classList.add('walk'); wl.style.transform='translateX('+via+'px) translateY(-7px)'; }
-      if(wr){ wr.classList.add('walk'); wr.style.transform='translateX('+via+'px) translateY(-7px)'; }
+      if(wl){ wl.classList.add('cammina'); wl.style.transform='translateX('+via+'px) translateY(-7px)'; }
+      if(wr){ wr.classList.add('cammina'); wr.style.transform='scaleX(-1) translateX(-'+via+'px) translateY(-7px)'; }
       no.classList.add('carried');
       no.style.transform='translateX('+via+'px) translateY(-18px) rotate(-8deg)';
     },6000);
