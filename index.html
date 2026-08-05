@@ -453,6 +453,50 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .back .frecciaind{transition:transform .2s var(--pop)}
 .back:active .frecciaind{transform:translateX(-4px)}
 
+/* ---------- firma ---------- */
+.firmabox{margin-top:4px;position:relative;height:170px;border-radius:16px;overflow:hidden;
+  border:1.5px dashed rgba(255,216,138,.65);background:rgba(24,14,36,.62);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#cv{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.xline{position:absolute;left:16px;right:16px;bottom:28px;
+  border-bottom:1.5px solid rgba(255,255,255,.35);pointer-events:none}
+.xmark{position:absolute;left:18px;bottom:32px;font-family:Georgia,serif;font-style:italic;
+  font-size:1.15rem;color:rgba(255,216,138,.85);pointer-events:none}
+.firmahint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-style:italic;font-size:.92rem;opacity:.45;pointer-events:none;transition:opacity .3s;
+  text-shadow:var(--sh)}
+.firmabox.dirty .firmahint{opacity:0}
+.firmarow{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:16px}
+.ghostbtn{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.26);
+  color:var(--ink);border-radius:100px;padding:13px 20px;font-size:.9rem;font-weight:500;
+  text-shadow:var(--sh);transition:transform .15s var(--pop)}
+.ghostbtn:active{transform:scale(.95)}
+.cta.spenta{opacity:.38;pointer-events:none}
+.vaifirma{display:none}
+.vaifirma.on{display:inline-flex;margin-top:16px;animation:rise .6s var(--ease) .25s both}
+
+/* ---------- recap firmato ---------- */
+.art5{margin-top:11px;border:1.5px solid rgba(255,216,138,.78);border-radius:12px;
+  padding:10px 12px;background:rgba(255,216,138,.1);text-align:left}
+.art5 dt{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);
+  font-weight:700;margin-bottom:4px}
+.art5 dd{font-size:.94rem;line-height:1.4}
+.sigblock{margin-top:13px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.sigblock .lab{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;opacity:.6;
+  text-align:left;line-height:1.5}
+.sigimg{height:54px;max-width:56%;object-fit:contain;object-position:right bottom;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))}
+.stampok{position:absolute;right:13px;top:34px;border:2px solid rgba(125,255,168,.8);
+  border-radius:9px;padding:5px 10px;color:#a9ffc6;font-size:.6rem;font-weight:800;
+  letter-spacing:.2em;text-transform:uppercase;
+  box-shadow:inset 0 0 0 1px rgba(125,255,168,.35);
+  animation:slam .55s cubic-bezier(.3,1.5,.5,1) .5s both}
+.toast{position:fixed;left:50%;bottom:76px;z-index:30;background:#fffdf8;color:#241531;
+  font-weight:700;font-size:.9rem;padding:11px 17px;border-radius:13px;
+  box-shadow:0 12px 30px rgba(0,0,0,.5);opacity:0;pointer-events:none;
+  transform:translateX(-50%) translateY(10px);transition:opacity .3s,transform .3s}
+.toast.on{opacity:1;transform:translateX(-50%)}
+
 /* ---------- indicatore passi ---------- */
 .steps{position:fixed;left:50%;transform:translateX(-50%);z-index:6;display:flex;gap:7px;
   bottom:calc(18px + env(safe-area-inset-bottom));animation:pageIn 1s ease-out 1s both}
@@ -495,6 +539,11 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .viaggio{margin-top:16px;padding-left:42px}.strada,.fatta{left:17px}.auto{left:1px;width:31px}
   .plan{gap:9px}.row{padding:12px 15px}.row span{font-size:.83rem}.row:before{left:-26px;top:17px}
   .ps{margin-top:15px}.maint p{padding:12px 14px;font-size:.85rem}
+  #s3 .sub{display:none}
+  .done{margin-top:14px;padding:6px 11px;font-size:.62rem}
+  .vaifirma.on{margin-top:12px}
+  .firmabox{height:148px}
+  .sigimg{height:46px}.art5 dd{font-size:.88rem}
 }
 /* telefoni piccoli: tutto deve stare comunque in una schermata */
 @media (max-height:665px){
@@ -508,22 +557,35 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .opt .em{font-size:1.28rem}
   .opt b{font-size:.91rem;margin-bottom:1px}
   .opt span{font-size:.75rem;line-height:1.3}
-  .doc .inner{padding:13px 14px 34px}
-  .doc h2{font-size:1.06rem}
-  .stamp{right:11px;bottom:8px;padding:3px 7px;font-size:.52rem}
-  .doc .rule{margin:7px 0 9px}
-  .field{padding:5px 0}
+  .doc .inner{padding:11px 14px 30px}
+  .doc h2{font-size:1.02rem}
+  .stamp{right:11px;bottom:7px;padding:3px 7px;font-size:.52rem}
+  .doc .rule{margin:6px 0 8px}
+  .doc .prot{margin-bottom:5px}
+  .field{padding:4px 0}
   .field dt{flex-basis:66px;font-size:.57rem}
   .field dd{font-size:.83rem}
   .menu{font-size:.62rem}
-  .missing{margin-top:8px;padding:7px 10px}
+  .missing{margin-top:7px;padding:6px 10px}
   .missing dd{font-size:.85rem}
-  .foot{margin-top:9px;font-size:.6rem;padding-right:104px}
-  .cta{margin-top:10px;padding:13px 26px;font-size:.98rem}
+  .foot{margin-top:7px;font-size:.58rem;padding-right:104px}
+  .cta{margin-top:8px;padding:12px 24px;font-size:.96rem}
   .viaggio{margin-top:12px}.row{padding:10px 13px}
   .pedale{bottom:calc(40px + env(safe-area-inset-bottom));padding:7px 16px 7px 10px;font-size:.75rem}
   .ped{width:19px;height:25px}
-  .back{margin-top:11px;padding:11px 18px;font-size:.8rem}
+  .back.on{margin-top:7px;padding:9px 14px;font-size:.72rem}
+  #s3 .ps{display:none}
+  #s3 .kicker{display:none}
+  #s3 .done{display:none}
+  .viaggio{margin-top:8px;padding-left:38px}.strada,.fatta{left:15px}.auto{left:0;width:29px}
+  .row{padding:7px 10px}.row b{font-size:.85rem}.row span{font-size:.7rem;line-height:1.26}
+  .row .ic{font-size:1.05rem}.plan{gap:5px}
+  .row:before{left:-23px;top:14px;width:8px;height:8px}
+  .vaifirma.on{margin-top:6px;padding:11px 20px;font-size:.88rem}
+  .firmabox{height:124px}.firmarow{margin-top:10px}
+  .ghostbtn{padding:11px 16px;font-size:.82rem}
+  .sigblock{margin-top:9px}.sigimg{height:38px}
+  .art5{margin-top:8px;padding:8px 10px}.art5 dd{font-size:.82rem}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
   .doc,.field,.stamp,.cta,.opt,.row,body,.steps{opacity:1!important}}
@@ -664,12 +726,61 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
     </svg>
     Accelera
   </button>
-  <div class="done" id="done"><span>✓</span> Art. 5 accettato, allegato A compilato — contratto firmato</div>
+  <div class="done" id="done"><span>✓</span> Allegato A compilato — manca solo la firma</div>
   <p class="ps" id="p-ps"></p>
-  <button class="back" id="back"><span class="frecciaind">←</span> fammi vedere le altre</button>
+  <button class="cta vaifirma" id="vaifirma">Firma il contratto ✍️</button>
+  <button class="back" id="back"><span class="frecciaind">←</span> altre mete</button>
 </section>
 
-<div class="steps" id="steps"><i class="on"></i><i></i><i></i><i></i></div>
+<!-- ============ 4. LA FIRMA ============ -->
+<section class="screen" id="s4">
+  <p class="kicker">Ultimo passo</p>
+  <h1>Metti la <em>firma</em>.</h1>
+  <p class="sub">Col dito, qui sotto. Vale come autografo.</p>
+  <div class="firmabox" id="firmabox">
+    <canvas id="cv"></canvas>
+    <span class="xmark">✕</span>
+    <div class="xline"></div>
+    <div class="firmahint">firma qui</div>
+  </div>
+  <div class="firmarow">
+    <button class="ghostbtn" id="pulisci">Pulisci</button>
+    <button class="cta spenta" id="applica" style="margin-top:0">Applica la firma →</button>
+  </div>
+  <button class="back on" id="cambia"><span class="frecciaind">←</span> cambia meta</button>
+</section>
+
+<!-- ============ 5. COPIA FIRMATA ============ -->
+<section class="screen" id="s5">
+  <p class="kicker">Copia firmata</p>
+  <div class="doc">
+    <div class="top"></div>
+    <div class="inner">
+      <p class="prot">Prot. 10/08 — vale a tutti gli effetti</p>
+      <h2>Contratto di baratto</h2>
+      <div class="rule"></div>
+      <dl class="fields">
+        <div class="field" style="animation-delay:.2s"><dt>Oggetto</dt><dd>Il letto, per una notte</dd></div>
+        <div class="field" style="animation-delay:.32s"><dt>In cambio</dt><dd>Colazione, la mattina dopo</dd></div>
+        <div class="field" style="animation-delay:.44s"><dt>Clausola</dt><dd>Il sottoscritto dorme per terra</dd></div>
+        <div class="field" style="animation-delay:.56s"><dt>Extra</dt><dd>Rapimento ricreativo — concesso</dd></div>
+      </dl>
+      <dl class="art5">
+        <dt>Art. 5 — il secondo baratto</dt>
+        <dd id="r-art5"></dd>
+      </dl>
+      <div class="sigblock">
+        <div class="lab">Letto e firmato<br>la controparte</div>
+        <img class="sigimg" id="sigimg" alt="firma">
+      </div>
+      <div class="stampok">Firmato</div>
+    </div>
+  </div>
+  <button class="cta" id="conferma">Manda la conferma 📨</button>
+</section>
+
+<div class="toast" id="toast"></div>
+<div class="steps" id="steps"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
 
 <script>
 /* =========================================================================
@@ -753,9 +864,10 @@ var OPZIONI = [
       nudge=document.getElementById('nudge'), say=document.getElementById('say'),
       maint=document.getElementById('maint'), steps=document.getElementById('steps'),
       s0=document.getElementById('s0'), s1=document.getElementById('s1'),
-      s2=document.getElementById('s2'), s3=document.getElementById('s3');
-  var SCHERMI=[s0,s1,s2,s3];
-  var n=0, chiuso=false;
+      s2=document.getElementById('s2'), s3=document.getElementById('s3'),
+      s4=document.getElementById('s4'), s5=document.getElementById('s5');
+  var SCHERMI=[s0,s1,s2,s3,s4,s5];
+  var n=0, chiuso=false, sceltaCorrente=null;
 
   function buzz(p){ if(navigator.vibrate){ try{ navigator.vibrate(p); }catch(e){} } }
 
@@ -799,6 +911,8 @@ var OPZIONI = [
       cur.classList.add('out');
       setTimeout(entra,330);
     } else entra();
+    /* il canvas della firma va dimensionato quando la schermata è visibile */
+    if(el===s4) setTimeout(setupCv,420);
   }
 
   /* ---------- 0 → 1 : apri il contratto ---------- */
@@ -858,6 +972,8 @@ var OPZIONI = [
      rect mentre sta ancora camminando la nuvoletta finiva fuori schermo e la
      codina puntava al vuoto. */
   function parla(testo,cx,topY){
+    nudge.classList.remove('on');      /* le parole dell'assistenza non devono
+                                          restare sopra il personaggio che parla */
     say.textContent=testo;
     say.style.left=Math.round(cx)+'px';
     say.style.top=Math.round(topY)+'px';
@@ -967,6 +1083,7 @@ var OPZIONI = [
       cavo.classList.add('on');
       buzz(12);
     },1150);
+    hkT(function(){ nudge.classList.remove('on'); },1150);
     hkT(function(){ parla(HACKER[0],hkCx,topH-14); },1550);
     hkT(function(){ taci(); },3600);
   }
@@ -975,20 +1092,20 @@ var OPZIONI = [
     if(!hk) return;
     spegniHk();
     hk.classList.remove('digita');
-    hk.classList.add('nega');
-    parla(HACKER[1],hkCx,hkTop-14);
     if(cavo) cavo.classList.remove('on');
-    hkT(function(){ taci(); },1900);
+    /* prima lascia leggere il messaggio dell'assistenza, POI parla lui */
+    hkT(function(){ hk.classList.add('nega'); parla(HACKER[1],hkCx,hkTop-14); },1250);
+    hkT(function(){ taci(); },3050);
     hkT(function(){                                   /* se ne va da dov'è venuto */
       hk.classList.remove('nega');
       hk.classList.add('cammina');
       hk.style.transform='scaleX(-1)';
       hk.style.left='-140px';
-    },2100);
+    },3250);
     hkT(function(){
       if(hk){ hk.remove(); hk=null; }
       if(cavo){ cavo.remove(); cavo=null; }
-    },3300);
+    },4450);
   }
 
   /* ---------- la scena degli operai ---------- */
@@ -1160,6 +1277,7 @@ var OPZIONI = [
     pedale.classList.remove('via');
     done.classList.remove('on'); ps.classList.remove('on');
     document.getElementById('back').classList.remove('on');
+    document.getElementById('vaifirma').classList.remove('on');
   }
 
   /* 9 · TIMING — ogni tratta ha la sua durata, non sono tutte uguali */
@@ -1253,12 +1371,15 @@ var OPZIONI = [
     pedale.classList.add('via');
     done.classList.add('on');
     ps.classList.add('on');
+    document.getElementById('vaifirma').classList.add('on');
     document.getElementById('back').classList.add('on');
     hearts(); buzz([10,70,10]);
   }
 
   function scegli(o){
     buzz(18);
+    sceltaCorrente=o;
+    firmaPulisci();
     document.getElementById('p-title').innerHTML=o.titolo;
     document.getElementById('p-sub').textContent=o.sub;
     ps.textContent=o.ps;
@@ -1274,6 +1395,79 @@ var OPZIONI = [
   }
 
   document.getElementById('back').addEventListener('click',function(){ show(s2); });
+  document.getElementById('vaifirma').addEventListener('click',function(){ buzz(14); show(s4); });
+  document.getElementById('cambia').addEventListener('click',function(){ show(s2); });
+
+  /* ---------- la firma col dito ---------- */
+  var cv=document.getElementById('cv'), cctx=cv.getContext('2d'),
+      firmabox=document.getElementById('firmabox'),
+      applica=document.getElementById('applica');
+  var firmata=false, disegnando=false;
+
+  function setupCv(){
+    var r=cv.getBoundingClientRect();
+    if(!r.width){ setTimeout(setupCv,150); return; }
+    var d=window.devicePixelRatio||1;
+    cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d);
+    cctx.setTransform(d,0,0,d,0,0);
+    cctx.lineWidth=2.6; cctx.lineCap='round'; cctx.lineJoin='round';
+    cctx.strokeStyle='#ffe9b8';
+  }
+  function firmaPulisci(){
+    cctx.save(); cctx.setTransform(1,0,0,1,0,0);
+    cctx.clearRect(0,0,cv.width,cv.height); cctx.restore();
+    firmata=false; disegnando=false;
+    firmabox.classList.remove('dirty');
+    applica.classList.add('spenta');
+  }
+  cv.addEventListener('pointerdown',function(e){
+    e.preventDefault();
+    try{ cv.setPointerCapture(e.pointerId); }catch(_){}
+    disegnando=true;
+    var r=cv.getBoundingClientRect();
+    var x=e.clientX-r.left, y=e.clientY-r.top;
+    cctx.beginPath(); cctx.moveTo(x,y); cctx.lineTo(x+.15,y+.15); cctx.stroke();
+    if(!firmata){ firmata=true; firmabox.classList.add('dirty'); applica.classList.remove('spenta'); buzz(6); }
+  });
+  cv.addEventListener('pointermove',function(e){
+    if(!disegnando) return;
+    var r=cv.getBoundingClientRect();
+    cctx.lineTo(e.clientX-r.left,e.clientY-r.top); cctx.stroke();
+  });
+  ['pointerup','pointercancel'].forEach(function(ev){
+    cv.addEventListener(ev,function(){ disegnando=false; });
+  });
+  document.getElementById('pulisci').addEventListener('click',function(){ buzz(8); firmaPulisci(); });
+
+  /* firma applicata → recap del contratto con l'articolo 5 compilato */
+  document.getElementById('applica').addEventListener('click',function(){
+    if(!firmata) return;
+    buzz([12,50,12]);
+    var o=sceltaCorrente||OPZIONI[0];
+    document.getElementById('r-art5').textContent=
+      'Lunedì 10, fuori provincia: '+o.nome.toLowerCase()+
+      '. Rientro per cena — con facoltà di prolungare a cena inclusa.';
+    document.getElementById('sigimg').src=cv.toDataURL('image/png');
+    show(s5); hearts();
+  });
+
+  /* ---------- conferma: la scelta parte verso di me ---------- */
+  var toastEl=document.getElementById('toast'), toastT=null;
+  function toast(t){
+    toastEl.textContent=t; toastEl.classList.add('on');
+    clearTimeout(toastT); toastT=setTimeout(function(){ toastEl.classList.remove('on'); },2600);
+  }
+  document.getElementById('conferma').addEventListener('click',function(){
+    buzz([14,60,14]);
+    var o=sceltaCorrente||OPZIONI[0];
+    var testo='✍️ Contratto firmato!\nArt. 5 — Lunedì 10, fuori provincia: '+o.nome+
+              '.\nRientro per cena… salvo prolungare 😏';
+    if(navigator.share){
+      navigator.share({text:testo}).then(function(){ toast('Inviata 💛'); }).catch(function(){});
+    }else if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(testo).then(function(){ toast('Copiato! Incollalo in chat 💬'); });
+    }else toast('Scrivimi in chat cosa hai scelto 💬');
+  });
 })();
 </script>
 </body>
