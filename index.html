@@ -263,7 +263,10 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 /* ---------- nuvoletta ---------- */
 .say{position:fixed;z-index:11;background:#fffdf8;color:#241531;
   font-size:.98rem;font-weight:700;line-height:1.34;padding:11px 15px;border-radius:16px;
-  max-width:72vw;text-align:center;box-shadow:0 14px 32px rgba(0,0,0,.55);
+  /* width:max-content è indispensabile: con la sola `left` il browser stringe
+     la bolla allo spazio che resta fino al bordo, e per chi parla a destra
+     diventava una colonna altissima falsando il calcolo della posizione */
+  width:max-content;max-width:72vw;text-align:center;box-shadow:0 14px 32px rgba(0,0,0,.55);
   opacity:0;transform:translate(-50%,12px) scale(.55);
   transform-origin:var(--tx,50%) 100%;
   transition:opacity .2s,transform .42s var(--pop)}
@@ -791,13 +794,20 @@ var ERRORI = [
   ['Mmm... strano, non è andato.',
    'Deve esserci un conflitto. Ti disattivo un attimo il «Sì» per capire se si risolve.'],
   ['Niente, il tocco non passa ancora.',
-   'Riprova, sto rifacendo il test.'],
-  ['No, mi sa che è proprio rotto. Aspetta...',
-   'Apro un ticket. Mando qualcuno a controllare.']
+   'Il tecnico ci sta rimettendo mano.'],
+  ['No, mi sa che è proprio rotto.',
+   'Apro un ticket. Mando qualcuno a portarlo via.']
 ];
 
-/* ⚙️  2) COSA DICE L'HACKER (1° e 2° tocco) E COSA DICONO GLI OPERAI (3°) */
-var HACKER  = ['Fermi tutti, ci penso io.', 'No no. Qua è marcio dentro, io mollo.'];
+/* ⚙️  2) L'HACKER: due tentativi, poi si arrende.
+       Ogni tentativo ha due battute: la prima è quello che fa,
+       la seconda dice a lei di riprovare (e resta a schermo). */
+var HACKER = [
+  ['Fermi tutti, ci penso io.',            'Ecco fatto. Riprova a premerlo.'],
+  ['Mmm... non ha preso niente.',          'Ricompilo tutto. Dai, ridagli un colpo.'],
+  ['Niente. Qua è marcio dentro, io mollo.','Chiamate quelli della manutenzione.']
+];
+/* ⚙️  COSA DICONO GLI OPERAI */
 var BATTUTE = ['Vai Gianni, portiamolo via!', 'È rotto, non c\'è niente da fare.'];
 
 /* =========================================================================
@@ -956,11 +966,15 @@ var OPZIONI = [
     msg(ERRORI[n][0],ERRORI[n][1]);
     if(n===0){
       setTimeout(function(){ yes.classList.add('locked'); buzz([20,60,20]); },900);
-      entraHacker();
+      entraHacker();                       /* arriva e fa il 1° tentativo */
     }
-    if(n===1){ no.classList.add('broken'); hackerMolla(); }
+    if(n===1){ no.classList.add('broken'); hackerRiprova(); }   /* 2° tentativo */
     n++;
-    if(n>=ERRORI.length){ chiuso=true; setTimeout(scena,1000); }
+    if(n>=ERRORI.length){                  /* si arrende, esce, poi gli addetti */
+      chiuso=true;
+      hackerMolla();
+      setTimeout(scena,4300);
+    }
   });
 
   /* ---------- nuvoletta: si aggancia a chi parla ----------
@@ -971,22 +985,32 @@ var OPZIONI = [
   /* cx è la coordinata NOTA del personaggio, non letta dal DOM: leggendo il
      rect mentre sta ancora camminando la nuvoletta finiva fuori schermo e la
      codina puntava al vuoto. */
-  function parla(testo,cx,topY){
+  /* cx = centro NOTO del personaggio, testaY = sua coordinata superiore.
+     La nuvoletta viene messa tutta SOPRA la testa: prima la si misura, poi la
+     si posiziona, altrimenti il bordo basso cade dentro la figura. */
+  function parla(testo,cx,testaY){
     nudge.classList.remove('on');      /* le parole dell'assistenza non devono
                                           restare sopra il personaggio che parla */
     say.textContent=testo;
     say.style.left=Math.round(cx)+'px';
-    say.style.top=Math.round(topY)+'px';
+    say.style.top='0px';
     say.style.setProperty('--tx','50%');
-    void say.offsetWidth;
 
-    var r=say.getBoundingClientRect(), dx=0;
-    if(r.left<8) dx=8-r.left;
-    else if(r.right>window.innerWidth-8) dx=window.innerWidth-8-r.right;
-    if(dx){ say.style.left=Math.round(cx+dx)+'px'; void say.offsetWidth; }
+    /* offsetWidth/offsetHeight, non getBoundingClientRect: il rect include la
+       trasformazione dell'animazione (scale .55) e restituiva metà altezza,
+       col risultato che la nuvoletta finiva addosso al personaggio */
+    var alta=say.offsetHeight, larga=say.offsetWidth;
+    say.style.top=Math.max(6,Math.round(testaY-alta-14))+'px';
 
-    var f=say.getBoundingClientRect();
-    var perc=f.width ? ((cx-f.left)/f.width)*100 : 50;
+    /* rientro nei bordi ragionando in coordinate di layout */
+    var dx=0, sx=cx-larga/2, dxEdge=cx+larga/2;
+    if(sx<8) dx=8-sx;
+    else if(dxEdge>window.innerWidth-8) dx=window.innerWidth-8-dxEdge;
+    var cxFin=cx+dx;
+    say.style.left=Math.round(cxFin)+'px';
+
+    /* la codina punta comunque al personaggio */
+    var perc=larga ? ((cx-(cxFin-larga/2))/larga)*100 : 50;
     say.style.setProperty('--tx',Math.max(12,Math.min(88,perc)).toFixed(1)+'%');
     say.classList.add('on');
   }
@@ -1083,37 +1107,51 @@ var OPZIONI = [
       cavo.classList.add('on');
       buzz(12);
     },1150);
-    hkT(function(){ nudge.classList.remove('on'); },1150);
-    hkT(function(){ parla(HACKER[0],hkCx,topH-14); },1550);
-    hkT(function(){ taci(); },3600);
+    hkT(function(){ tentativo(0,400); },1150);
   }
 
-  function hackerMolla(){
+  /* un tentativo = "sto lavorando" + "riprova tu", che resta a schermo
+     finché non tocca di nuovo: così non deve indovinare che va ricliccato */
+  function tentativo(i,ritardo){
+    if(!hk) return;
+    hk.classList.add('digita');
+    hkT(function(){ parla(HACKER[i][0],hkCx,hkTop); },ritardo);
+    hkT(function(){ taci(); },ritardo+1800);
+    hkT(function(){ parla(HACKER[i][1],hkCx,hkTop); },ritardo+2050);
+  }
+
+  function hackerRiprova(){                            /* 2° tentativo */
     if(!hk) return;
     spegniHk();
+    taci();
+    tentativo(1,900);
+  }
+
+  function hackerMolla(){                              /* si arrende e va via */
+    if(!hk) return;
+    spegniHk();
+    taci();
     hk.classList.remove('digita');
     if(cavo) cavo.classList.remove('on');
-    /* prima lascia leggere il messaggio dell'assistenza, POI parla lui */
-    hkT(function(){ hk.classList.add('nega'); parla(HACKER[1],hkCx,hkTop-14); },1250);
-    hkT(function(){ taci(); },3050);
+    hkT(function(){ hk.classList.add('nega'); parla(HACKER[2][0],hkCx,hkTop); },900);
+    hkT(function(){ parla(HACKER[2][1],hkCx,hkTop); },2500);
+    hkT(function(){ taci(); },4000);
     hkT(function(){                                   /* se ne va da dov'è venuto */
       hk.classList.remove('nega');
       hk.classList.add('cammina');
       hk.style.transform='scaleX(-1)';
       hk.style.left='-140px';
-    },3250);
+    },4150);
     hkT(function(){
       if(hk){ hk.remove(); hk=null; }
       if(cavo){ cavo.remove(); cavo=null; }
-    },4450);
+    },5350);
   }
 
   /* ---------- la scena degli operai ---------- */
   function scena(){
-    /* se l'hacker è ancora in giro (tocchi ravvicinati) sparisce qui */
-    spegniHk();
-    if(hk){ hk.remove(); hk=null; }
-    if(cavo){ cavo.remove(); cavo=null; }
+    /* l'hacker esce da solo con i suoi tempi: non lo si strappa via qui,
+       si incrociano mentre gli addetti entrano */
     s1.classList.add('dim');
     yes.classList.remove('back'); yes.classList.add('away');
 
@@ -1161,11 +1199,11 @@ var OPZIONI = [
     /* posizioni note in anticipo: le nuvolette non devono leggere il DOM
        mentre gli operai sono ancora in cammino */
     var metaL=Math.max(4, cx-74), metaR=Math.min(window.innerWidth-66, cx+r0.width+12);
-    var bubbleY=cy-58;
+    var testaOp=cy+r0.height/2-40;         /* coordinata superiore degli operai */
     setTimeout(function(){ if(wl) wl.classList.remove('cammina'); if(wr) wr.classList.remove('cammina'); },2250);
-    setTimeout(function(){ if(wl) parla(BATTUTE[0],metaL+31,bubbleY); },2350);
+    setTimeout(function(){ if(wl) parla(BATTUTE[0],metaL+31,testaOp); },2350);
     setTimeout(function(){ taci(); },3700);
-    setTimeout(function(){ if(wr){ wr.classList.add('nega'); parla(BATTUTE[1],metaR+31,bubbleY); } },3900);
+    setTimeout(function(){ if(wr){ wr.classList.add('nega'); parla(BATTUTE[1],metaR+31,testaOp); } },3900);
     setTimeout(function(){ taci(); if(wr) wr.classList.remove('nega'); },5250);
 
     setTimeout(function(){
@@ -1187,6 +1225,9 @@ var OPZIONI = [
 
     setTimeout(function(){
       no.remove(); if(wl) wl.remove(); if(wr) wr.remove(); spot.remove();
+      spegniHk();
+      if(hk){ hk.remove(); hk=null; }
+      if(cavo){ cavo.remove(); cavo=null; }
       nudge.classList.remove('on');
       s1.classList.remove('dim');
       yes.classList.remove('locked','away');
