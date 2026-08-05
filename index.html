@@ -311,7 +311,10 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   background:var(--glass);border:1px solid rgba(255,255,255,.3);border-radius:19px;
   padding:16px 34px 16px 17px;color:var(--ink);font-weight:400;font-size:1rem;text-shadow:var(--sh);
   box-shadow:0 8px 24px -10px rgba(0,0,0,.5);
-  opacity:0;animation:cardIn .7s var(--ease) forwards;
+  /* NIENTE opacity:0 di base: nascondendo e rimostrando la schermata
+     l'animazione non riparte, e le schede restavano invisibili per sempre.
+     Così, se l'animazione non gira, la scheda si vede lo stesso. */
+  animation:cardIn .7s var(--ease) both;
   transition:transform .2s,background .25s,border-color .25s,box-shadow .25s}
 @keyframes cardIn{from{opacity:0;transform:translateY(22px) rotateX(11deg) scale(.97)}
   to{opacity:1;transform:none}}
@@ -576,6 +579,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   0%  {opacity:0;transform:translateX(-50%) rotate(-32deg) scale(2.8)}
   55% {opacity:1;transform:translateX(-50%) rotate(-9deg) scale(.93)}
   100%{opacity:1;transform:translateX(-50%) rotate(-11deg) scale(1)}}
+/* link travestito da pulsante: un vero <a> verso il file .ics, che su iPhone
+   apre direttamente il Calendario */
+.incal{display:inline-flex;align-items:center;margin-top:10px;text-decoration:none}
 .toast{position:fixed;left:50%;bottom:76px;z-index:30;background:#fffdf8;color:#241531;
   font-weight:700;font-size:.9rem;padding:11px 17px;border-radius:13px;
   box-shadow:0 12px 30px rgba(0,0,0,.5);opacity:0;pointer-events:none;
@@ -913,6 +919,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
     </div>
   </div>
   <button class="cta" id="conferma">Manda la conferma 📨</button>
+  <a class="ghostbtn incal" id="incal" href="ics/prosecco.ics">Mettilo in calendario 📅</a>
 </section>
 
 <div class="toast" id="toast"></div>
@@ -948,7 +955,7 @@ var BATTUTE = ['Vai Gianni, portiamolo via!', 'È rotto, non c\'è niente da far
    ========================================================================= */
 var OPZIONI = [
   {
-    em:'🍇', nome:'Le colline del Prosecco',
+    em:'🍇', ics:'prosecco', nome:'Le colline del Prosecco',
     teaser:'Vigneti terrazzati e un tramonto che non ti aspetti',
     titolo:'Colline del <em>Prosecco</em>.',
     sub:'Valdobbiadene. Un\'ora di strada, un altro mondo.',
@@ -961,7 +968,7 @@ var OPZIONI = [
     ]
   },
   {
-    em:'⛵', nome:'Il lago al tramonto',
+    em:'⛵', ics:'garda', nome:'Il lago al tramonto',
     teaser:'Il Garda, la sponda veronese, il sole che cade nell\'acqua',
     titolo:'Il <em>lago</em> al tramonto.',
     sub:'Garda. Un\'ora e un quarto, e non sei più in nessun posto che conosci.',
@@ -974,28 +981,28 @@ var OPZIONI = [
     ]
   },
   {
-    em:'🌉', nome:'Il ponte sul Brenta',
-    teaser:'Bassano, il ponte di legno, e poi si sconfina al tramonto',
-    titolo:'Il <em>ponte</em> sul Brenta.',
-    sub:'Bassano, e per il tramonto si passa il confine verso Possagno.',
-    ps:'P.S. — un goccio si può. Tanto guido io.',
+    em:'♟️', ics:'brenta', nome:'Scacchi, ponte e fiume',
+    teaser:'La piazza degli scacchi, il ponte di legno, e poi si sconfina',
+    titolo:'Scacchi, ponte e <em>fiume</em>.',
+    sub:'Marostica e Bassano, e al tramonto si passa in Treviso.',
+    ps:'P.S. — la partita vera con le persone è a settembre. Intanto ci prendiamo la piazza.',
     tappe:[
-      ['🚗','Ti vengo a prendere','Trentacinque minuti e siamo sul Brenta.'],
-      ['🌉','Il Ponte degli Alpini','Il ponte di legno di Palladio, il fiume sotto, le botteghe intorno.'],
-      ['🥃','Le grapperie','Due passi fra le distillerie storiche, giusto per dire di averlo fatto.'],
+      ['🚗','Ti vengo a prendere','Mezz\'ora e siamo sotto le mura di Marostica.'],
+      ['♟️','La piazza degli scacchi','La scacchiera disegnata a terra e il castello che la guarda dall\'alto.'],
+      ['🌉','Il Ponte degli Alpini','Bassano, il ponte di legno di Palladio e le grapperie che ci stanno sopra.'],
       ['🌄','Possagno al tramonto','Si sconfina in Treviso: il tempio sul colle e tutta la pianura sotto.']
     ]
   },
   {
-    em:'🏰', nome:'Il borgo sul colle',
+    em:'🏰', ics:'asolo', nome:'Il borgo sul colle',
     teaser:'Asolo, la rocca e cento orizzonti che si aprono',
     titolo:'Il borgo <em>sul colle</em>.',
     sub:'Asolo. Un\'ora, e sei in un posto che sembra finto.',
     ps:'P.S. — la chiamano la città dai cento orizzonti. Vedrai perché.',
     tappe:[
       ['🚗','Ti vengo a prendere','Un\'ora verso est, salendo tra le colline trevigiane.'],
-      ['🏰','Sotto la rocca','Vicoli in salita, portici, botteghe. Nessuna fretta.'],
-      ['🌄','I cento orizzonti','Dalla rocca si vedono le colline una dietro l\'altra fino alla pianura.'],
+      ['🏰','Vicoli in salita','Portici, botteghe, la rocca che ti guarda da sopra. Nessuna fretta.'],
+      ['🌄','I cento orizzonti','Dal sentiero sopra il paese le colline si aprono una dietro l\'altra.'],
       ['🍷','Per chiudere','Un calice in piazza, con il colle che diventa arancione.']
     ]
   }
@@ -1060,6 +1067,11 @@ var OPZIONI = [
     function entra(){
       SCHERMI.forEach(function(s){ s.classList.remove('on','out'); });
       el.classList.add('on');
+      /* rientrando su una schermata già vista l'animazione d'ingresso non
+         riparte da sola: la si riavvia a mano */
+      Array.prototype.forEach.call(el.querySelectorAll('.opt'),function(o){
+        o.style.animation='none'; void o.offsetWidth; o.style.animation='';
+      });
       var dots=steps.children;
       for(var i=0;i<dots.length;i++) dots[i].classList.toggle('on', i===idx);
       window.scrollTo(0,0);
@@ -1790,6 +1802,7 @@ var OPZIONI = [
       'Lunedì 10, fuori provincia: '+o.nome+          /* niente minuscolo: "Verona" è un nome proprio */
       '. Rientro per cena — con facoltà di prolungare a cena inclusa.';
     document.getElementById('sigimg').src=cv.toDataURL('image/png');
+    document.getElementById('incal').href='ics/'+(o.ics||'prosecco')+'.ics';
     show(s5); hearts();
   });
 
