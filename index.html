@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
-<meta name="theme-color" content="#241531">
+<meta name="theme-color" content="#1d1030">
 <meta name="robots" content="noindex, nofollow">
 <title>Una domanda per te</title>
 <meta property="og:title" content="Ho una domanda per te...">
@@ -16,6 +16,7 @@
   --glass:linear-gradient(rgba(255,255,255,.11),rgba(255,255,255,.045)),rgba(28,16,42,.72);
   --sh:0 1px 3px rgba(0,0,0,.6), 0 2px 20px rgba(0,0,0,.4);
   --ease:cubic-bezier(.22,.9,.28,1);
+  --pop:cubic-bezier(.34,1.5,.5,1);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{overflow-x:hidden}
@@ -30,36 +31,43 @@ body{
   padding:calc(26px + env(safe-area-inset-top)) 20px calc(52px + env(safe-area-inset-bottom));
   user-select:none;-webkit-user-select:none;
   -webkit-font-smoothing:antialiased;
+  animation:pageIn 1s ease-out both;      /* solo opacity: non rompe i position:fixed */
 }
+@keyframes pageIn{from{opacity:0}to{opacity:1}}
 
 /* ---------- cielo ---------- */
 .star{position:fixed;border-radius:50%;background:#fff;z-index:0;pointer-events:none;
   animation:tw 4s ease-in-out infinite}
-@keyframes tw{0%,100%{opacity:var(--o)}50%{opacity:calc(var(--o) * .25)}}
-.sun{position:fixed;left:50%;bottom:25vh;width:150px;height:150px;margin-left:-75px;border-radius:50%;
+@keyframes tw{0%,100%{opacity:var(--o)}50%{opacity:calc(var(--o) * .22)}}
+.sunwrap{position:fixed;inset:0;z-index:0;pointer-events:none;
+  animation:sunRise 2.2s var(--ease) both}
+@keyframes sunRise{from{transform:translateY(46px);opacity:0}to{transform:none;opacity:1}}
+.sun{position:absolute;left:50%;bottom:25vh;width:150px;height:150px;margin-left:-75px;border-radius:50%;
   background:radial-gradient(circle,#fff3cf 0%,#ffca75 42%,rgba(247,185,95,.35) 62%,rgba(247,185,95,0) 74%);
-  z-index:0;animation:sunPulse 7s ease-in-out infinite}
+  animation:sunPulse 7s ease-in-out infinite}
 @keyframes sunPulse{0%,100%{transform:scale(1);opacity:.92}50%{transform:scale(1.07);opacity:1}}
-.hills{position:fixed;inset:auto 0 0 0;height:46vh;z-index:1;pointer-events:none}
+.hills{position:fixed;inset:auto 0 0 0;height:46vh;z-index:1;pointer-events:none;
+  animation:hillsIn 1.5s var(--ease) .15s both}
+@keyframes hillsIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
 .hills svg{width:100%;height:100%;display:block}
 .veil{position:fixed;inset:0;z-index:2;pointer-events:none;
   background:radial-gradient(ellipse 88% 52% at 50% 46%,rgba(14,7,22,.5) 0%,rgba(14,7,22,.18) 55%,rgba(14,7,22,0) 78%)}
-/* grana: toglie la plasticosità dei gradienti */
 .grain{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
-/* ---------- schermate ---------- */
+/* ---------- schermate + transizioni ---------- */
 .screen{position:relative;z-index:5;width:100%;max-width:430px;text-align:center;display:none;margin:auto}
 .screen.on{display:block}
-/* entrata scaglionata degli elementi */
-.screen.on > *{animation:rise .7s var(--ease) both}
-.screen.on > *:nth-child(1){animation-delay:.05s}
-.screen.on > *:nth-child(2){animation-delay:.14s}
-.screen.on > *:nth-child(3){animation-delay:.23s}
-.screen.on > *:nth-child(4){animation-delay:.32s}
-.screen.on > *:nth-child(5){animation-delay:.41s}
-.screen.on > *:nth-child(6){animation-delay:.5s}
-@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.screen.out{display:block;animation:sink .34s cubic-bezier(.4,0,1,1) forwards}
+@keyframes sink{to{opacity:0;transform:translateY(-20px) scale(.97);filter:blur(3px)}}
+.screen.on > *{animation:rise .75s var(--ease) both}
+.screen.on > *:nth-child(1){animation-delay:.06s}
+.screen.on > *:nth-child(2){animation-delay:.15s}
+.screen.on > *:nth-child(3){animation-delay:.24s}
+.screen.on > *:nth-child(4){animation-delay:.33s}
+.screen.on > *:nth-child(5){animation-delay:.42s}
+.screen.on > *:nth-child(6){animation-delay:.51s}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
 
 .kicker{font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;opacity:.9;
   margin-bottom:18px;text-shadow:var(--sh);font-weight:600}
@@ -68,19 +76,71 @@ h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(2
 h1 em{font-style:italic;color:var(--gold)}
 .sub{font-size:1.03rem;line-height:1.58;opacity:.96;margin-bottom:32px;text-shadow:var(--sh)}
 
+/* ================= SCHERMATA 0 — IL CONTRATTO ================= */
+.doc{position:relative;text-align:left;border-radius:20px;overflow:hidden;
+  background:linear-gradient(rgba(255,255,255,.09),rgba(255,255,255,.035)),rgba(24,13,36,.82);
+  border:1px solid rgba(255,216,138,.42);
+  box-shadow:0 26px 60px -20px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  animation:docDrop 1s var(--pop) .25s both}
+@keyframes docDrop{from{opacity:0;transform:translateY(-44px) rotate(-2.5deg) scale(.9)}
+  to{opacity:1;transform:none}}
+.doc .top{height:8px;background:repeating-linear-gradient(45deg,#ffd88a 0 8px,#241531 8px 16px);opacity:.85}
+.doc .inner{padding:20px 20px 54px}   /* il fondo è riservato al timbro */
+.doc h2{font-family:Georgia,serif;font-weight:400;font-size:1.32rem;letter-spacing:.02em;
+  text-align:center;margin-bottom:2px}
+.doc .rule{height:1px;background:linear-gradient(90deg,transparent,rgba(255,216,138,.65),transparent);
+  margin:11px 0 14px}
+.doc .prot{text-align:center;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;
+  opacity:.58;font-family:ui-monospace,Menlo,Consolas,monospace;margin-bottom:9px}
+.field{display:flex;gap:12px;align-items:baseline;padding:9px 0;
+  border-bottom:1px dashed rgba(255,255,255,.14);
+  opacity:0;animation:typein .55s var(--ease) forwards}
+.fields .field:last-child{border-bottom:0}
+.field dt{flex:0 0 76px;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+  opacity:.62;font-weight:700}
+.field dd{font-size:.95rem;line-height:1.4}
+.fields .field:nth-child(1){animation-delay:.95s}
+.fields .field:nth-child(2){animation-delay:1.15s}
+.fields .field:nth-child(3){animation-delay:1.35s}
+.fields .field:nth-child(4){animation-delay:1.55s}
+@keyframes typein{from{opacity:0;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
+
+.stamp{position:absolute;right:14px;bottom:11px;
+  border:2px solid rgba(255,122,146,.85);border-radius:9px;padding:5px 10px;
+  color:#ffa9b9;font-size:.58rem;font-weight:800;letter-spacing:.18em;text-align:center;
+  box-shadow:inset 0 0 0 1px rgba(255,122,146,.35);text-transform:uppercase;line-height:1.3;
+  opacity:0;animation:slam .55s cubic-bezier(.3,1.5,.5,1) 2s forwards}
+.stamp small{display:block;font-size:.48rem;opacity:.75;letter-spacing:.1em}
+@keyframes slam{0%{opacity:0;transform:rotate(-34deg) scale(3)}
+  55%{opacity:1;transform:rotate(-11deg) scale(.92)}
+  100%{opacity:1;transform:rotate(-13deg) scale(1)}}
+
+.cta{margin-top:24px;background:var(--glass);border:1px solid rgba(255,255,255,.34);
+  color:var(--ink);text-shadow:var(--sh);box-shadow:0 10px 28px -10px rgba(0,0,0,.6);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  opacity:0;animation:rise .7s var(--ease) 2.5s both;transition:transform .2s,border-color .25s}
+.cta:active{transform:scale(.96);border-color:rgba(255,216,138,.7)}
+
 /* ---------- bottoni ---------- */
 .btns{display:flex;gap:14px;justify-content:center;align-items:center;min-height:66px}
 button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36px;font-weight:600;
   font-size:1.06rem;letter-spacing:.01em}
 #yes{position:relative;overflow:hidden;color:#fff;
   background:linear-gradient(115deg,#ff8f66 0%,#ff6b8a 42%,#ffc09e 52%,#ff6b8a 62%,#ff8f66 100%);
-  background-size:320% 100%;animation:sheen 5s ease-in-out infinite;
-  box-shadow:0 12px 34px -6px rgba(255,107,138,.6),inset 0 1px 0 rgba(255,255,255,.25);
-  transition:transform .6s cubic-bezier(.34,1.25,.5,1),background-color .7s,color .4s,box-shadow .5s,opacity .5s}
+  background-size:320% 100%;
+  animation:sheen 5s ease-in-out infinite, halo 3.2s ease-in-out infinite;
+  transition:transform .6s var(--pop),background-color .7s,color .4s,opacity .5s}
 @keyframes sheen{0%,100%{background-position:100% 0}50%{background-position:0 0}}
+@keyframes halo{
+  0%,100%{box-shadow:0 12px 32px -8px rgba(255,107,138,.55),inset 0 1px 0 rgba(255,255,255,.25)}
+  50%{box-shadow:0 18px 48px -6px rgba(255,107,138,.85),inset 0 1px 0 rgba(255,255,255,.32)}}
 #yes:active{transform:scale(.95)}
+#yes .rip{position:absolute;width:20px;height:20px;border-radius:50%;
+  background:rgba(255,255,255,.6);pointer-events:none;
+  transform:translate(-50%,-50%) scale(0);animation:rip .65s ease-out forwards}
+@keyframes rip{to{transform:translate(-50%,-50%) scale(16);opacity:0}}
 
-/* --- il Sì disattivato dall'"assistenza" --- */
 #yes.locked{color:transparent;background:linear-gradient(135deg,#4b3b55,#332741);background-size:auto;
   animation:jolt .5s cubic-bezier(.36,.07,.19,.97);
   box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06);
@@ -94,7 +154,11 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes lockPop{from{opacity:0;transform:scale(.3) rotate(-25deg)}to{opacity:1;transform:none}}
-#yes.away{transform:translateX(-180%) scale(.84);opacity:0}
+#yes.away{transform:translateX(-180%) scale(.84);opacity:0;animation:none}
+#yes.back{animation:yesBack .9s var(--pop) both, sheen 5s ease-in-out infinite}
+@keyframes yesBack{0%{transform:translateX(-180%) scale(.84);opacity:0}
+  70%{transform:translateX(0) scale(1.22);opacity:1}
+  100%{transform:scale(1.14);opacity:1}}
 
 #no{background:var(--glass);color:var(--ink);border:1px solid rgba(255,255,255,.42);
   text-shadow:var(--sh);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
@@ -102,24 +166,22 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 #no.broken{filter:grayscale(.7);opacity:.85}
 #no.center{position:fixed;z-index:8;margin:0;
   transition:left .85s cubic-bezier(.34,1.1,.45,1),top .85s cubic-bezier(.34,1.1,.45,1),
-             transform .55s cubic-bezier(.34,1.4,.5,1),box-shadow .6s}
+             transform .55s var(--pop),box-shadow .6s}
 #no.held{box-shadow:0 20px 30px -10px rgba(0,0,0,.6)}
 #no.carried{transition:transform 1.05s cubic-bezier(.5,0,.72,.9)}
 #no.shake{animation:jolt .42s cubic-bezier(.36,.07,.19,.97)}
 
-/* alone caldo dietro al bottone guasto */
 .spot{position:fixed;z-index:7;pointer-events:none;border-radius:50%;
   background:radial-gradient(circle,rgba(255,216,138,.34) 0%,rgba(255,150,110,.15) 45%,rgba(255,216,138,0) 72%);
   opacity:0;transform:scale(.7);transition:opacity .7s,transform .9s var(--ease)}
-.spot.on{opacity:1;transform:scale(1)}
+.spot.on{opacity:1;transform:scale(1);animation:spotBreathe 2.4s ease-in-out infinite}
+@keyframes spotBreathe{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4)}}
 
-/* durante la scena il testo sopra si abbassa */
-#s1.dim .kicker,#s1.dim h1,#s1.dim .sub{opacity:.24}
-#s1 .kicker,#s1 h1,#s1 .sub{transition:opacity .7s}
+#s1.dim .kicker,#s1.dim h1,#s1.dim .sub{opacity:.24;filter:blur(1.5px)}
+#s1 .kicker,#s1 h1,#s1 .sub{transition:opacity .7s,filter .7s}
 
-/* messaggi dell'assistenza */
 .nudge{font-size:1rem;margin-top:24px;min-height:4.4em;line-height:1.5;text-shadow:var(--sh);
-  opacity:0;transform:translateY(-4px);transition:opacity .3s,transform .3s;font-style:italic}
+  opacity:0;transform:translateY(-6px);transition:opacity .3s,transform .3s;font-style:italic}
 .nudge.on{opacity:1;transform:none}
 .nudge .sys{display:block;margin-top:8px;font-size:.9rem;font-style:normal;opacity:.9}
 
@@ -134,20 +196,19 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .say{position:fixed;z-index:11;background:#fffdf8;color:#241531;
   font-size:1rem;font-weight:700;line-height:1.35;padding:12px 16px;border-radius:17px;
   max-width:76vw;text-align:center;box-shadow:0 12px 30px rgba(0,0,0,.5);
-  opacity:0;transform:translate(-50%,8px) scale(.72);transform-origin:bottom center;
-  transition:opacity .25s,transform .34s cubic-bezier(.34,1.55,.5,1)}
+  opacity:0;transform:translate(-50%,10px) scale(.7);transform-origin:bottom center;
+  transition:opacity .25s,transform .38s var(--pop)}
 .say.on{opacity:1;transform:translate(-50%,0) scale(1)}
 .say:after{content:'';position:absolute;top:100%;left:var(--tx,50%);margin-left:-8px;
   border:8px solid transparent;border-top-color:#fffdf8}
 
-/* cartello manutenzione */
 .maint{display:none;margin-top:20px;border-radius:15px;overflow:hidden;
   border:1px solid rgba(255,216,138,.55);background:rgba(24,14,36,.86);
   box-shadow:0 14px 34px -10px rgba(0,0,0,.6);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.maint.on{display:block;animation:swing .7s cubic-bezier(.34,1.45,.5,1) both}
-@keyframes swing{0%{opacity:0;transform:translateY(-22px) rotate(-3deg) scale(.92)}
-  60%{opacity:1;transform:translateY(3px) rotate(1deg) scale(1.01)}
+.maint.on{display:block;animation:swing .8s var(--pop) both}
+@keyframes swing{0%{opacity:0;transform:translateY(-26px) rotate(-3.5deg) scale(.9)}
+  58%{opacity:1;transform:translateY(4px) rotate(1.2deg) scale(1.015)}
   100%{opacity:1;transform:none}}
 .tape{height:10px;background:repeating-linear-gradient(45deg,#ffd88a 0 9px,#241531 9px 18px)}
 .maint p{padding:14px 16px;font-size:.9rem;line-height:1.52;text-shadow:var(--sh)}
@@ -155,21 +216,24 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   color:var(--gold);margin-bottom:6px}
 
 /* ---------- card opzioni ---------- */
-.opts{display:flex;flex-direction:column;gap:11px}
+.opts{display:flex;flex-direction:column;gap:11px;perspective:900px}
 .opt{position:relative;display:flex;gap:15px;align-items:center;width:100%;text-align:left;
   background:var(--glass);border:1px solid rgba(255,255,255,.3);border-radius:19px;
   padding:16px 34px 16px 17px;color:var(--ink);font-weight:400;font-size:1rem;text-shadow:var(--sh);
   box-shadow:0 8px 24px -10px rgba(0,0,0,.5);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  opacity:0;transform:translateY(16px);animation:rowIn .6s var(--ease) forwards;
+  opacity:0;animation:cardIn .7s var(--ease) forwards;
   transition:transform .2s,background .25s,border-color .25s,box-shadow .25s}
-.opt:nth-child(1){animation-delay:.12s}.opt:nth-child(2){animation-delay:.24s}
-.opt:nth-child(3){animation-delay:.36s}.opt:nth-child(4){animation-delay:.48s}
+@keyframes cardIn{from{opacity:0;transform:translateY(22px) rotateX(11deg) scale(.97)}
+  to{opacity:1;transform:none}}
+.opt:nth-child(1){animation-delay:.14s}.opt:nth-child(2){animation-delay:.27s}
+.opt:nth-child(3){animation-delay:.4s}.opt:nth-child(4){animation-delay:.53s}
 .opt:after{content:'›';position:absolute;right:16px;top:50%;transform:translateY(-52%);
-  font-size:1.5rem;opacity:.45;font-weight:300}
+  font-size:1.5rem;opacity:.45;font-weight:300;transition:transform .25s,opacity .25s}
 .opt:active{transform:scale(.972);border-color:rgba(255,216,138,.7);
   box-shadow:0 4px 14px -6px rgba(0,0,0,.5);
   background:linear-gradient(rgba(255,255,255,.2),rgba(255,255,255,.12)),rgba(28,16,42,.72)}
+.opt:active:after{transform:translate(5px,-52%);opacity:.95}
 .opt .em{font-size:1.75rem;line-height:1;flex-shrink:0;text-shadow:none;
   filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
 .opt b{display:block;font-weight:600;font-size:1rem;margin-bottom:3px}
@@ -181,13 +245,17 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   border:1px solid rgba(255,255,255,.26);border-radius:17px;padding:15px 17px;text-shadow:var(--sh);
   box-shadow:0 8px 24px -12px rgba(0,0,0,.5);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  opacity:0;transform:translateY(14px);animation:rowIn .6s var(--ease) forwards}
-.row:nth-child(1){animation-delay:.2s}.row:nth-child(2){animation-delay:.34s}
-.row:nth-child(3){animation-delay:.48s}.row:nth-child(4){animation-delay:.62s}
-/* filo che collega le tappe */
-.row:not(:last-child):after{content:'';position:absolute;left:27px;top:100%;height:11px;width:2px;
-  background:linear-gradient(rgba(255,216,138,.55),rgba(255,216,138,.15))}
-@keyframes rowIn{to{opacity:1;transform:none}}
+  opacity:0;animation:rowIn .7s var(--ease) forwards}
+@keyframes rowIn{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
+.row:nth-child(1){animation-delay:.22s}.row:nth-child(2){animation-delay:.4s}
+.row:nth-child(3){animation-delay:.58s}.row:nth-child(4){animation-delay:.76s}
+/* il filo tra le tappe si allunga da solo */
+.row:not(:last-child):after{content:'';position:absolute;left:27px;top:100%;width:2px;height:0;
+  background:linear-gradient(rgba(255,216,138,.6),rgba(255,216,138,.15));
+  animation:link .35s ease-out forwards}
+.row:nth-child(1):after{animation-delay:.62s}.row:nth-child(2):after{animation-delay:.8s}
+.row:nth-child(3):after{animation-delay:.98s}
+@keyframes link{to{height:11px}}
 .row .ic{font-size:1.35rem;line-height:1.25;flex-shrink:0;text-shadow:none;
   filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
 .row b{display:block;font-size:.97rem;margin-bottom:3px}
@@ -198,37 +266,41 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 
 /* ---------- indicatore passi ---------- */
 .steps{position:fixed;left:50%;transform:translateX(-50%);z-index:6;display:flex;gap:7px;
-  bottom:calc(18px + env(safe-area-inset-bottom))}
+  bottom:calc(18px + env(safe-area-inset-bottom));animation:pageIn 1s ease-out 1s both}
 .steps i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.28);
-  transition:background .45s var(--ease),width .45s var(--ease)}
+  transition:background .45s var(--ease),width .45s var(--pop)}
 .steps i.on{background:var(--gold);width:20px;border-radius:3px}
 
 /* ---------- coriandoli ---------- */
-.heart{position:fixed;z-index:12;pointer-events:none;font-size:22px;animation:fly 2.7s ease-out forwards}
-@keyframes fly{0%{opacity:1;transform:translateY(0) scale(.5) rotate(0)}
-  100%{opacity:0;transform:translateY(-78vh) scale(1.3) rotate(var(--r))}}
+.heart{position:fixed;z-index:12;pointer-events:none;font-size:22px;animation:fly 2.9s ease-out forwards}
+@keyframes fly{0%{opacity:1;transform:translate(0,0) scale(.4) rotate(0)}
+  15%{opacity:1}
+  100%{opacity:0;transform:translate(var(--dx),-82vh) scale(1.25) rotate(var(--r))}}
 
 @media (max-height:720px){
   .kicker{margin-bottom:12px}
   h1{font-size:clamp(1.65rem,7.2vw,2.25rem)}
   .sub{margin-bottom:23px;font-size:.95rem}
   .nudge{font-size:.95rem;margin-top:19px}
+  .doc .inner{padding:16px 16px 48px}.doc h2{font-size:1.16rem}
+  .field{padding:7px 0}.field dd{font-size:.88rem}
+  .cta{margin-top:18px;padding:15px 30px}
   .opts{gap:9px}.opt{padding:13px 30px 13px 15px}.opt .em{font-size:1.5rem}.opt span{font-size:.82rem}
   .plan{margin-top:17px;gap:9px}.row{padding:12px 15px}.row span{font-size:.83rem}
   .ps{margin-top:15px}.maint p{padding:12px 14px;font-size:.85rem}
 }
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
+  .doc,.field,.stamp,.cta,.opt,.row,body,.steps{opacity:1!important}}
 </style>
 </head>
 <body>
 
-<div class="sun"></div>
+<div class="sunwrap"><div class="sun"></div></div>
 <div class="hills">
   <svg viewBox="0 0 400 200" preserveAspectRatio="none">
     <path fill="var(--hill-1)" d="M0,88 C58,52 108,100 164,74 C224,44 274,96 330,66 C360,50 386,64 400,58 L400,200 L0,200 Z"/>
     <path fill="var(--hill-2)" d="M0,120 C54,92 104,134 160,110 C220,84 268,128 325,105 C358,92 384,108 400,100 L400,200 L0,200 Z"/>
     <path fill="var(--hill-3)" d="M0,152 C68,131 118,165 184,148 C244,132 294,162 350,145 C375,138 390,145 400,141 L400,200 L0,200 Z"/>
-    <!-- filari in prospettiva sulla collina in primo piano -->
     <g opacity=".2" stroke="#fff" stroke-width=".6" fill="none">
       <path d="M0,163 C68,142 118,176 184,159 C244,143 294,173 350,156 C375,149 390,156 400,152"/>
       <path d="M0,172 C68,151 118,185 184,168 C244,152 294,182 350,165 C375,158 390,165 400,161"/>
@@ -247,11 +319,32 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 
 <div class="say" id="say"></div>
 
+<!-- ============ 0. IL CONTRATTO ============ -->
+<section class="screen on" id="s0">
+  <p class="kicker">Documento in arrivo</p>
+  <div class="doc">
+    <div class="top"></div>
+    <div class="inner">
+      <p class="prot">Prot. 10/08 — copia unica</p>
+      <h2>Contratto di gita</h2>
+      <div class="rule"></div>
+      <dl class="fields">
+        <div class="field"><dt>Oggetto</dt><dd>Una giornata fuori provincia</dd></div>
+        <div class="field"><dt>Data</dt><dd>Lunedì 10, dal pomeriggio</dd></div>
+        <div class="field"><dt>Parti</dt><dd>Io e te</dd></div>
+        <div class="field"><dt>Clausola</dt><dd>Rientro previsto per cena</dd></div>
+      </dl>
+      <div class="stamp">Da firmare<small>in fondo</small></div>
+    </div>
+  </div>
+  <button class="cta" id="apri">Leggi la proposta →</button>
+</section>
+
 <!-- ============ 1. LA DOMANDA ============ -->
-<section class="screen on" id="s1">
-  <p class="kicker">Ho una proposta</p>
-  <h1>Lunedì usciamo <em>insieme</em>?</h1>
-  <p class="sub">Ti porto fuori provincia.<br>Torniamo per cena. Devi solo scegliere.</p>
+<section class="screen" id="s1">
+  <p class="kicker">Articolo unico</p>
+  <h1>Lunedì, <em>fuori provincia</em>.</h1>
+  <p class="sub">Ti porto dove non sei mai stata.<br>Torniamo per cena. Devi solo firmare.</p>
   <div class="btns" id="btns">
     <button id="yes">Sì ✨</button>
     <button id="no">No</button>
@@ -266,7 +359,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 
 <!-- ============ 2. LA SCELTA ============ -->
 <section class="screen" id="s2">
-  <p class="kicker">Lo sapevo</p>
+  <p class="kicker">Firmato</p>
   <h1>Ora <em>scegli tu</em>.</h1>
   <p class="sub">Quattro posti. Uno solo, lunedì.<br>Tocca quello che ti ispira di più.</p>
   <div class="opts" id="opts"></div>
@@ -282,12 +375,12 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   <button class="back" id="back">no aspetta, fammi vedere le altre</button>
 </section>
 
-<div class="steps" id="steps"><i class="on"></i><i></i><i></i></div>
+<div class="steps" id="steps"><i class="on"></i><i></i><i></i><i></i></div>
 
 <script>
 /* =========================================================================
    ⚙️  1) COSA DICE L'ASSISTENZA A OGNI TOCCO SUL "NO"
-       Al 1° tocco disattiva il Sì. Al 3° arrivano gli operai.
+       Al 1° tocco disattiva il Sì. All'ultimo arrivano gli operai.
    ========================================================================= */
 var ERRORI = [
   ['Mmm... strano, non è andato.',
@@ -364,20 +457,21 @@ var OPZIONI = [
   var no=document.getElementById('no'), yes=document.getElementById('yes'),
       nudge=document.getElementById('nudge'), say=document.getElementById('say'),
       maint=document.getElementById('maint'), steps=document.getElementById('steps'),
-      s1=document.getElementById('s1'), s2=document.getElementById('s2'), s3=document.getElementById('s3');
+      s0=document.getElementById('s0'), s1=document.getElementById('s1'),
+      s2=document.getElementById('s2'), s3=document.getElementById('s3');
+  var SCHERMI=[s0,s1,s2,s3];
   var n=0, chiuso=false;
 
-  /* ---------- stelle nel cielo alto ---------- */
+  function buzz(p){ if(navigator.vibrate){ try{ navigator.vibrate(p); }catch(e){} } }
+
+  /* ---------- stelle ---------- */
   (function stelle(){
     var frag=document.createDocumentFragment();
-    for(var i=0;i<44;i++){
+    for(var i=0;i<50;i++){
       var s=document.createElement('div');
       s.className='star';
-      var y=Math.random()*46;                       /* solo nella parte alta */
-      var o=(1-y/50)*0.85+0.1;                      /* più in alto = più brillante */
-      var d=1+Math.random()*1.6;
-      s.style.left=(Math.random()*100)+'vw';
-      s.style.top=y+'vh';
+      var y=Math.random()*46, o=(1-y/50)*0.85+0.1, d=1+Math.random()*1.7;
+      s.style.left=(Math.random()*100)+'vw'; s.style.top=y+'vh';
       s.style.width=d+'px'; s.style.height=d+'px';
       s.style.setProperty('--o',o.toFixed(2));
       s.style.animationDelay=(Math.random()*4)+'s';
@@ -385,6 +479,27 @@ var OPZIONI = [
     }
     document.body.appendChild(frag);
   })();
+
+  /* ---------- transizione tra schermate ---------- */
+  function show(el){
+    var idx=SCHERMI.indexOf(el);
+    var cur=document.querySelector('.screen.on');
+    function entra(){
+      el.classList.add('on');
+      var dots=steps.children;
+      for(var i=0;i<dots.length;i++) dots[i].classList.toggle('on', i===idx);
+      window.scrollTo(0,0);
+    }
+    if(cur && cur!==el){
+      cur.classList.add('out');
+      setTimeout(function(){ cur.classList.remove('on','out'); entra(); },330);
+    } else entra();
+  }
+
+  /* ---------- 0 → 1 : apri il contratto ---------- */
+  document.getElementById('apri').addEventListener('click',function(){
+    buzz(16); show(s1);
+  });
 
   function msg(l1,l2){
     nudge.classList.remove('on');
@@ -398,22 +513,17 @@ var OPZIONI = [
   no.addEventListener('click',function(e){
     e.preventDefault();
     if(chiuso) return;
-    if(navigator.vibrate) navigator.vibrate(30);
+    buzz(30);
     no.classList.remove('shake'); void no.offsetWidth; no.classList.add('shake');
     msg(ERRORI[n][0],ERRORI[n][1]);
-
-    if(n===0){                                    /* 1° tocco: disattiva il Sì */
-      setTimeout(function(){
-        yes.classList.add('locked');
-        if(navigator.vibrate) navigator.vibrate([20,60,20]);
-      },900);
+    if(n===0){
+      setTimeout(function(){ yes.classList.add('locked'); buzz([20,60,20]); },900);
     }
     if(n>=1) no.classList.add('broken');
     n++;
     if(n>=ERRORI.length){ chiuso=true; setTimeout(scena,850); }
   });
 
-  /* ---------- nuvoletta condivisa ---------- */
   function parla(testo,tailPerc,topY){
     say.textContent=testo;
     say.style.setProperty('--tx',tailPerc+'%');
@@ -430,9 +540,8 @@ var OPZIONI = [
   /* ---------- la scena degli operai ---------- */
   function scena(){
     s1.classList.add('dim');
-    yes.classList.add('away');
+    yes.classList.remove('back'); yes.classList.add('away');
 
-    /* il No esce dal flusso e si centra SULLA RIGA DEI PULSANTI */
     var r0=no.getBoundingClientRect();
     document.body.appendChild(no);
     no.style.left=r0.left+'px'; no.style.top=r0.top+'px';
@@ -473,23 +582,22 @@ var OPZIONI = [
     },1100);
 
     var bubbleY=cy-72;
-
     setTimeout(function(){ if(wl) wl.classList.remove('walk'); if(wr) wr.classList.remove('walk'); },2250);
     setTimeout(function(){ parla(BATTUTE[0],26,bubbleY); },2350);
     setTimeout(function(){ taci(); },3700);
     setTimeout(function(){ parla(BATTUTE[1],74,bubbleY); },3900);
     setTimeout(function(){ taci(); },5250);
 
-    setTimeout(function(){                        /* lo sollevano */
+    setTimeout(function(){
       no.classList.add('held');
       no.style.transform='translateY(-18px) rotate(-8deg)';
       if(wl) wl.style.transform='translateY(-7px)';
       if(wr) wr.style.transform='translateY(-7px)';
       spot.classList.remove('on');
-      if(navigator.vibrate) navigator.vibrate(20);
+      buzz(20);
     },5450);
 
-    setTimeout(function(){                        /* se lo portano via */
+    setTimeout(function(){
       var via=window.innerWidth+200;
       if(wl){ wl.classList.add('walk'); wl.style.transform='translateX('+via+'px) translateY(-7px)'; }
       if(wr){ wr.classList.add('walk'); wr.style.transform='translateX('+via+'px) translateY(-7px)'; }
@@ -497,47 +605,59 @@ var OPZIONI = [
       no.style.transform='translateX('+via+'px) translateY(-18px) rotate(-8deg)';
     },6000);
 
-    setTimeout(function(){                        /* il Sì torna, arriva il cartello */
+    setTimeout(function(){
       no.remove(); if(wl) wl.remove(); if(wr) wr.remove(); spot.remove();
       nudge.classList.remove('on');
       s1.classList.remove('dim');
       yes.classList.remove('locked','away');
-      yes.style.transform='scale(1.14)';
+      yes.classList.add('back');                 /* rientra col rimbalzo */
+      /* rete di sicurezza: se l'animazione non parte (pagina in secondo piano,
+         motion ridotto, ecc.) il Sì deve comunque restare visibile e centrato */
+      var fissa=function(){
+        yes.classList.remove('back');
+        yes.style.transform='scale(1.14)';
+        yes.style.opacity='1';
+      };
+      yes.addEventListener('animationend',function h(ev){
+        if(ev.animationName==='yesBack'){ yes.removeEventListener('animationend',h); fissa(); }
+      });
+      setTimeout(fissa,1500);
       maint.classList.add('on');
-      if(navigator.vibrate) navigator.vibrate([10,70,10]);
+      buzz([10,70,10]);
     },7050);
   }
 
-  /* ---------- coriandoli ---------- */
+  /* ---------- coriandoli con deriva ---------- */
   function hearts(){
     var set=['💛','🥂','🌅','✨','🧡','💫'];
-    for(var i=0;i<26;i++){
+    for(var i=0;i<28;i++){
       setTimeout(function(){
         var el=document.createElement('div');
         el.className='heart'; el.textContent=set[Math.floor(Math.random()*set.length)];
-        el.style.left=(Math.random()*92+4)+'vw'; el.style.top=(Math.random()*22+72)+'vh';
-        el.style.setProperty('--r',(Math.random()*120-60)+'deg');
-        el.style.fontSize=(16+Math.random()*20)+'px';
+        el.style.left=(Math.random()*92+4)+'vw'; el.style.top=(Math.random()*20+74)+'vh';
+        el.style.setProperty('--r',(Math.random()*140-70)+'deg');
+        el.style.setProperty('--dx',(Math.random()*120-60)+'px');
+        el.style.fontSize=(15+Math.random()*22)+'px';
+        el.style.animationDuration=(2.4+Math.random()*1.1)+'s';
         document.body.appendChild(el);
-        setTimeout(function(){el.remove();},2800);
-      }, i*52);
+        setTimeout(function(){el.remove();},3600);
+      }, i*48);
     }
   }
 
-  function show(el,idx){
-    [s1,s2,s3].forEach(function(s){s.classList.remove('on');});
-    el.classList.add('on');
-    var dots=steps.children;
-    for(var i=0;i<dots.length;i++) dots[i].classList.toggle('on', i===idx);
-    window.scrollTo(0,0);
-  }
-
-  /* ---------- SÌ → schermata scelta ---------- */
-  yes.addEventListener('click',function(){
+  /* ---------- SÌ ---------- */
+  yes.addEventListener('click',function(e){
     if(yes.classList.contains('locked')) return;
-    if(navigator.vibrate) navigator.vibrate([14,50,14]);
+    var r=yes.getBoundingClientRect();
+    var rip=document.createElement('span');
+    rip.className='rip';
+    rip.style.left=((e.clientX||r.left+r.width/2)-r.left)+'px';
+    rip.style.top =((e.clientY||r.top+r.height/2)-r.top)+'px';
+    yes.appendChild(rip);
+    setTimeout(function(){ rip.remove(); },700);
+    buzz([14,50,14]);
     hearts();
-    setTimeout(function(){ show(s2,1); },380);
+    setTimeout(function(){ show(s2); },420);
   });
 
   /* ---------- le 4 card ---------- */
@@ -550,9 +670,8 @@ var OPZIONI = [
     box.appendChild(b);
   });
 
-  /* ---------- scelta → programma ---------- */
   function scegli(o){
-    if(navigator.vibrate) navigator.vibrate(18);
+    buzz(18);
     document.getElementById('p-title').innerHTML=o.titolo;
     document.getElementById('p-sub').textContent=o.sub;
     document.getElementById('p-ps').textContent=o.ps;
@@ -562,10 +681,10 @@ var OPZIONI = [
       d.innerHTML='<div class="ic">'+t[0]+'</div><div><b>'+t[1]+'</b><span>'+t[2]+'</span></div>';
       rows.appendChild(d);
     });
-    show(s3,2); hearts();
+    show(s3); hearts();
   }
 
-  document.getElementById('back').addEventListener('click',function(){ show(s2,1); });
+  document.getElementById('back').addEventListener('click',function(){ show(s2); });
 })();
 </script>
 </body>
