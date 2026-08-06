@@ -6,11 +6,11 @@ METHOD:PUBLISH
 BEGIN:VEVENT
 UID:garda-20260810@colline
 DTSTAMP:20260805T120000Z
-DTSTART:20260810T130000Z
+DTSTART:20260810T080000Z
 DTEND:20260810T193000Z
 SUMMARY:Fuori provincia - Il lago al tramonto
 LOCATION:Punta San Vigilio, Garda (VR)
-DESCRIPTION:Lazise dentro le mura (Porta del Lion, Dogana Veneta, porto vecchio), poi Punta San Vigilio per il tramonto e aperitivo.\nArt. 5 del contratto: rientro per cena, con facolta' di prolungare.
+DESCRIPTION:Lazise dentro le mura, pranzo sul porto, poi Punta San Vigilio per il tramonto e aperitivo.\nArt. 5 del contratto: partenza in mattinata, rientro per cena, con facolta' di prolungare.
 BEGIN:VALARM
 TRIGGER:-PT2H
 ACTION:DISPLAY
