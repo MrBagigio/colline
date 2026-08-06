@@ -330,6 +330,11 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
 .opt b{display:block;font-weight:600;font-size:1rem;margin-bottom:3px}
 .opt span{display:block;font-size:.86rem;opacity:.94;line-height:1.42}
+/* riga di servizio: quanto dura e che tipo di giornata è — informazioni per
+   scegliere, non un voto: marchiarne una come "la migliore" renderebbe finta
+   la scelta e farebbe sentire uno scarto qualsiasi altra */
+.opt .dati{display:block;margin-top:5px;font-size:.72rem;line-height:1.3;
+  letter-spacing:.04em;opacity:.72;font-weight:600;text-transform:uppercase}
 
 /* ---------- il viaggio: strada, macchina, tappe ---------- */
 .viaggio{position:relative;margin-top:16px;padding-left:46px}
@@ -394,15 +399,20 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   animation:puff .8s ease-out forwards}
 @keyframes puff{0%{opacity:.6;transform:scale(.35)}
   100%{opacity:0;transform:scale(2.4) translateY(-18px)}}
-/* attaccata alla macchina finiva sopra al testo delle tappe: sta fissa in
-   basso, sopra il pedale, dove non copre niente */
-.brum{position:fixed;left:50%;bottom:calc(106px + env(safe-area-inset-bottom));z-index:7;
-  white-space:nowrap;background:#fffdf8;color:#241531;font-size:.7rem;font-weight:800;
-  letter-spacing:.08em;text-transform:uppercase;
-  padding:5px 11px;border-radius:10px;box-shadow:0 8px 18px rgba(0,0,0,.45);
-  opacity:0;transform:translateX(-50%) translateY(8px) scale(.6);
-  transition:opacity .2s,transform .32s var(--pop)}
+/* Esce dalla macchina, come dev'essere: sta appena sopra al cofano e viaggia
+   con lei. Sta tutto dentro la corsia della strada, così non finisce mai
+   sopra al testo delle tappe — per quello va tenuto corto. */
+.brum{position:absolute;left:50%;bottom:100%;margin-bottom:5px;z-index:4;
+  width:46px;text-align:center;white-space:nowrap;
+  background:#fffdf8;color:#241531;font-size:.54rem;font-weight:800;
+  letter-spacing:.02em;text-transform:uppercase;
+  padding:3px 0;border-radius:7px;box-shadow:0 5px 12px rgba(0,0,0,.45);
+  opacity:0;transform:translateX(-50%) translateY(5px) scale(.6);
+  transform-origin:bottom center;
+  transition:opacity .2s,transform .3s var(--pop)}
 .brum.on{opacity:1;transform:translateX(-50%) scale(1)}
+.brum:after{content:'';position:absolute;top:100%;left:50%;margin-left:-4px;
+  border:4px solid transparent;border-top-color:#fffdf8}
 
 .plan{text-align:left;display:flex;flex-direction:column;gap:9px}
 .row{position:relative;display:flex;gap:14px;align-items:flex-start;background:var(--glass);
@@ -617,6 +627,16 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .vaifirma.on{margin-top:10px}
   .back.on{margin-top:7px}
 }
+/* iPhone in verticale con la barra di Safari: restano ~745px veri, e le quattro
+   tappe con il pulsante sotto non ci stavano più */
+@media (max-height:790px){
+  #s3 .sub{display:none}
+  .plan{gap:7px}
+  .row{padding:9px 13px}
+  .row span{font-size:.82rem;line-height:1.36}
+  .row:before{top:15px}
+  .ps{margin-top:7px}
+}
 /* il contratto è la schermata più alta: si compatta prima delle altre,
    così il bottone resta sempre nello schermo senza dover scorrere */
 @media (max-height:810px){
@@ -633,6 +653,11 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .stamp{padding:4px 8px;font-size:.55rem}
   .cta{margin-top:17px;padding:15px 30px}
   #s0 .kicker{margin-bottom:12px}
+  /* la riga informativa alza ogni scheda: qui va ricompensato, altrimenti
+     su un iPhone in verticale (745px utili) le quattro schede sforano */
+  .opts{gap:9px}
+  .opt{padding:13px 32px 13px 16px}
+  .opt .dati{margin-top:3px;font-size:.66rem}
 }
 @media (max-height:720px){
   .kicker{margin-bottom:12px}
@@ -643,6 +668,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .field{padding:7px 0}.field dd{font-size:.88rem}
   .cta{margin-top:18px;padding:15px 30px}
   .opts{gap:9px}.opt{padding:13px 30px 13px 15px}.opt .em{font-size:1.5rem}.opt span{font-size:.82rem}
+  .opt .dati{margin-top:3px;font-size:.66rem}
   .viaggio{margin-top:16px;padding-left:42px}.strada,.fatta{left:17px}.auto{left:1px;width:31px}
   .plan{gap:9px}.row{padding:12px 15px}.row span{font-size:.83rem}.row:before{left:-26px;top:17px}
   .ps{margin-top:15px}.maint p{padding:12px 14px;font-size:.85rem}
@@ -665,6 +691,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .opt .em{font-size:1.28rem}
   .opt b{font-size:.91rem;margin-bottom:1px}
   .opt span{font-size:.75rem;line-height:1.3}
+  .opt .dati{display:none}          /* su schermi bassi conta solo che i 4 pulsanti ci stiano */
   .doc .inner{padding:11px 14px 30px}
   .doc h2{font-size:1.02rem}
   .stamp{right:11px;bottom:7px;padding:3px 7px;font-size:.52rem}
@@ -680,7 +707,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .cta{margin-top:8px;padding:12px 24px;font-size:.96rem}
   .viaggio{margin-top:12px}.row{padding:10px 13px}
   .pedale{bottom:calc(40px + env(safe-area-inset-bottom));padding:7px 16px 7px 10px;font-size:.75rem}
-  .brum{bottom:calc(88px + env(safe-area-inset-bottom));font-size:.64rem;padding:4px 9px}
+  .brum{width:40px;font-size:.5rem;padding:2px 0}
   .ped{width:19px;height:25px}
   .back.on{margin-top:7px;padding:9px 14px;font-size:.72rem}
   #s3 .ps{display:none}
@@ -727,7 +754,6 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 <div class="veil"></div>
 
 <div class="say" id="say"></div>
-<span class="brum" id="brum">brum brum</span>
 
 <!-- ============ 0. IL CONTRATTO ============ -->
 <section class="screen on" id="s0">
@@ -760,8 +786,8 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 <section class="screen" id="s1">
   <p class="kicker">Art. 5 — il secondo baratto</p>
   <h1>Lunedì, <em>fuori provincia</em>.</h1>
-  <p class="sub">L'unico giorno che ti lasciano. Rientro per cena,
-  con facoltà di prolungare.<br>Decidi tu se il contratto si firma.</p>
+  <p class="sub">L'unico giorno che ti lasciano. Si parte in mattinata,
+  si rientra per cena — salvo prolungare.<br>Decidi tu se il contratto si firma.</p>
   <div class="btns" id="btns">
     <button id="yes">Sì ✨</button>
     <button id="no">No</button>
@@ -815,6 +841,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
           <circle class="faroL" cx="31.5" cy="57.5" r="3.2"/>
         </svg>
       </div>
+      <span class="brum" id="brum">brum</span>
     </div>
     <div class="plan" id="p-rows"></div>
   </div>
@@ -956,54 +983,58 @@ var BATTUTE = ['Vai Gianni, portiamolo via!', 'È rotto, non c\'è niente da far
 var OPZIONI = [
   {
     em:'🍇', ics:'prosecco', nome:'Le colline del Prosecco',
+    dati:'metà mattina · 1h di strada',
     teaser:'Vigneti terrazzati e un tramonto che non ti aspetti',
     titolo:'Colline del <em>Prosecco</em>.',
     sub:'Valdobbiadene. Un\'ora di strada, un altro mondo.',
     ps:'P.S. — il bottone "No" non è mai stato riparato. Era voluto.',
     tappe:[
-      ['🚗','Ti vengo a prendere','Un\'ora verso nord. Si sale tra le colline, si smette di vedere case.'],
+      ['🚗','Ti vengo a prendere','Metà mattina. Un\'ora verso nord: si sale tra le colline e si smette di vedere case.'],
       ['🍇','Tra i filari','Vigneti terrazzati, patrimonio UNESCO. Camminata dentro le vigne.'],
-      ['🌅','Colle Colesel','Panchine di legno affacciate sulla valle del Cartizze. Per il tramonto.'],
-      ['🥂','Per chiudere','Un calice e due cose buone, con le colline ancora davanti.']
+      ['🍽️','Pranzo in collina','Un\'osteria tra le vigne, senza guardare l\'orologio.'],
+      ['🌅','Colle Colesel','Panchine di legno sulla valle del Cartizze per il tramonto, e un calice.']
     ]
   },
   {
     em:'⛵', ics:'garda', nome:'Il lago al tramonto',
+    dati:'metà mattina · 1h15 di strada',
     teaser:'Un promontorio di cipressi sul Garda, e il sole che cade nell\'acqua',
     titolo:'Il <em>lago</em> al tramonto.',
     sub:'Punta San Vigilio. Non il Garda dei lidi: un promontorio con un viale di cipressi e un porticciolo.',
     ps:'P.S. — anche se al lago ci sei già stata, lì probabilmente no.',
     tappe:[
-      ['🚗','Ti vengo a prendere','Un\'ora e un quarto verso ovest. A un certo punto si apre tutto e c\'è l\'acqua.'],
+      ['🚗','Ti vengo a prendere','Metà mattina, un\'ora e un quarto verso ovest. A un certo punto si apre tutto e c\'è l\'acqua.'],
       ['🏘️','Lazise','Si entra dalla Porta del Lion: vicoli acciottolati, la Dogana Veneta sulla piazza, i cigni sul porto vecchio.'],
-      ['🌅','Punta San Vigilio','Il viale di cipressi, la villa del Cinquecento, la baia. Di sera si entra gratis.'],
-      ['🍸','Per chiudere','Aperitivo con i piedi quasi nell\'acqua, e si decide se rientrare.']
+      ['🍽️','Pranzo sul porto','Pesce di lago e un calice di Bardolino, con l\'acqua a due passi.'],
+      ['🌅','Punta San Vigilio','Il viale di cipressi, la baia, il tramonto. Di sera si entra gratis e si fa aperitivo.']
     ]
   },
   {
     em:'♟️', ics:'brenta', nome:'Scacchi, ponte e fiume',
+    dati:'mattina · 30 min di strada',
     teaser:'La piazza degli scacchi, il ponte di legno, e poi si sconfina',
     titolo:'Scacchi, ponte e <em>fiume</em>.',
     sub:'Marostica e Bassano, e al tramonto si passa in Treviso.',
     ps:'P.S. — la partita vera con le persone è a settembre. Intanto ci prendiamo la piazza.',
     tappe:[
-      ['🚗','Ti vengo a prendere','Mezz\'ora e siamo sotto le mura di Marostica.'],
+      ['🚗','Ti vengo a prendere','In mattinata. Mezz\'ora e siamo sotto le mura di Marostica.'],
       ['♟️','La piazza degli scacchi','La scacchiera disegnata a terra e il castello che la guarda dall\'alto.'],
-      ['🌉','Il Ponte degli Alpini','Bassano, il ponte di legno di Palladio e le grapperie che ci stanno sopra.'],
+      ['🌉','Bassano e il ponte','Pranzo sul Brenta, il ponte di legno di Palladio, due passi tra le grapperie.'],
       ['🌄','Possagno al tramonto','Si sconfina in Treviso: il tempio sul colle e tutta la pianura sotto.']
     ]
   },
   {
     em:'🏰', ics:'asolo', nome:'Il borgo sul colle',
+    dati:'metà mattina · 1h di strada',
     teaser:'Asolo, i portici, e un verbo inventato apposta per non fare niente',
     titolo:'Il borgo <em>sul colle</em>.',
     sub:'Asolo. Un\'ora, e sei nella città dai cento orizzonti.',
     ps:'P.S. — «asolare» è una parola vera, inventata qui. Vuol dire esattamente questo.',
     tappe:[
-      ['🚗','Ti vengo a prendere','Un\'ora verso est, salendo tra le colline trevigiane.'],
+      ['🚗','Ti vengo a prendere','Metà mattina, un\'ora verso est, salendo tra le colline trevigiane.'],
       ['🏛️','Via Browning','Si passa la porta e cambia l\'aria: portici, palazzi affrescati, botteghe.'],
-      ['⛰️','I 276 gradini','Da Porta Colmarion si sale alla Rocca tra gli alberi. Panchine a metà strada, e la vista che si spalanca.'],
-      ['🍷','Asolare','Qui hanno inventato un verbo per perdere tempo bene. Un calice in piazza e lo facciamo.']
+      ['🍽️','Pranzo e asolare','Qui hanno inventato un verbo per perdere tempo bene. Lo facciamo a tavola.'],
+      ['⛰️','I 276 gradini','Nel pomeriggio si sale alla Rocca da Porta Colmarion. Panchine a metà, e la vista che si spalanca.']
     ]
   }
 ];
@@ -1451,7 +1482,8 @@ var OPZIONI = [
   OPZIONI.forEach(function(o){
     var b=document.createElement('button');
     b.className='opt';
-    b.innerHTML='<div class="em">'+o.em+'</div><div><b>'+o.nome+'</b><span>'+o.teaser+'</span></div>';
+    b.innerHTML='<div class="em">'+o.em+'</div><div><b>'+o.nome+'</b><span>'+o.teaser+
+                '</span><span class="dati">'+(o.dati||'')+'</span></div>';
     b.addEventListener('click',function(){ scegli(o); });
     box.appendChild(b);
   });
@@ -1462,7 +1494,8 @@ var OPZIONI = [
       done=document.getElementById('done'), ps=document.getElementById('p-ps'),
       viaggio=document.querySelector('.viaggio');
   var tappa=-1, inViaggio=false, posAuto=0;
-  var VERSI=['brum brum','vrooom','brum!','ci siamo quasi'];
+  /* corti per forza: la nuvoletta sta nella corsia della strada */
+  var VERSI=['brum','vrum','brum!','vroom'];
 
   /* tutti i timer del viaggio in un registro: cambiando meta a metà strada
      vanno spenti, altrimenti continuano a scattare sul viaggio nuovo */
@@ -1799,8 +1832,8 @@ var OPZIONI = [
     buzz([12,50,12]);
     var o=sceltaCorrente||OPZIONI[0];
     document.getElementById('r-art5').textContent=
-      'Lunedì 10, fuori provincia: '+o.nome+          /* niente minuscolo: "Verona" è un nome proprio */
-      '. Rientro per cena — con facoltà di prolungare a cena inclusa.';
+      'Lunedì 10, fuori provincia: '+o.nome+          /* niente minuscolo: sono nomi propri */
+      '. Partenza in mattinata, rientro per cena — con facoltà di prolungare a cena inclusa.';
     document.getElementById('sigimg').src=cv.toDataURL('image/png');
     document.getElementById('incal').href='ics/'+(o.ics||'prosecco')+'.ics';
     show(s5); hearts();
@@ -1845,7 +1878,7 @@ var OPZIONI = [
     buzz([14,60,14]);
     var o=sceltaCorrente||OPZIONI[0];
     var testo='✍️ Contratto firmato!\nArt. 5 — Lunedì 10, fuori provincia: '+o.nome+
-              '.\nRientro per cena… salvo prolungare 😏';
+              '.\nSi parte in mattinata, si rientra per cena… salvo prolungare 😏';
     if(navigator.share){
       navigator.share({text:testo}).then(function(){
         toast('Inviata 💛');
