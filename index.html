@@ -1173,7 +1173,7 @@ var OPZIONI = [
        Dopo parla l'hacker, e due voci insieme erano solo confusione. */
     if(n===0) msg(ERRORI[0][0],ERRORI[0][1]); else nudge.classList.remove('on');
     if(n===0){
-      setTimeout(function(){ yes.classList.add('locked'); buzz([20,60,20]); },900);
+      scT(function(){ yes.classList.add('locked'); buzz([20,60,20]); },900);
       entraHacker();                       /* arriva e fa il 1° tentativo */
     }
     if(n===1){ no.classList.add('broken'); hackerRiprova(); }   /* 2° tentativo */
@@ -1181,7 +1181,7 @@ var OPZIONI = [
     if(n>=ERRORI.length){                  /* si arrende, esce, poi gli addetti */
       chiuso=true;
       hackerMolla();
-      setTimeout(scena,3900);      /* gli addetti entrano mentre lui esce */
+      scT(scena,3900);             /* gli addetti entrano mentre lui esce */
     }
   });
 
@@ -1357,7 +1357,28 @@ var OPZIONI = [
     },4950);
   }
 
-  /* ---------- la scena degli operai ---------- */
+  /* ---------- la scena degli operai ----------
+     Tutti i tempi in un registro: se lei dice sì mentre la scena è in corso va
+     smontata, altrimenti hacker, operai e nuvolette continuano a recitare sopra
+     la schermata delle mete. */
+  var scTimer=[];
+  function scT(fn,ms){ var id=setTimeout(fn,ms); scTimer.push(id); return id; }
+
+  /* sipario: si spegne tutto quello che riguarda il giochino del No */
+  function annullaScena(){
+    scTimer.forEach(clearTimeout); scTimer=[];
+    spegniHk();
+    taci();
+    nudge.classList.remove('on');
+    s1.classList.remove('dim');
+    if(hk){ hk.remove(); hk=null; }
+    if(cavo){ cavo.remove(); cavo=null; }
+    Array.prototype.forEach.call(document.body.querySelectorAll('.pers,.spot,.cavo'),
+      function(e){ e.remove(); });
+    /* se la scena aveva già staccato il No dalla riga dei bottoni, se ne va con lei */
+    if(no.parentNode===document.body) no.remove();
+  }
+
   function scena(){
     /* l'hacker esce da solo con i suoi tempi: non lo si strappa via qui,
        si incrociano mentre gli addetti entrano */
@@ -1372,7 +1393,7 @@ var OPZIONI = [
     var cx=Math.round((window.innerWidth-r0.width)/2);
     var cy=Math.round(r0.top);
     void no.offsetWidth;
-    setTimeout(function(){ no.style.left=cx+'px'; no.style.top=cy+'px'; },350);
+    scT(function(){ no.style.left=cx+'px'; no.style.top=cy+'px'; },350);
 
     var spot=document.createElement('div');
     spot.className='spot';
@@ -1380,10 +1401,10 @@ var OPZIONI = [
     spot.style.left=Math.round(cx+r0.width/2-150)+'px';
     spot.style.top =Math.round(cy+r0.height/2-95)+'px';
     document.body.appendChild(spot);
-    setTimeout(function(){ spot.classList.add('on'); },700);
+    scT(function(){ spot.classList.add('on'); },700);
 
     var wl,wr;
-    setTimeout(function(){
+    scT(function(){
       function operaio(lato,tuta,attrezzo){
         var w=document.createElement('div');
         w.className='pers operaio '+lato;
@@ -1399,7 +1420,7 @@ var OPZIONI = [
       void wl.offsetWidth; void wr.offsetWidth;
       wl.classList.add('cammina');
       wl.style.left=metaL+'px';
-      setTimeout(function(){
+      scT(function(){
         wr.classList.add('cammina');
         wr.style.left=metaR+'px';
       },170);
@@ -1409,13 +1430,13 @@ var OPZIONI = [
        mentre gli operai sono ancora in cammino */
     var metaL=Math.max(4, cx-74), metaR=Math.min(window.innerWidth-66, cx+r0.width+12);
     var testaOp=cy+r0.height/2-40;         /* coordinata superiore degli operai */
-    setTimeout(function(){ if(wl) wl.classList.remove('cammina'); if(wr) wr.classList.remove('cammina'); },2250);
-    setTimeout(function(){ if(wl) parla(BATTUTE[0],metaL+31,testaOp); },2350);
-    setTimeout(function(){ taci(); },3700);
-    setTimeout(function(){ if(wr){ wr.classList.add('nega'); parla(BATTUTE[1],metaR+31,testaOp); } },3900);
-    setTimeout(function(){ taci(); if(wr) wr.classList.remove('nega'); },5250);
+    scT(function(){ if(wl) wl.classList.remove('cammina'); if(wr) wr.classList.remove('cammina'); },2250);
+    scT(function(){ if(wl) parla(BATTUTE[0],metaL+31,testaOp); },2350);
+    scT(function(){ taci(); },3700);
+    scT(function(){ if(wr){ wr.classList.add('nega'); parla(BATTUTE[1],metaR+31,testaOp); } },3900);
+    scT(function(){ taci(); if(wr) wr.classList.remove('nega'); },5250);
 
-    setTimeout(function(){
+    scT(function(){
       no.classList.add('held');
       no.style.transform='translateY(-18px) rotate(-8deg)';
       if(wl) wl.style.transform='translateY(-7px)';
@@ -1424,7 +1445,7 @@ var OPZIONI = [
       buzz(20);
     },5450);
 
-    setTimeout(function(){
+    scT(function(){
       var via=window.innerWidth+200;
       if(wl){ wl.classList.add('cammina'); wl.style.transform='translateX('+via+'px) translateY(-7px)'; }
       if(wr){ wr.classList.add('cammina'); wr.style.transform='scaleX(-1) translateX(-'+via+'px) translateY(-7px)'; }
@@ -1432,7 +1453,7 @@ var OPZIONI = [
       no.style.transform='translateX('+via+'px) translateY(-18px) rotate(-8deg)';
     },6000);
 
-    setTimeout(function(){
+    scT(function(){
       /* prima si sgombra il campo: sei nodi tolti dal DOM, il cavo, la penombra.
          Se il rientro del Sì partisse in questo stesso fotogramma, i primi
          fotogrammi verrebbero mangiati dalla pulizia e il rimbalzo si vedrebbe
@@ -1463,15 +1484,15 @@ var OPZIONI = [
         });
         /* rete di sicurezza: se l'animazione non parte (pagina in secondo piano,
            motion ridotto, ecc.) il Sì deve comunque restare visibile e centrato */
-        setTimeout(fissa,1500);
+        scT(fissa,1500);
         /* l'avviso di servizio entra dopo, non sopra: due animazioni pesanti
            nello stesso momento erano l'altra metà degli scatti */
-        setTimeout(function(){ maint.classList.add('on'); },560);
+        scT(function(){ maint.classList.add('on'); },560);
       };
       /* due frame di respiro; il timeout è la scorta per quando la pagina non è
          in primo piano e requestAnimationFrame non scatta proprio */
       requestAnimationFrame(function(){ requestAnimationFrame(rientra); });
-      setTimeout(rientra,150);
+      scT(rientra,150);
     },7050);
   }
 
@@ -1496,6 +1517,10 @@ var OPZIONI = [
   /* ---------- SÌ ---------- */
   yes.addEventListener('click',function(e){
     if(yes.classList.contains('locked')) return;
+    /* premendo No e SUBITO dopo Sì si passava alla scelta con la scena ancora in
+       corso: l'hacker, il cavo e le nuvolette continuavano a recitare sopra le
+       mete. Ha detto sì: il giochino finisce qui. */
+    annullaScena();
     var r=yes.getBoundingClientRect();
     var rip=document.createElement('span');
     rip.className='rip';
