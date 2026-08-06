@@ -736,7 +736,12 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .vaifirma2.on{margin-top:4px;padding:12px 22px;font-size:.9rem}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
-  .doc,.field,.stamp,.cta,.opt,.row,body,.steps{opacity:1!important}}
+  /* tutto ciò che parte da opacity:0 e si accende SOLO grazie a un'animazione va
+     riacceso a mano qui: con "Riduci movimento" attivo l'animazione non parte e
+     resta invisibile. .missing e .foot sono l'articolo mancante, cioè il senso
+     stesso della pagina: senza di loro il contratto non dice più niente. */
+  .doc,.field,.stamp,.missing,.foot,.cta,.opt,.row,body,.steps{opacity:1!important}
+  .pozza{opacity:1!important;transform:translateX(-50%)!important}}
 </style>
 </head>
 <body>
@@ -1909,6 +1914,29 @@ var OPZIONI = [
     cv.addEventListener(ev,function(){ disegnando=false; });
   });
   document.getElementById('pulisci').addEventListener('click',function(){ buzz(8); firmaPulisci(); });
+
+  /* Ruotando il telefono la scatola della firma cambia misura ma il bitmap del
+     canvas resta quello di prima: il tratto finiva sfalsato rispetto al dito e
+     la parte destra della firma veniva tagliata via. Qui si rifà il canvas alla
+     misura nuova, riportandoci dentro quel che era già stato firmato. */
+  var rifaiT=null;
+  function rifaiFirma(){
+    if(!s4.classList.contains('on')) return;
+    clearTimeout(rifaiT);
+    rifaiT=setTimeout(function(){
+      var vecchia=firmata ? cv.toDataURL('image/png') : null;
+      setupCv();
+      if(!vecchia) return;
+      var img=new Image();
+      img.onload=function(){
+        var r=cv.getBoundingClientRect();
+        cctx.drawImage(img,0,0,r.width,r.height);   /* il contesto è già scalato al dpr */
+      };
+      img.src=vecchia;
+    },180);
+  }
+  window.addEventListener('resize',rifaiFirma);
+  window.addEventListener('orientationchange',rifaiFirma);
 
   /* firma applicata → recap del contratto con l'articolo 5 compilato */
   document.getElementById('applica').addEventListener('click',function(){
