@@ -189,7 +189,11 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes lockPop{from{opacity:0;transform:scale(.3) rotate(-25deg)}to{opacity:1;transform:none}}
 #yes.away{transform:translateX(-180%) scale(.84);opacity:0;animation:none}
-#yes.back{animation:yesBack .9s var(--pop) both, sheen 5s ease-in-out infinite}
+/* durante il rientro NIENTE sheen: quella anima background-position su un
+   gradiente largo 320%, cioè ridipinge il bottone a ogni fotogramma mentre lo
+   si sta già trasformando. Era la causa degli scatti. Solo transform+opacity,
+   che il compositore gestisce da solo. */
+#yes.back{animation:yesBack .85s var(--pop) both;will-change:transform,opacity}
 @keyframes yesBack{0%{transform:translateX(-180%) scale(.84);opacity:0}
   70%{transform:translateX(0) scale(1.22);opacity:1}
   100%{transform:scale(1.14);opacity:1}}
@@ -446,20 +450,25 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
    scentrerebbe il pedale, che è fisso e centrato via translateX(-50%) */
 .screen.on > .pedale{animation:none}
 .pedale.via{opacity:0;pointer-events:none;transform:translateX(-50%) scale(.9)}
-.pedale:active{transform:translateX(-50%) scale(.95);border-color:rgba(255,216,138,.75)}
+.pedale:active,.pedale.giu{transform:translateX(-50%) scale(.95);border-color:rgba(255,216,138,.75)}
+/* più lo si pigia, più il pedale si scalda: si vede che sta facendo qualcosa */
+.pedale.g1{border-color:rgba(255,216,138,.6)}
+.pedale.g2{border-color:rgba(255,216,138,.85);background:rgba(255,216,138,.14)}
+.pedale.g3{border-color:rgba(255,216,138,1);background:rgba(255,216,138,.22);
+  box-shadow:0 8px 26px -8px rgba(255,216,138,.5)}
 .ped{width:22px;height:29px;display:block;flex-shrink:0}
 .ped-terra{fill:rgba(255,255,255,.28)}
 .ped-piatto{fill:#3a2a48;stroke:rgba(255,216,138,.85);stroke-width:1.4;
   transform-origin:50% 10%;animation:invito 2.6s ease-in-out infinite}
 .ped-righe{stroke:rgba(255,216,138,.8);stroke-width:1.4;stroke-linecap:round}
 .ped-gruppo{transform-origin:50% 10%;transition:transform .16s var(--pop)}
-.pedale:active .ped-gruppo{transform:rotate(19deg) translateY(1px)}
-.pedale:active .ped-piatto{animation:none}
+.pedale:active .ped-gruppo,.pedale.giu .ped-gruppo{transform:rotate(19deg) translateY(1px)}
+.pedale:active .ped-piatto,.pedale.giu .ped-piatto{animation:none}
 /* ogni tanto il pedale accenna una premuta, per farsi notare */
 @keyframes invito{0%,84%,100%{transform:rotate(0)}90%{transform:rotate(10deg)}}
 /* scie di velocità che scattano alla pressione */
 .scie{opacity:0;transition:opacity .12s}
-.pedale:active .scie{opacity:1}
+.pedale:active .scie,.pedale.giu .scie{opacity:1}
 .row .ic{font-size:1.35rem;line-height:1.25;flex-shrink:0;text-shadow:none;
   filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
 .row b{display:block;font-size:.97rem;margin-bottom:3px}
@@ -862,7 +871,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
         </g>
       </g>
     </svg>
-    Accelera
+    <span id="ped-lab">Accelera</span>
   </button>
   <div class="done" id="done"><span>✓</span> Allegato A compilato</div>
   <p class="ps" id="p-ps"></p>
@@ -1420,27 +1429,45 @@ var OPZIONI = [
     },6000);
 
     setTimeout(function(){
+      /* prima si sgombra il campo: sei nodi tolti dal DOM, il cavo, la penombra.
+         Se il rientro del Sì partisse in questo stesso fotogramma, i primi
+         fotogrammi verrebbero mangiati dalla pulizia e il rimbalzo si vedrebbe
+         a scatti. Il 'no' resta con la classe .away finché non si parte davvero,
+         così non lampeggia al centro nel frattempo. */
       no.remove(); if(wl) wl.remove(); if(wr) wr.remove(); spot.remove();
       spegniHk();
       if(hk){ hk.remove(); hk=null; }
       if(cavo){ cavo.remove(); cavo=null; }
       nudge.classList.remove('on');
       s1.classList.remove('dim');
-      yes.classList.remove('locked','away');
-      yes.classList.add('back');                 /* rientra col rimbalzo */
-      /* rete di sicurezza: se l'animazione non parte (pagina in secondo piano,
-         motion ridotto, ecc.) il Sì deve comunque restare visibile e centrato */
+      yes.classList.remove('locked');
+      buzz([10,70,10]);
+
       var fissa=function(){
         yes.classList.remove('back');
+        yes.style.willChange='auto';
         yes.style.transform='scale(1.14)';
         yes.style.opacity='1';
       };
-      yes.addEventListener('animationend',function h(ev){
-        if(ev.animationName==='yesBack'){ yes.removeEventListener('animationend',h); fissa(); }
-      });
-      setTimeout(fissa,1500);
-      maint.classList.add('on');
-      buzz([10,70,10]);
+      var partito=false;
+      var rientra=function(){
+        if(partito) return; partito=true;
+        yes.classList.remove('away');
+        yes.classList.add('back');               /* rientra col rimbalzo */
+        yes.addEventListener('animationend',function h(ev){
+          if(ev.animationName==='yesBack'){ yes.removeEventListener('animationend',h); fissa(); }
+        });
+        /* rete di sicurezza: se l'animazione non parte (pagina in secondo piano,
+           motion ridotto, ecc.) il Sì deve comunque restare visibile e centrato */
+        setTimeout(fissa,1500);
+        /* l'avviso di servizio entra dopo, non sopra: due animazioni pesanti
+           nello stesso momento erano l'altra metà degli scatti */
+        setTimeout(function(){ maint.classList.add('on'); },560);
+      };
+      /* due frame di respiro; il timeout è la scorta per quando la pagina non è
+         in primo piano e requestAnimationFrame non scatta proprio */
+      requestAnimationFrame(function(){ requestAnimationFrame(rientra); });
+      setTimeout(rientra,150);
     },7050);
   }
 
@@ -1493,20 +1520,37 @@ var OPZIONI = [
       fatta=document.getElementById('fatta'), pedale=document.getElementById('pedale'),
       done=document.getElementById('done'), ps=document.getElementById('p-ps'),
       viaggio=document.querySelector('.viaggio');
-  var tappa=-1, inViaggio=false, posAuto=0;
+  var tappa=-1, inViaggio=false, posAuto=0, finito=false;
   /* corti per forza: la nuvoletta sta nella corsia della strada */
   var VERSI=['brum','vrum','brum!','vroom'];
 
   /* tutti i timer del viaggio in un registro: cambiando meta a metà strada
      vanno spenti, altrimenti continuano a scattare sul viaggio nuovo */
   var timers=[], attesa=null;
+  /* i timer della tratta in corso stanno anche in un registro a parte: l'acceleratore
+     deve poterli buttare via senza toccare il resto del viaggio */
+  var trattaT=[], tratta=null;
   function T(fn,ms){ var id=setTimeout(fn,ms); timers.push(id); return id; }
-  function spegniTimer(){ timers.forEach(clearTimeout); timers=[]; attesa=null; }
+  function TT(fn,ms){ var id=T(fn,ms); trattaT.push(id); return id; }
+  function spegniTratta(){ trattaT.forEach(clearTimeout); trattaT=[]; }
+  function spegniTimer(){ timers.forEach(clearTimeout); timers=[]; trattaT=[]; attesa=null; }
   function pausa(fn,ms){ attesa=T(function(){ attesa=null; fn(); },ms); }
+
+  /* 0 = andatura da gita; ogni pigiata sale di marcia e accorcia sia la corsa
+     sia la sosta sulla tappa. Non è solo un "salta": il viaggio resta un viaggio. */
+  var fretta=0, MARCE=[1,.62,.42,.3], ETICHETTE=['Accelera','Più forte','Ancora!','A tavoletta'];
+  var pedLab=document.getElementById('ped-lab');
+  function mostraMarcia(){
+    pedale.classList.remove('g1','g2','g3');
+    if(fretta) pedale.classList.add('g'+fretta);
+    pedLab.textContent=ETICHETTE[fretta];
+  }
 
   function resetViaggio(){
     spegniTimer();
-    tappa=-1; inViaggio=false; posAuto=0;
+    tappa=-1; inViaggio=false; posAuto=0; tratta=null; finito=false;
+    fretta=0; mostraMarcia();
+    pedale.classList.remove('giu');
     auto.style.transform='translateY(0px)'; auto.classList.remove('guida','carica','frena');
     viaggio.classList.remove('inmoto');
     Array.prototype.forEach.call(viaggio.querySelectorAll('.puff'),function(p){p.remove();});
@@ -1550,7 +1594,7 @@ var OPZIONI = [
     var row=rows[tappa];
     var y0=posAuto;
     var y=Math.round(row.getBoundingClientRect().top-base.top+16);
-    var dur=DURATE[Math.min(tappa,DURATE.length-1)];
+    var dur=Math.round(DURATE[Math.min(tappa,DURATE.length-1)]*MARCE[fretta]);
 
     buzz(12);
 
@@ -1559,54 +1603,95 @@ var OPZIONI = [
 
     T(function(){
       auto.classList.remove('carica');
-      auto.classList.add('guida');
-      viaggio.classList.add('inmoto');
-      auto.style.setProperty('--dur',dur+'ms');
-      auto.style.transform='translateY('+y+'px)'; posAuto=y;
-      fatta.style.transitionDuration=dur+'ms';
-      fatta.style.height=Math.max(0,y+6)+'px';
       brum.textContent=VERSI[Math.min(tappa,VERSI.length-1)];
-      brum.classList.add('on');
-
-      /* 8 · azione secondaria: gli sbuffi seguono la macchina lungo il tragitto */
-      for(var i=1;i<=6;i++){
-        (function(k){ T(function(){
-          if(inViaggio) sbuffo(y0+(y-y0)*(k/7));
-        }, dur*k/7); })(i);
-      }
-
-      /* 3 · follow through: arriva, frena, si schiaccia e si assesta */
-      T(function(){
-        auto.classList.remove('guida');
-        viaggio.classList.remove('inmoto');
-        auto.classList.add('frena');
-        brum.classList.remove('on');
-        row.classList.remove('locked');
-        row.classList.add('qui','visto','arrivo');
-        buzz([8,40,8]);
-        T(function(){
-          auto.classList.remove('frena');
-          row.classList.remove('arrivo');
-        },660);
-        inViaggio=false;
-        /* sosta per leggere la tappa, poi riparte da sola */
-        pausa(vaiAllaTappa, SOSTA);
-      },dur);
-    },220);
+      corri(y0,y,dur,row);
+    },Math.round(220*MARCE[fretta]));
   }
 
-  /* il pedale (o un tocco sul viaggio) salta la sosta e riparte subito */
+  /* fa percorrere alla macchina il tratto y0→y in dur ms. Richiamabile a metà
+     corsa con un tratto più corto: è così che l'acceleratore morde davvero. */
+  function corri(y0,y,dur,row){
+    tratta={y0:y0,y:y,dur:dur,row:row};
+    auto.classList.add('guida');
+    viaggio.classList.add('inmoto');
+    auto.style.setProperty('--dur',dur+'ms');
+    auto.style.transform='translateY('+y+'px)'; posAuto=y;
+    fatta.style.transitionDuration=dur+'ms';
+    fatta.style.height=Math.max(0,y+6)+'px';
+    brum.classList.add('on');
+
+    /* 8 · azione secondaria: gli sbuffi seguono la macchina lungo il tragitto */
+    for(var i=1;i<=6;i++){
+      (function(k){ TT(function(){
+        if(inViaggio) sbuffo(y0+(y-y0)*(k/7));
+      }, dur*k/7); })(i);
+    }
+
+    /* 3 · follow through: arriva, frena, si schiaccia e si assesta */
+    TT(function(){
+      tratta=null;
+      auto.classList.remove('guida');
+      viaggio.classList.remove('inmoto');
+      auto.classList.add('frena');
+      brum.classList.remove('on');
+      row.classList.remove('locked');
+      row.classList.add('qui','visto','arrivo');
+      buzz([8,40,8]);
+      T(function(){
+        auto.classList.remove('frena');
+        row.classList.remove('arrivo');
+      },Math.round(660*MARCE[fretta]));
+      inViaggio=false;
+      /* sosta per leggere la tappa, poi riparte da sola */
+      pausa(vaiAllaTappa, Math.round(SOSTA*MARCE[fretta]));
+    },dur);
+  }
+
+  /* dove si trova adesso la macchina: la transizione è a metà, quindi il valore
+     buono è quello calcolato dal browser, non quello che le abbiamo assegnato */
+  function yCorrente(){
+    var m=getComputedStyle(auto).transform;
+    if(!m||m==='none') return 0;
+    var p=m.slice(m.indexOf('(')+1,-1).split(',');
+    return parseFloat(p[p.length-1])||0;
+  }
+
+  /* taglia corto il tratto in corso: riparte dal punto esatto in cui si trova,
+     senza salti, con quel che resta da fare compresso */
+  function accorcia(){
+    if(!inViaggio||!tratta) return;
+    var yNow=yCorrente(), meta=tratta.y;
+    var resta=meta-yNow;
+    if(resta<10) return;                       /* è già praticamente arrivata */
+    spegniTratta();
+    var fatto=Math.max(1,meta-tratta.y0);
+    var dur=Math.max(150,Math.round(tratta.dur*(resta/fatto)*0.45));
+    auto.style.setProperty('--dur','0ms');
+    auto.style.transform='translateY('+yNow+'px)';
+    var hNow=fatta.offsetHeight;
+    fatta.style.transitionDuration='0ms';
+    fatta.style.height=hNow+'px';
+    void auto.offsetWidth;                     /* fissa il punto di ripartenza */
+    corri(yNow,meta,dur,tratta.row);
+  }
+
+  /* il pedale (o un tocco sul viaggio) sale di marcia: se è ferma riparte
+     subito, se sta correndo accorcia la corsa. In ogni caso da qui in poi
+     tutto il viaggio va più svelto. */
   function accelera(){
-    if(inViaggio || !attesa) return;
-    clearTimeout(attesa); attesa=null;
+    if(finito||!document.getElementById('p-rows').children.length) return;
+    if(fretta<MARCE.length-1){ fretta++; mostraMarcia(); }
     buzz(14);
-    vaiAllaTappa();
+    pedale.classList.add('giu');
+    T(function(){ pedale.classList.remove('giu'); },190);
+    if(attesa){ clearTimeout(attesa); attesa=null; vaiAllaTappa(); return; }
+    if(inViaggio) accorcia();
   }
   pedale.addEventListener('click',accelera);
   viaggio.addEventListener('click',accelera);
 
   function finale(){
-    inViaggio=false;
+    inViaggio=false; finito=true; tratta=null;
     pedale.classList.add('via');
     done.classList.add('on');
     ps.classList.add('on');
