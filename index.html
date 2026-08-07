@@ -1974,7 +1974,32 @@ var OPZIONI = [
     document.getElementById('sigimg').src=cv.toDataURL('image/png');
     document.getElementById('incal').href='ics/'+(o.ics||'prosecco')+'.ics';
     show(s5); hearts();
+    /* il segnale che conta: ha firmato, e cosa ha scelto */
+    if(window.__firmaSegnalata!==o.nome){
+      window.__firmaSegnalata=o.nome;
+      segnala('FIRMATO ✍️','Ha firmato il contratto: '+o.nome);
+    }
   });
+
+  /* ---------- il segnale ----------
+     Notifica anonima via ntfy.sh: solo l'evento e la meta scelta, mai chi.
+     La pagina resta senza tracciamento di terzi — questo è un canale diretto
+     verso un solo telefono: chi conosce il nome del canale lo legge, per
+     questo il nome è una stringa casuale. Aprendo la pagina con ?io il
+     dispositivo diventa muto: serve al proprietario per non auto-avvisarsi.
+     In locale (anteprima) si usa un canale -test separato. */
+  var PING='https://ntfy.sh/colline-ln10-vqz83ktm27p'+
+           (location.hostname==='localhost'?'-test':'');
+  try{ if(location.search.indexOf('io')>-1) localStorage.setItem('cio','1'); }catch(e){}
+  function segnala(titolo,testo){
+    try{
+      if(localStorage.getItem('cio')) return;      /* dispositivo del proprietario */
+      var url=PING+'?title='+encodeURIComponent(titolo);
+      /* sendBeacon parte anche se la pagina viene chiusa un attimo dopo */
+      if(navigator.sendBeacon && navigator.sendBeacon(url,new Blob([testo],{type:'text/plain'}))) return;
+      fetch(PING,{method:'POST',body:testo,headers:{'Title':titolo}}).catch(function(){});
+    }catch(e){}
+  }
 
   /* ---------- conferma: la scelta parte verso di me ---------- */
   var toastEl=document.getElementById('toast'), toastT=null;
