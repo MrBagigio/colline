@@ -70,7 +70,9 @@ body{
 /* ---------- schermate + transizioni ---------- */
 .screen{position:relative;z-index:5;width:100%;max-width:430px;text-align:center;display:none;margin:auto}
 .screen.on{display:block}
-.screen.out{display:block;animation:sink .34s cubic-bezier(.4,0,1,1) forwards}
+/* la schermata che se ne va non prende tocchi: un secondo tocco in quei 330 ms
+   accodava un'altra schermata e vinceva l'ultimo (firmava e finiva alle mete) */
+.screen.out{display:block;animation:sink .34s cubic-bezier(.4,0,1,1) forwards;pointer-events:none}
 @keyframes sink{to{opacity:0;transform:translateY(-20px) scale(.97);filter:blur(3px)}}
 .screen.on > *{animation:rise .75s var(--ease) both}
 .screen.on > *:nth-child(1){animation-delay:.06s}
@@ -638,13 +640,19 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 }
 /* iPhone in verticale con la barra di Safari: restano ~745px veri, e le quattro
    tappe con il pulsante sotto non ci stavano più */
-@media (max-height:790px){
+/* righe compatte su tutti i telefoni: misurato col viaggio finito, Garda e Asolo
+   hanno una riga di testo in più e sforavano a 390×745 (12 px), 390×844 (25 px)
+   e 375×812 (fino a 78 px, dove lo schermo è anche più stretto) */
+@media (max-height:900px){
+  .plan{gap:6px}
+  .row{padding:8px 13px}
+  .row span{font-size:.8rem;line-height:1.33}
+  .row:before{top:14px}
+  .ps{margin-top:6px}
+}
+/* a 375×812 il sottotitolo del Garda va su tre righe e sforava ancora di 24 px */
+@media (max-height:820px){
   #s3 .sub{display:none}
-  .plan{gap:7px}
-  .row{padding:9px 13px}
-  .row span{font-size:.82rem;line-height:1.36}
-  .row:before{top:15px}
-  .ps{margin-top:7px}
 }
 /* il contratto è la schermata più alta: si compatta prima delle altre,
    così il bottone resta sempre nello schermo senza dover scorrere */
@@ -741,7 +749,11 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
      resta invisibile. .missing e .foot sono l'articolo mancante, cioè il senso
      stesso della pagina: senza di loro il contratto non dice più niente. */
   .doc,.field,.stamp,.missing,.foot,.cta,.opt,.row,body,.steps{opacity:1!important}
-  .pozza{opacity:1!important;transform:translateX(-50%)!important}}
+  .pozza{opacity:1!important;transform:translateX(-50%)!important}
+  /* ...ma gli stati spenti restano spenti: la riaccensione qui sopra li batteva,
+     e tappe bloccate e "Applica la firma" sembravano attive */
+  .row.locked{opacity:.24!important}
+  .cta.spenta{opacity:.38!important}}
 </style>
 </head>
 <body>
@@ -1138,7 +1150,10 @@ var OPZIONI = [
 
   function msg(l1,l2){
     nudge.classList.remove('on');
-    setTimeout(function(){
+    scT(function(){
+      /* mentre un personaggio parla la sua nuvoletta occupa proprio quel posto:
+         le due scritte finivano una sopra l'altra */
+      if(say.classList.contains('on')) return;
       nudge.innerHTML=l1+'<span class="sys">'+l2+'</span>';
       nudge.classList.add('on');
     },140);
@@ -1273,7 +1288,7 @@ var OPZIONI = [
   }
 
   /* ---------- l'hacker ---------- */
-  var hk=null, cavo=null, hkTimer=[], hkCx=0, hkTop=0;
+  var hk=null, cavo=null, hkTimer=[], hkCx=0, hkTop=0, arriva=null;
   function hkT(fn,ms){ var id=setTimeout(fn,ms); hkTimer.push(id); return id; }
   function spegniHk(){ hkTimer.forEach(clearTimeout); hkTimer=[]; }
 
@@ -1306,7 +1321,13 @@ var OPZIONI = [
     hk.classList.add('cammina');
     hk.style.left=meta+'px';
 
-    hkT(function(){                                   /* arrivato: collega il PC */
+    /* l'arrivo è un passo a sé: se un secondo No cancella i timer prima che
+       scatti, il secondo tentativo lo completa invece di lasciarlo camminare
+       sul posto senza cavo */
+    arriva=function(){
+      arriva=null;
+      if(!hk) return;
+      hk.style.left=meta+'px';
       hk.classList.remove('cammina');
       hk.classList.add('digita');
       var x1=meta+LARGO-8,  y1=topH+40;               /* dal portatile... */
@@ -1315,7 +1336,8 @@ var OPZIONI = [
         'M'+x1+' '+y1+' C'+(x1+70)+' '+(y1+16)+' '+(x2+26)+' '+(y2+58)+' '+x2+' '+y2);
       cavo.classList.add('on');
       buzz(12);
-    },1150);
+    };
+    hkT(function(){ if(arriva) arriva(); },1150);
     hkT(function(){ tentativo(0,400); },1150);
   }
 
@@ -1332,6 +1354,7 @@ var OPZIONI = [
   function hackerRiprova(){                            /* 2° tentativo */
     if(!hk) return;
     spegniHk();
+    if(arriva) arriva();
     taci();
     tentativo(1,500);       /* niente più messaggio da leggere prima: parte subito */
   }
@@ -1619,6 +1642,9 @@ var OPZIONI = [
     tappa++;
     if(tappa>=rows.length){ finale(); return; }
     inViaggio=true;
+    /* ripartendo col pedale subito dopo l'arrivo la frenata era ancora accesa,
+       e vincendo sulle altre pose la macchina correva frenando, a stop accesi */
+    auto.classList.remove('frena');
 
     var row=rows[tappa];
     var y0=posAuto;
@@ -1791,8 +1817,14 @@ var OPZIONI = [
     return dx>70 ? 99 : 0;
   }
 
+  /* un dito solo: un secondo dito azzerava il punto di partenza e i campioni
+     dei due si mescolavano, la velocità saltava e i calici si rompevano anche
+     trascinando piano */
+  var ditoB=null;
   calB.addEventListener('pointerdown',function(e){
     if(fatto||rotto) return;
+    if(trascino && e.pointerId!==ditoB) return;
+    ditoB=e.pointerId;
     e.preventDefault();
     try{ calB.setPointerCapture(e.pointerId); }catch(_){}
     trascino=true; calB.classList.remove('attesa'); calB.classList.add('presa');
@@ -1801,7 +1833,7 @@ var OPZIONI = [
     buzz(6);
   });
   calB.addEventListener('pointermove',function(e){
-    if(!trascino||fatto||rotto) return;
+    if(!trascino||fatto||rotto||e.pointerId!==ditoB) return;
     campioni.push({x:e.clientX,t:performance.now()});
     if(campioni.length>7) campioni.shift();
     var d=Math.min(0,e.clientX-dx0);         /* si muove solo verso sinistra */
@@ -1812,7 +1844,9 @@ var OPZIONI = [
     }
   });
   ['pointerup','pointercancel'].forEach(function(ev){
-    calB.addEventListener(ev,function(){
+    calB.addEventListener(ev,function(e){
+      if(e.pointerId!==ditoB) return;
+      ditoB=null;
       trascino=false; calB.classList.remove('presa');
       if(!fatto&&!rotto){ calB.style.transform=''; calB.classList.add('attesa'); }
     });
@@ -1905,9 +1939,14 @@ var OPZIONI = [
       applica=document.getElementById('applica');
   var firmata=false, disegnando=false;
 
+  function misuraGiusta(){
+    var r=cv.getBoundingClientRect(), d=window.devicePixelRatio||1;
+    return cv.width===Math.round(r.width*d) && cv.height===Math.round(r.height*d);
+  }
   function setupCv(){
     var r=cv.getBoundingClientRect();
     if(!r.width){ setTimeout(setupCv,150); return; }
+    if(misuraGiusta()) return;     /* rifarlo cancellerebbe una firma già iniziata */
     var d=window.devicePixelRatio||1;
     cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d);
     cctx.setTransform(d,0,0,d,0,0);
@@ -1921,8 +1960,15 @@ var OPZIONI = [
     firmabox.classList.remove('dirty');
     applica.classList.add('spenta');
   }
+  /* un dito solo: col secondo i due tratti finivano nello stesso percorso, a zig-zag */
+  var ditoCv=null;
   cv.addEventListener('pointerdown',function(e){
     e.preventDefault();
+    if(disegnando && e.pointerId!==ditoCv) return;
+    /* un tocco arrivato prima della preparazione del canvas veniva poi cancellato
+       dalla preparazione stessa, e si applicava una firma vuota */
+    if(!misuraGiusta()) setupCv();
+    ditoCv=e.pointerId;
     try{ cv.setPointerCapture(e.pointerId); }catch(_){}
     disegnando=true;
     var r=cv.getBoundingClientRect();
@@ -1931,12 +1977,12 @@ var OPZIONI = [
     if(!firmata){ firmata=true; firmabox.classList.add('dirty'); applica.classList.remove('spenta'); buzz(6); }
   });
   cv.addEventListener('pointermove',function(e){
-    if(!disegnando) return;
+    if(!disegnando||e.pointerId!==ditoCv) return;
     var r=cv.getBoundingClientRect();
     cctx.lineTo(e.clientX-r.left,e.clientY-r.top); cctx.stroke();
   });
   ['pointerup','pointercancel'].forEach(function(ev){
-    cv.addEventListener(ev,function(){ disegnando=false; });
+    cv.addEventListener(ev,function(e){ if(e.pointerId===ditoCv){ disegnando=false; ditoCv=null; } });
   });
   document.getElementById('pulisci').addEventListener('click',function(){ buzz(8); firmaPulisci(); });
 
@@ -1949,13 +1995,21 @@ var OPZIONI = [
     if(!s4.classList.contains('on')) return;
     clearTimeout(rifaiT);
     rifaiT=setTimeout(function(){
+      /* le barre del browser che compaiono e spariscono mandano resize senza che
+         il canvas cambi: rifarlo lì spezzava il tratto a metà */
+      if(misuraGiusta()) return;
+      if(disegnando){ rifaiFirma(); return; }
+      var d=window.devicePixelRatio||1;
+      var w0=cv.width/d, h0=cv.height/d;
       var vecchia=firmata ? cv.toDataURL('image/png') : null;
       setupCv();
       if(!vecchia) return;
       var img=new Image();
       img.onload=function(){
+        /* in proporzione: allargarla solo in orizzontale la deformava */
         var r=cv.getBoundingClientRect();
-        cctx.drawImage(img,0,0,r.width,r.height);   /* il contesto è già scalato al dpr */
+        var k=Math.min(r.width/w0, r.height/h0);
+        cctx.drawImage(img,0,0,w0*k,h0*k);           /* il contesto è già scalato al dpr */
       };
       img.src=vecchia;
     },180);
@@ -1988,17 +2042,29 @@ var OPZIONI = [
      questo il nome è una stringa casuale. Aprendo la pagina con ?io il
      dispositivo diventa muto: serve al proprietario per non auto-avvisarsi.
      In locale (anteprima) si usa un canale -test separato. */
+  /* canale vero solo sul sito pubblicato: un'anteprima da 127.0.0.1 o dall'IP di
+     casa scriveva sul canale vero e sembrava una sua firma */
   var PING='https://ntfy.sh/colline-ln10-vqz83ktm27p'+
-           (location.hostname==='localhost'?'-test':'');
-  try{ if(location.search.indexOf('io')>-1) localStorage.setItem('cio','1'); }catch(e){}
+           (/\.github\.io$/.test(location.hostname)?'':'-test');
+  /* il parametro esatto, non la sottostringa: i social aggiungono codici casuali
+     (fbclid, utm_content=link_in_bio) che contengono "io" e zittirebbero per
+     sempre il suo telefono */
+  try{ if(/[?&]io(=|&|$)/.test(location.search)) localStorage.setItem('cio','1'); }catch(e){}
+  function proprietario(){
+    /* in un suo try: con l'archivio bloccato (Safari "blocca tutti i cookie")
+       l'eccezione faceva saltare anche l'invio */
+    try{ return !!localStorage.getItem('cio'); }catch(e){ return false; }
+  }
   function segnala(titolo,testo){
+    if(proprietario()) return;
+    /* il titolo va nell'indirizzo, mai in un'intestazione: un'intestazione con
+       un'emoji fa fallire la richiesta (TypeError) prima ancora di partire */
+    var url=PING+'?title='+encodeURIComponent(titolo);
     try{
-      if(localStorage.getItem('cio')) return;      /* dispositivo del proprietario */
-      var url=PING+'?title='+encodeURIComponent(titolo);
       /* sendBeacon parte anche se la pagina viene chiusa un attimo dopo */
       if(navigator.sendBeacon && navigator.sendBeacon(url,new Blob([testo],{type:'text/plain'}))) return;
-      fetch(PING,{method:'POST',body:testo,headers:{'Title':titolo}}).catch(function(){});
     }catch(e){}
+    try{ fetch(url,{method:'POST',body:testo,keepalive:true}).catch(function(){}); }catch(e){}
   }
 
   /* ---------- conferma: la scelta parte verso di me ---------- */
@@ -2036,15 +2102,23 @@ var OPZIONI = [
                                      : 'Fammi uno screenshot e mandamelo 📸');
     }
   }
+  /* un secondo tocco col pannello di condivisione già aperto veniva rifiutato
+     (InvalidStateError, non AbortError) e faceva comparire "Copiato!" dietro al
+     pannello: finché il primo non si chiude, gli altri tocchi non fanno niente */
+  var condividendo=false;
   document.getElementById('conferma').addEventListener('click',function(){
+    if(condividendo) return;
     buzz([14,60,14]);
     var o=sceltaCorrente||OPZIONI[0];
     var testo='✍️ Contratto firmato!\nArt. 5 — Lunedì 10, fuori provincia: '+o.nome+
               '.\nSi parte in mattinata, si rientra per cena… salvo prolungare 😏';
     if(navigator.share){
+      condividendo=true;
       navigator.share({text:testo}).then(function(){
+        condividendo=false;
         toast('Inviata 💛');
       }).catch(function(err){
+        condividendo=false;
         if(err && err.name==='AbortError') return;   /* ha chiuso lei: nessun avviso */
         consegna(testo);
       });
