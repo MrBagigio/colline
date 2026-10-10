@@ -457,14 +457,20 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .row{position:relative;display:flex;gap:14px;align-items:flex-start;background:var(--glass);
   border:1px solid rgba(255,255,255,.26);border-radius:17px;padding:13px 16px;text-shadow:var(--sh);
   box-shadow:0 8px 24px -12px rgba(0,0,0,.5);
-  transition:opacity .55s,filter .55s,border-color .4s}
+  transition:opacity .55s,border-color .4s}
+/* tappa non ancora raggiunta: si vede la scheda, non cosa c'è dentro.
+   Prima era solo sbiadita e il programma si leggeva tutto in anticipo. */
+.row > *{transition:opacity .5s var(--out) .12s,transform .5s var(--out) .12s}
+.row.locked > *{opacity:0;transform:translateY(6px);transition:none}
+.row.locked::after{content:'';position:absolute;left:50%;top:50%;width:34px;height:6px;margin:-3px 0 0 -17px;
+  background:radial-gradient(circle,rgba(255,255,255,.55) 2px,transparent 2.5px) 0 0/12px 6px repeat-x}
 /* segnalino sulla strada, uno per tappa */
 .row:before{content:'';position:absolute;left:-29px;top:20px;width:9px;height:9px;border-radius:50%;
   background:rgba(255,255,255,.3);box-shadow:0 0 0 3px rgba(28,16,42,.75);
   transition:background .45s,transform .45s var(--pop)}
 /* niente blur: sfocare quattro schede e poi animarne la transizione è una
    delle cose che iOS fatica di più a comporre. Grigio + trasparenza bastano. */
-.row.locked{opacity:.24;filter:grayscale(1)}
+.row.locked{opacity:.45}
 .row.qui:before{background:var(--gold);transform:scale(1.45);
   box-shadow:0 0 0 3px rgba(28,16,42,.75),0 0 12px rgba(255,216,138,.9)}
 .row.visto:before{background:var(--gold)}
@@ -799,7 +805,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   .pozza{opacity:1!important;transform:translateX(-50%)!important}
   /* ...ma gli stati spenti restano spenti: la riaccensione qui sopra li batteva,
      e tappe bloccate e "Applica la firma" sembravano attive */
-  .row.locked{opacity:.24!important}
+  .row.locked{opacity:.45!important}
   .cta.spenta{opacity:.38!important}}
 /* Manrope è un filo più larga del carattere di sistema: col viaggio finito
    sforava di 2-19 px e il recap di 22 px a 320x568. Si stringono solo quei testi. */
