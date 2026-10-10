@@ -29,8 +29,15 @@
   --sh:0 1px 2px rgba(0,0,0,.7), 0 2px 10px rgba(0,0,0,.45);
   --ease:cubic-bezier(.22,.9,.28,1);
   --pop:cubic-bezier(.34,1.5,.5,1);
+  /* curve del sistema: entrate decise, uscite che accelerano, molla leggera
+     solo dove c'è un impatto (Sì, timbri, rilascio dei pulsanti) */
+  --out:cubic-bezier(.22,1,.36,1);
+  --in:cubic-bezier(.55,0,1,.45);
+  --spring:cubic-bezier(.34,1.3,.64,1);
+  --press:cubic-bezier(.2,0,0,1);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+button,a,.opt,.viaggio,.pedale{touch-action:manipulation}
 html{overflow-x:hidden}
 body{
   font-family:Manrope,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
@@ -76,9 +83,9 @@ body{
 .screen.on{display:block}
 /* la schermata che se ne va non prende tocchi: un secondo tocco in quei 330 ms
    accodava un'altra schermata e vinceva l'ultimo (firmava e finiva alle mete) */
-.screen.out{display:block;animation:sink .34s cubic-bezier(.4,0,1,1) forwards;pointer-events:none}
-@keyframes sink{to{opacity:0;transform:translateY(-20px) scale(.97);filter:blur(3px)}}
-.screen.on > *{animation:rise .75s var(--ease) both}
+.screen.out{display:block;animation:sink .3s var(--in) forwards;pointer-events:none}
+@keyframes sink{to{opacity:0;transform:translateY(-16px) scale(.98)}}
+.screen.on > *{animation:rise .7s var(--out) backwards}
 .screen.on > *:nth-child(1){animation-delay:.06s}
 .screen.on > *:nth-child(2){animation-delay:.15s}
 .screen.on > *:nth-child(3){animation-delay:.24s}
@@ -87,6 +94,10 @@ body{
 .screen.on > *:nth-child(6){animation-delay:.51s}
 .screen.on > *:nth-child(7){animation-delay:.6s}
 @keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.screen.on > .doc{animation:docDrop .9s cubic-bezier(.2,.9,.3,1.15) .12s backwards}
+/* le schede hanno il loro ingresso a scaglioni: animare anche il contenitore
+   faceva finire le prime due dentro un riquadro ancora invisibile */
+.screen.on > .opts{animation:none}
 
 .kicker{font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;opacity:.9;
   margin-bottom:18px;text-shadow:var(--sh);font-weight:600}
@@ -120,10 +131,10 @@ h1 em{font-style:italic;color:var(--gold)}
 .field dt{flex:0 0 76px;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
   opacity:.62;font-weight:700}
 .field dd{font-size:.95rem;line-height:1.4}
-.fields .field:nth-child(1){animation-delay:.92s}
-.fields .field:nth-child(2){animation-delay:1.1s}
-.fields .field:nth-child(3){animation-delay:1.28s}
-.fields .field:nth-child(4){animation-delay:1.46s}
+.fields .field:nth-child(1){animation-delay:.62s}
+.fields .field:nth-child(2){animation-delay:.76s}
+.fields .field:nth-child(3){animation-delay:.9s}
+.fields .field:nth-child(4){animation-delay:1.04s}
 .menu{display:block;margin-top:3px;font-size:.72rem;line-height:1.4;font-style:normal;
   opacity:.62;font-family:ui-monospace,Menlo,Consolas,monospace}
 @keyframes typein{from{opacity:0;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
@@ -149,16 +160,17 @@ h1 em{font-style:italic;color:var(--gold)}
   border:2px solid rgba(255,122,146,.85);border-radius:9px;padding:5px 10px;
   color:#ffa9b9;font-size:.58rem;font-weight:800;letter-spacing:.18em;text-align:center;
   box-shadow:inset 0 0 0 1px rgba(255,122,146,.35);text-transform:uppercase;line-height:1.3;
-  opacity:0;animation:slam .55s cubic-bezier(.3,1.5,.5,1) 2.35s forwards}
+  opacity:0;animation:slam .5s linear 1.55s forwards}
 .stamp small{display:block;font-size:.48rem;opacity:.75;letter-spacing:.1em}
-@keyframes slam{0%{opacity:0;transform:rotate(-34deg) scale(3)}
-  55%{opacity:1;transform:rotate(-11deg) scale(.92)}
+@keyframes slam{0%{opacity:0;transform:rotate(-34deg) scale(3);animation-timing-function:cubic-bezier(.55,0,1,.45)}
+  8%{opacity:1}
+  55%{opacity:1;transform:rotate(-11deg) scale(.94);animation-timing-function:cubic-bezier(.2,.8,.3,1)}
   100%{opacity:1;transform:rotate(-13deg) scale(1)}}
 
 .cta{margin-top:24px;background:var(--glass);border:1px solid rgba(255,255,255,.34);
   color:var(--ink);text-shadow:var(--sh);box-shadow:0 10px 28px -10px rgba(0,0,0,.6);
-  transition:transform .2s,border-color .25s}
-.cta:active{transform:scale(.96);border-color:rgba(255,216,138,.7)}
+  transition:transform .26s var(--spring),border-color .25s,opacity .25s}
+.cta:active{transform:scale(.96);border-color:rgba(255,216,138,.7);transition-duration:90ms,.25s,.25s;transition-timing-function:var(--press)}
 /* pulsante nel pulsante: la freccia vive in un suo cerchio, che si sposta quando lo premi */
 .cta,.ghostbtn{display:inline-flex;align-items:center;justify-content:center;gap:12px}
 .fr{width:1.85em;height:1.85em;margin:-.45em -.95em -.45em 0;border-radius:50%;flex-shrink:0;
@@ -170,7 +182,7 @@ h1 em{font-style:italic;color:var(--gold)}
 /* l'entrata ritardata vale SOLO per il bottone del contratto: sulla classe
    .cta rendeva invisibili per 2,85s anche "Applica la firma" e "Manda la
    conferma", che compaiono su schermate diverse */
-#apri{opacity:0;animation:rise .7s var(--ease) 2.85s both}
+#apri{animation:rise .6s var(--out) 1.9s backwards}
 
 /* ---------- bottoni ---------- */
 .btns{display:flex;gap:14px;justify-content:center;align-items:center;min-height:66px}
@@ -180,12 +192,13 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   background:linear-gradient(115deg,#ff8f66 0%,#ff6b8a 42%,#ffc09e 52%,#ff6b8a 62%,#ff8f66 100%);
   background-size:320% 100%;
   animation:sheen 5s ease-in-out infinite, halo 3.2s ease-in-out infinite;
-  transition:transform .6s var(--pop),background-color .7s,color .4s,opacity .5s}
+  --s:1;transform:scale(var(--s));
+  transition:transform .26s var(--spring),background-color .7s,color .4s,opacity .5s}
 @keyframes sheen{0%,100%{background-position:100% 0}50%{background-position:0 0}}
 @keyframes halo{
   0%,100%{box-shadow:0 12px 32px -8px rgba(255,107,138,.55),inset 0 1px 0 rgba(255,255,255,.25)}
   50%{box-shadow:0 18px 48px -6px rgba(255,107,138,.85),inset 0 1px 0 rgba(255,255,255,.32)}}
-#yes:active{transform:scale(.95)}
+#yes:active{transform:scale(calc(var(--s) * .93));transition-duration:90ms;transition-timing-function:var(--press)}
 #yes .rip{position:absolute;width:20px;height:20px;border-radius:50%;
   background:rgba(255,255,255,.6);pointer-events:none;
   transform:translate(-50%,-50%) scale(0);animation:rip .65s ease-out forwards}
@@ -209,16 +222,17 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
    gradiente largo 320%, cioè ridipinge il bottone a ogni fotogramma mentre lo
    si sta già trasformando. Era la causa degli scatti. Solo transform+opacity,
    che il compositore gestisce da solo. */
-#yes.back{animation:yesBack .85s var(--pop) both;will-change:transform,opacity}
-@keyframes yesBack{0%{transform:translateX(-180%) scale(.84);opacity:0}
-  70%{transform:translateX(0) scale(1.22);opacity:1}
-  100%{transform:scale(1.14);opacity:1}}
+/* un rimbalzo solo: prima i fotogrammi avevano già l'overshoot e la curva ne
+   aggiungeva un altro a ogni tratto, tre sobbalzi in 850 ms */
+#yes.back{animation:yesBack .7s cubic-bezier(.3,1.25,.5,1) both;will-change:transform,opacity}
+@keyframes yesBack{from{transform:translateX(-180%) scale(.84);opacity:0}
+  to{transform:scale(1.14);opacity:1}}
 
 #no{background:var(--glass);color:var(--ink);border:1px solid rgba(255,255,255,.42);
   text-shadow:var(--sh);
   box-shadow:0 6px 20px rgba(0,0,0,.28);
-  transition:transform .12s var(--pop),filter .5s,opacity .5s}
-#no:active{transform:scale(.93)}
+  transition:transform .26s var(--spring),filter .5s,opacity .5s}
+#no:active{transform:scale(.93);transition-duration:90ms;transition-timing-function:var(--press)}
 #no.broken{filter:grayscale(.7);opacity:.85}
 #no.center{position:fixed;z-index:8;margin:0;
   transition:left .85s cubic-bezier(.34,1.1,.45,1),top .85s cubic-bezier(.34,1.1,.45,1),
@@ -248,8 +262,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 
 /* ---------- personaggi ---------- */
 .pers{position:fixed;z-index:9;
-  filter:drop-shadow(0 8px 16px rgba(0,0,0,.55));
-  transition:left 1.05s cubic-bezier(.35,0,.35,1),transform 1.05s cubic-bezier(.5,0,.72,.9),opacity .45s}
+  transition:left 1.05s cubic-bezier(.25,.1,.75,.9),transform 1.05s cubic-bezier(.25,.1,.75,.9),opacity .45s}
+.pers::after{content:'';position:absolute;left:14%;right:14%;bottom:-5px;height:10px;border-radius:50%;
+  background:radial-gradient(rgba(0,0,0,.5),rgba(0,0,0,0) 70%);z-index:-1}
 .pers svg{display:block;height:auto}
 .corpo{transform-origin:50% 100%}
 .pers.cammina .corpo{animation:passo .42s ease-in-out infinite}
@@ -295,8 +310,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   transition:opacity .4s}
 .cavo.on{opacity:1}
 .cavo path{fill:none;stroke:#7dffa8;stroke-width:2.4;stroke-linecap:round;
-  stroke-dasharray:7 6;animation:scorreCavo .7s linear infinite;
-  filter:drop-shadow(0 0 4px rgba(125,255,168,.7))}
+  stroke-dasharray:7 6;animation:scorreCavo .7s linear infinite}
 @keyframes scorreCavo{to{stroke-dashoffset:-13}}
 
 /* ---------- nuvoletta ---------- */
@@ -366,12 +380,11 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   background:repeating-linear-gradient(rgba(255,216,138,.5) 0 9px,rgba(255,216,138,0) 9px 18px);
   background-size:100% 18px}
 /* la segnaletica scorre: dà il senso della velocità */
-.viaggio.inmoto .strada{animation:scorre .34s linear infinite}
 @keyframes scorre{to{background-position-y:18px}}
 /* la parte di strada già percorsa si accende */
 .fatta{position:absolute;left:20px;top:8px;width:3px;height:0;border-radius:2px;
   background:linear-gradient(rgba(255,216,138,.95),rgba(255,170,110,.85));
-  box-shadow:0 0 10px rgba(255,216,138,.6);transition:height .95s cubic-bezier(.4,0,.25,1)}
+  box-shadow:0 0 10px rgba(255,216,138,.6);transition:height .95s cubic-bezier(.45,0,.3,1)}
 /* ---- la macchina: 12 principi ---- */
 /* si sposta con transform, non con `top`: animare `top` rifà il layout a ogni
    fotogramma ed è la causa principale degli scatti sul telefono */
@@ -399,21 +412,23 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 /* 2 · SQUASH & STRETCH + ARCO — parte stirata e ondeggia in corsa */
 .auto.guida .carro{animation:lancio .3s cubic-bezier(.2,.8,.4,1) both,
                              sbanda .42s ease-in-out .3s infinite}
+/* il lancio finisce esattamente sulla posa da cui parte la crociera:
+   prima c'era un salto dell'8% a 0.3 s */
 @keyframes lancio{from{transform:translateY(-4px) scaleY(.84) scaleX(1.14)}
-  to{transform:translateY(0) scaleY(1.16) scaleX(.9)}}
+  to{transform:translateX(-2px) rotate(-2.5deg) scaleY(1.04) scaleX(.97)}}
 @keyframes sbanda{
-  0%,100%{transform:translateX(-2px) rotate(-2.5deg) scaleY(1.08) scaleX(.95)}
-  50%    {transform:translateX(2px)  rotate(2.5deg)  scaleY(1.08) scaleX(.95)}}
+  0%,100%{transform:translateX(-2px) rotate(-2.5deg) scaleY(1.04) scaleX(.97)}
+  50%    {transform:translateX(2px)  rotate(2.5deg)  scaleY(1.04) scaleX(.97)}}
 .auto.guida .faroL{opacity:1}
 .auto.guida .fascio{opacity:1}
 
 /* 3 · FOLLOW THROUGH — frena, si schiaccia e rimbalza fino a fermarsi */
 .auto.frena .carro{animation:frena .62s cubic-bezier(.3,.9,.4,1) both}
 @keyframes frena{
-  0%  {transform:translateY(4px) scaleY(.76) scaleX(1.2)}
-  32% {transform:translateY(-4px) scaleY(1.12) scaleX(.91)}
-  56% {transform:translateY(1px) scaleY(.95) scaleX(1.04)}
-  78% {transform:translateY(-1px) scaleY(1.03) scaleX(.98)}
+  0%  {transform:scaleY(1.04) scaleX(.97)}
+  25% {transform:translateY(3px) scaleY(.9) scaleX(1.07)}
+  55% {transform:translateY(-1px) scaleY(1.03) scaleX(.99)}
+  78% {transform:scaleY(.99) scaleX(1.01)}
   100%{transform:none}}
 .auto.frena .stopL{fill:#ff5568}
 
@@ -465,12 +480,15 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   background:var(--glass);border:1px solid rgba(255,255,255,.3);color:var(--ink);
   font-size:.82rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;
   text-shadow:var(--sh);box-shadow:0 8px 22px -10px rgba(0,0,0,.6);
-  transition:transform .15s var(--pop),border-color .25s,opacity .55s}
+  /* larghezza fissa: col testo della marcia il pulsante centrato cambiava misura a scatti */
+  min-width:176px;justify-content:center;
+  transition:transform .26s var(--spring),border-color .25s,opacity .55s}
 /* l'animazione d'ingresso delle schermate finisce con transform:none e
    scentrerebbe il pedale, che è fisso e centrato via translateX(-50%) */
 .screen.on > .pedale{animation:none}
 .pedale.via{opacity:0;pointer-events:none;transform:translateX(-50%) scale(.9)}
-.pedale:active,.pedale.giu{transform:translateX(-50%) scale(.95);border-color:rgba(255,216,138,.75)}
+.pedale:active,.pedale.giu{transform:translateX(-50%) scale(.95);border-color:rgba(255,216,138,.75);transition-duration:90ms,.25s,.55s;transition-timing-function:var(--press)}
+.pedale.via .ped-piatto{animation:none}
 /* più lo si pigia, più il pedale si scalda: si vede che sta facendo qualcosa */
 .pedale.g1{border-color:rgba(255,216,138,.6)}
 .pedale.g2{border-color:rgba(255,216,138,.85);background:rgba(255,216,138,.14)}
@@ -500,12 +518,16 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   background:rgba(255,216,138,.1);font-size:.68rem;font-weight:800;letter-spacing:.14em;
   text-transform:uppercase;color:var(--gold);text-shadow:none;
   display:none}
-.done.on{display:inline-flex;animation:stampIn .6s cubic-bezier(.3,1.5,.5,1) both}
+.done.on{display:inline-flex;animation:stampIn .6s cubic-bezier(.3,1.5,.5,1) backwards}
+#s3 > .done.on{animation-delay:0s}
+#s3 > .ps.on{animation-delay:.25s}
+#s3 > .vaifirma.on{animation-delay:.5s}
+#s3 > .back.on{animation-delay:.65s}
 @keyframes stampIn{0%{opacity:0;transform:scale(2.2)}
   55%{opacity:1;transform:scale(.94)}100%{opacity:1;transform:none}}
 .done span{font-size:.95rem;letter-spacing:0}
 .ps{margin-top:12px;font-size:.88rem;opacity:.9;font-style:italic;text-shadow:var(--sh);display:none}
-.ps.on{display:block;animation:rise .6s var(--ease) .25s both}
+.ps.on{display:block;animation:rise .6s var(--out) .25s backwards}
 /* durante il viaggio sta nascosto: finirebbe sotto il pedale fisso */
 .back{display:none}
 .back.on{margin-top:9px;display:inline-flex;align-items:center;gap:8px;
@@ -514,8 +536,8 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.26);
   color:var(--ink);text-shadow:var(--sh);
   box-shadow:0 6px 18px -10px rgba(0,0,0,.6);
-  transition:transform .15s var(--pop),border-color .25s,background .25s}
-.back:active{transform:scale(.96);background:rgba(255,255,255,.17);
+  transition:transform .26s var(--spring),border-color .25s,background .25s}
+.back:active{transform:scale(.96);transition-duration:90ms,.25s,.25s;transition-timing-function:var(--press);background:rgba(255,255,255,.17);
   border-color:rgba(255,216,138,.6)}
 .back .frecciaind{transition:transform .2s var(--pop)}
 .back:active .frecciaind{transform:translateX(-4px)}
@@ -524,7 +546,8 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .tavolo{position:relative;height:230px;margin-top:6px;touch-action:none}
 .calice{position:absolute;bottom:14px;width:96px;height:150px;
   filter:drop-shadow(0 10px 18px rgba(0,0,0,.55));
-  transition:transform .38s var(--pop),opacity .25s}
+  transform-origin:50% 92%;
+  transition:transform .38s var(--spring),opacity .25s}
 .calice svg{width:100%;height:100%;display:block}
 #calA{left:16%}
 #calB{right:16%;cursor:grab}
@@ -587,14 +610,14 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .firmarow{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:16px}
 .ghostbtn{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.26);
   color:var(--ink);border-radius:100px;padding:13px 20px;font-size:.9rem;font-weight:500;
-  text-shadow:var(--sh);transition:transform .15s var(--pop)}
-.ghostbtn:active{transform:scale(.95)}
+  text-shadow:var(--sh);transition:transform .26s var(--spring)}
+.ghostbtn:active{transform:scale(.95);transition-duration:90ms;transition-timing-function:var(--press)}
 .cta.spenta{opacity:.38;pointer-events:none}
 /* quando la firma c'è, il bottone si accende col bordo dorato */
 #applica:not(.spenta){border-color:rgba(255,216,138,.75);
   box-shadow:0 10px 28px -10px rgba(0,0,0,.6),0 0 0 1px rgba(255,216,138,.25)}
 .vaifirma{display:none}
-.vaifirma.on{display:inline-flex;margin-top:12px;animation:rise .6s var(--ease) .25s both}
+.vaifirma.on{display:inline-flex;margin-top:12px;animation:rise .6s var(--out) .25s backwards}
 
 /* ---------- recap firmato ---------- */
 .art5{margin-top:11px;border:1.5px solid rgba(255,216,138,.78);border-radius:12px;
@@ -614,10 +637,12 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;
   box-shadow:inset 0 0 0 1px rgba(255,216,138,.35);
   transform:translateX(-50%) rotate(-11deg);
-  animation:slamCentro .55s cubic-bezier(.3,1.5,.5,1) .5s both}
+  /* si timbra a documento scritto (i campi finiscono a ~1.1s), non durante */
+  animation:slamCentro .5s linear 1.2s both}
 @keyframes slamCentro{
-  0%  {opacity:0;transform:translateX(-50%) rotate(-32deg) scale(2.8)}
-  55% {opacity:1;transform:translateX(-50%) rotate(-9deg) scale(.93)}
+  0%  {opacity:0;transform:translateX(-50%) rotate(-32deg) scale(2.8);animation-timing-function:cubic-bezier(.55,0,1,.45)}
+  8%  {opacity:1}
+  55% {opacity:1;transform:translateX(-50%) rotate(-9deg) scale(.94);animation-timing-function:cubic-bezier(.2,.8,.3,1)}
   100%{opacity:1;transform:translateX(-50%) rotate(-11deg) scale(1)}}
 /* link travestito da pulsante: un vero <a> verso il file .ics, che su iPhone
    apre direttamente il Calendario */
@@ -637,11 +662,12 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 
 /* ---------- coriandoli ---------- */
 .heart{position:fixed;z-index:12;pointer-events:none;width:14px;height:14px;
-  animation:fly 2.9s cubic-bezier(.2,.7,.3,1) forwards}
-.heart svg{width:100%;height:100%;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
-@keyframes fly{0%{opacity:1;transform:translate(0,0) scale(.4) rotate(0)}
-  15%{opacity:1}
-  100%{opacity:0;transform:translate(var(--dx),-82vh) scale(1.25) rotate(var(--r))}}
+  animation:fly 1.6s linear forwards}
+.heart svg{width:100%;height:100%;display:block}
+@keyframes fly{
+  0%{opacity:1;transform:translate(0,0) rotate(0) scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1)}
+  32%{opacity:1;transform:translate(calc(var(--dx) * .45),var(--up)) rotate(calc(var(--r) * .4)) scale(1);animation-timing-function:cubic-bezier(.5,0,.9,.6)}
+  100%{opacity:0;transform:translate(var(--dx),var(--fall)) rotate(var(--r)) scale(.6)}}
 
 /* Il viaggio è la schermata più lunga di tutte: con quattro tappe piene
    sforava già a 844px (iPhone 13 Pro a schermo intero). Si stringe da qui. */
@@ -1129,6 +1155,8 @@ var OPZIONI = [
 /* ===================== fine personalizzazione ===================== */
 
 (function(){
+  document.addEventListener('touchstart',function(){},{passive:true});
+  var MOTO_RIDOTTO=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   var no=document.getElementById('no'), yes=document.getElementById('yes'),
       nudge=document.getElementById('nudge'), say=document.getElementById('say'),
       maint=document.getElementById('maint'), steps=document.getElementById('steps'),
@@ -1433,8 +1461,11 @@ var OPZIONI = [
     hkT(function(){ taci(); },3600);
     hkT(function(){                                   /* se ne va da dov'è venuto */
       hk.classList.remove('nega');
-      hk.classList.add('cammina');
+      hk.style.transition='none';
       hk.style.transform='scaleX(-1)';
+      void hk.offsetWidth;
+      hk.style.transition='';
+      hk.classList.add('cammina');
       hk.style.left='-140px';
     },3750);
     hkT(function(){
@@ -1526,7 +1557,7 @@ var OPZIONI = [
       no.classList.add('held');
       no.style.transform='translateY(-18px) rotate(-8deg)';
       if(wl) wl.style.transform='translateY(-7px)';
-      if(wr) wr.style.transform='scaleX(-1) translateY(-7px)';
+      if(wr){ wr.style.transition='none'; wr.style.transform='translateY(-7px)'; void wr.offsetWidth; wr.style.transition=''; }
       spot.classList.remove('on');
       buzz(20);
     },5450);
@@ -1534,7 +1565,7 @@ var OPZIONI = [
     scT(function(){
       var via=window.innerWidth+200;
       if(wl){ wl.classList.add('cammina'); wl.style.transform='translateX('+via+'px) translateY(-7px)'; }
-      if(wr){ wr.classList.add('cammina'); wr.style.transform='scaleX(-1) translateX(-'+via+'px) translateY(-7px)'; }
+      if(wr){ wr.classList.add('cammina'); wr.style.transform='translateX('+via+'px) translateY(-7px)'; }
       no.classList.add('carried');
       no.style.transform='translateX('+via+'px) translateY(-18px) rotate(-8deg)';
     },6000);
@@ -1557,7 +1588,9 @@ var OPZIONI = [
       var fissa=function(){
         yes.classList.remove('back');
         yes.style.willChange='auto';
-        yes.style.transform='scale(1.14)';
+        /* nella variabile, non in style.transform: lo stile in linea batteva
+           :active e il Sì, dopo il rientro, non si schiacciava più al tocco */
+        yes.style.setProperty('--s','1.14');
         yes.style.opacity='1';
       };
       var partito=false;
@@ -1583,26 +1616,31 @@ var OPZIONI = [
   }
 
   /* ---------- coriandoli con deriva ---------- */
-  function hearts(){
+  function hearts(sorgente){
+    if(MOTO_RIDOTTO) return;
+    var o=sorgente?sorgente.getBoundingClientRect():null;
+    var ox=o?o.left+o.width/2:innerWidth/2, oy=o?o.top+o.height/2:innerHeight*.6;
     /* cuori, scintille e puntini disegnati: le emoji sembravano un adesivo */
     var FORME=['<path d="M12 20.5s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.8a4.2 4.2 0 0 1 7.5 2.5c0 5.6-7.5 10.2-7.5 10.2z"/>',
                '<path d="M12 2.5l2.1 7.4 7.4 2.1-7.4 2.1-2.1 7.4-2.1-7.4-7.4-2.1 7.4-2.1z"/>',
                '<circle cx="12" cy="12" r="6"/>'];
     var TINTE=['#ffd88a','#ffb27a','#ff8f8a','#ff6b8a','#fff1d6'];
-    for(var i=0;i<28;i++){
+    for(var i=0;i<22;i++){
       setTimeout(function(){
         var el=document.createElement('div');
         el.className='heart';
         el.innerHTML='<svg viewBox="0 0 24 24" fill="'+TINTE[Math.floor(Math.random()*TINTE.length)]+'">'+
                      FORME[Math.floor(Math.random()*FORME.length)]+'</svg>';
-        el.style.left=(Math.random()*92+4)+'vw'; el.style.top=(Math.random()*20+74)+'vh';
-        el.style.setProperty('--r',(Math.random()*140-70)+'deg');
-        el.style.setProperty('--dx',(Math.random()*120-60)+'px');
+        el.style.left=(ox-7)+'px'; el.style.top=(oy-7)+'px';
+        el.style.setProperty('--r',(Math.random()*360-180)+'deg');
+        el.style.setProperty('--dx',(Math.random()*320-160)+'px');
+        el.style.setProperty('--up',(-120-Math.random()*170)+'px');
+        el.style.setProperty('--fall',(40+Math.random()*200)+'px');
         var lato=(9+Math.random()*13)+'px'; el.style.width=lato; el.style.height=lato;
-        el.style.animationDuration=(2.4+Math.random()*1.1)+'s';
+        el.style.animationDuration=(1.3+Math.random()*.6)+'s';
         document.body.appendChild(el);
-        setTimeout(function(){el.remove();},3600);
-      }, i*48);
+        setTimeout(function(){el.remove();},2000);
+      }, i*16);
     }
   }
 
@@ -1621,8 +1659,8 @@ var OPZIONI = [
     yes.appendChild(rip);
     setTimeout(function(){ rip.remove(); },700);
     buzz([14,50,14]);
-    hearts();
-    setTimeout(function(){ show(s2); },420);
+    hearts(yes);
+    setTimeout(function(){ show(s2); },260);
   });
 
   /* ---------- le 4 card ---------- */
@@ -1734,8 +1772,13 @@ var OPZIONI = [
 
   /* fa percorrere alla macchina il tratto y0→y in dur ms. Richiamabile a metà
      corsa con un tratto più corto: è così che l'acceleratore morde davvero. */
-  function corri(y0,y,dur,row){
+  function corri(y0,y,dur,row,lanciata){
     tratta={y0:y0,y:y,dur:dur,row:row};
+    /* da ferma parte piano e arriva piano; già lanciata (pedale a metà corsa)
+       riparte con velocità: con la stessa curva si fermava un istante a ogni pigiata */
+    var curva=lanciata?'cubic-bezier(.15,.6,.35,1)':'';
+    auto.style.transitionTimingFunction=curva;
+    fatta.style.transitionTimingFunction=curva;
     auto.classList.add('guida');
     viaggio.classList.add('inmoto');
     auto.style.setProperty('--dur',dur+'ms');
@@ -1747,7 +1790,7 @@ var OPZIONI = [
     /* 8 · azione secondaria: gli sbuffi seguono la macchina lungo il tragitto */
     for(var i=1;i<=6;i++){
       (function(k){ TT(function(){
-        if(inViaggio) sbuffo(y0+(y-y0)*(k/7));
+        if(inViaggio && !MOTO_RIDOTTO) sbuffo(yCorrente());
       }, dur*k/7); })(i);
     }
 
@@ -1767,7 +1810,8 @@ var OPZIONI = [
       },Math.round(660*MARCE[fretta]));
       inViaggio=false;
       /* sosta per leggere la tappa, poi riparte da sola */
-      pausa(vaiAllaTappa, Math.round(SOSTA*MARCE[fretta]));
+      var ultima=row===document.querySelector('#p-rows .row:last-child');
+      pausa(vaiAllaTappa, ultima ? 650 : Math.round(SOSTA*MARCE[fretta]));
     },dur);
   }
 
@@ -1796,7 +1840,7 @@ var OPZIONI = [
     fatta.style.transitionDuration='0ms';
     fatta.style.height=hNow+'px';
     void auto.offsetWidth;                     /* fissa il punto di ripartenza */
-    corri(yNow,meta,dur,tratta.row);
+    corri(yNow,meta,dur,tratta.row,true);
   }
 
   /* il pedale (o un tocco sul viaggio) sale di marcia: se è ferma riparte
@@ -1821,7 +1865,7 @@ var OPZIONI = [
     ps.classList.add('on');
     document.getElementById('vaifirma').classList.add('on');
     document.getElementById('back').classList.add('on');
-    hearts(); buzz([10,70,10]);
+    buzz([10,70,10]);
   }
 
   function scegli(o){
@@ -1838,7 +1882,7 @@ var OPZIONI = [
       rows.appendChild(d);
     });
     resetViaggio();
-    show(s3); hearts();
+    show(s3);
     T(vaiAllaTappa,950);          /* parte da sola appena la schermata è entrata */
   }
 
@@ -1917,7 +1961,8 @@ var OPZIONI = [
       if(e.pointerId!==ditoB) return;
       ditoB=null;
       trascino=false; calB.classList.remove('presa');
-      if(!fatto&&!rotto){ calB.style.transform=''; calB.classList.add('attesa'); }
+      if(!fatto&&!rotto){ calB.style.transform='';
+        bT(function(){ if(!fatto&&!rotto&&!trascino) calB.classList.add('attesa'); },420); }
     });
   });
   /* ripiego: se non trascina, un tocco sul calice fa comunque cin */
@@ -1939,6 +1984,9 @@ var OPZIONI = [
     fatto=true; trascino=false;
     calB.classList.remove('attesa','presa');
     var p=avvicina();
+    /* i calici ci mettono ~0.38 s ad arrivare: suono, scritta e scintille
+       al contatto, non alla partenza */
+    bT(function(){
     buzz([18,50,18]);
 
     var e=document.createElement('div');
@@ -1953,14 +2001,14 @@ var OPZIONI = [
         s.style.setProperty('--sx',Math.round(Math.cos(ang)*r)+'px');
         s.style.setProperty('--sy',Math.round(Math.sin(ang)*r)+'px');
         s.style.animationDelay=(k*18)+'ms';
-        tavolo.appendChild(s);
+        if(!MOTO_RIDOTTO) tavolo.appendChild(s);
         setTimeout(function(){ s.remove(); },1200);
       })(i);
     }
     setTimeout(function(){ e.remove(); },1000);
-    hearts();
     bsub.textContent='Ecco. Ora è ufficiale.';
     setTimeout(function(){ vaifirma2.classList.add('on'); },500);
+    },230);
   }
 
   /* troppa foga: si rompono */
@@ -2030,7 +2078,7 @@ var OPZIONI = [
     applica.classList.add('spenta');
   }
   /* un dito solo: col secondo i due tratti finivano nello stesso percorso, a zig-zag */
-  var ditoCv=null;
+  var ditoCv=null, rcCv=null, punti=[];
   cv.addEventListener('pointerdown',function(e){
     e.preventDefault();
     if(disegnando && e.pointerId!==ditoCv) return;
@@ -2040,15 +2088,26 @@ var OPZIONI = [
     ditoCv=e.pointerId;
     try{ cv.setPointerCapture(e.pointerId); }catch(_){}
     disegnando=true;
-    var r=cv.getBoundingClientRect();
-    var x=e.clientX-r.left, y=e.clientY-r.top;
+    rcCv=cv.getBoundingClientRect();
+    var x=e.clientX-rcCv.left, y=e.clientY-rcCv.top;
+    punti=[{x:x,y:y}];
     cctx.beginPath(); cctx.moveTo(x,y); cctx.lineTo(x+.15,y+.15); cctx.stroke();
     if(!firmata){ firmata=true; firmabox.classList.add('dirty'); applica.classList.remove('spenta'); buzz(6); }
   });
   cv.addEventListener('pointermove',function(e){
     if(!disegnando||e.pointerId!==ditoCv) return;
-    var r=cv.getBoundingClientRect();
-    cctx.lineTo(e.clientX-r.left,e.clientY-r.top); cctx.stroke();
+    /* tutti i punti fra un fotogramma e l'altro, non solo l'ultimo: con un dito
+       veloce le curve diventavano poligoni */
+    var lista=(e.getCoalescedEvents&&e.getCoalescedEvents().length)?e.getCoalescedEvents():[e];
+    for(var i=0;i<lista.length;i++){
+      punti.push({x:lista[i].clientX-rcCv.left,y:lista[i].clientY-rcCv.top});
+      var n=punti.length; if(n<3) continue;
+      var a=punti[n-3], b=punti[n-2], c=punti[n-1];
+      cctx.beginPath();
+      cctx.moveTo((a.x+b.x)/2,(a.y+b.y)/2);
+      cctx.quadraticCurveTo(b.x,b.y,(b.x+c.x)/2,(b.y+c.y)/2);
+      cctx.stroke();
+    }
   });
   ['pointerup','pointercancel'].forEach(function(ev){
     cv.addEventListener(ev,function(e){ if(e.pointerId===ditoCv){ disegnando=false; ditoCv=null; } });
@@ -2095,7 +2154,7 @@ var OPZIONI = [
       'Una giornata fuori: '+o.nome+
       '. Partenza in mattinata, rientro per cena — con facoltà di prolungare a cena inclusa.';
     document.getElementById('sigimg').src=cv.toDataURL('image/png');
-    show(s5); hearts();
+    show(s5); hearts(document.getElementById('applica'));
     /* il segnale che conta: ha firmato, e cosa ha scelto */
     if(window.__firmaSegnalata!==o.nome){
       window.__firmaSegnalata=o.nome;
