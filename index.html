@@ -17,6 +17,9 @@
 <meta name="twitter:title" content="Ho una domanda per te...">
 <meta name="twitter:description" content="Apri. Ci vuole un secondo.">
 <meta name="twitter:image" content="https://mrbagigio.github.io/colline/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap">
 <style>
 :root{
   --sky-1:#1d1030; --sky-2:#472456; --sky-3:#8d4468; --sky-4:#df7156; --sky-5:#f7b95f;
@@ -30,7 +33,8 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{overflow-x:hidden}
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+  font-family:Manrope,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+  font-feature-settings:"ss01","cv01";-webkit-font-smoothing:antialiased;
   color:var(--ink);
   background:linear-gradient(180deg,var(--sky-1) 0%,var(--sky-2) 30%,var(--sky-3) 55%,var(--sky-4) 76%,var(--sky-5) 100%);
   background-attachment:fixed;
@@ -86,7 +90,7 @@ body{
 
 .kicker{font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;opacity:.9;
   margin-bottom:18px;text-shadow:var(--sh);font-weight:600}
-h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(2rem,8.8vw,2.9rem);
+h1{font-family:Fraunces,Georgia,"Times New Roman",serif;font-weight:400;font-variation-settings:"opsz" 144,"SOFT" 50;font-size:clamp(2rem,8.8vw,2.9rem);
   line-height:1.12;letter-spacing:-.01em;text-shadow:var(--sh);margin-bottom:15px}
 h1 em{font-style:italic;color:var(--gold)}
 .sub{font-size:1.03rem;line-height:1.58;opacity:.96;margin-bottom:32px;text-shadow:var(--sh)}
@@ -95,13 +99,15 @@ h1 em{font-style:italic;color:var(--gold)}
 .doc{position:relative;text-align:left;border-radius:20px;overflow:hidden;
   background:linear-gradient(rgba(255,255,255,.09),rgba(255,255,255,.035)),rgba(24,13,36,.82);
   border:1px solid rgba(255,216,138,.42);
-  box-shadow:0 26px 60px -20px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.08);
+  /* doppia cornice: un guscio sottile attorno al foglio, come una lastra nel suo telaio */
+  box-shadow:0 0 0 5px rgba(255,255,255,.035),0 0 0 6px rgba(255,216,138,.14),
+    0 30px 70px -22px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.1);
   animation:docDrop 1s var(--pop) .25s both}
 @keyframes docDrop{from{opacity:0;transform:translateY(-44px) rotate(-2.5deg) scale(.9)}
   to{opacity:1;transform:none}}
 .doc .top{height:8px;background:repeating-linear-gradient(45deg,#ffd88a 0 8px,#241531 8px 16px);opacity:.85}
 .doc .inner{padding:20px 20px 54px}   /* il fondo è riservato al timbro */
-.doc h2{font-family:Georgia,serif;font-weight:400;font-size:1.32rem;letter-spacing:.02em;
+.doc h2{font-family:Fraunces,Georgia,serif;font-weight:500;font-weight:400;font-size:1.32rem;letter-spacing:.02em;
   text-align:center;margin-bottom:2px}
 .doc .rule{height:1px;background:linear-gradient(90deg,transparent,rgba(255,216,138,.65),transparent);
   margin:11px 0 14px}
@@ -153,6 +159,14 @@ h1 em{font-style:italic;color:var(--gold)}
   color:var(--ink);text-shadow:var(--sh);box-shadow:0 10px 28px -10px rgba(0,0,0,.6);
   transition:transform .2s,border-color .25s}
 .cta:active{transform:scale(.96);border-color:rgba(255,216,138,.7)}
+/* pulsante nel pulsante: la freccia vive in un suo cerchio, che si sposta quando lo premi */
+.cta,.ghostbtn{display:inline-flex;align-items:center;justify-content:center;gap:12px}
+.fr{width:1.85em;height:1.85em;margin:-.45em -.95em -.45em 0;border-radius:50%;flex-shrink:0;
+  display:grid;place-items:center;background:rgba(255,255,255,.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.fr .ico{width:15px;height:15px;stroke-width:1.9}
+.cta:active .fr{transform:translateX(3px) scale(1.06)}
+.ghostbtn .ico{width:17px;height:17px;stroke-width:1.7}
 /* l'entrata ritardata vale SOLO per il bottone del contratto: sulla classe
    .cta rendeva invisibili per 2,85s anche "Applica la firma" e "Manda la
    conferma", che compaiono su schermate diverse */
@@ -316,7 +330,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .opt{position:relative;display:flex;gap:15px;align-items:center;width:100%;text-align:left;
   background:var(--glass);border:1px solid rgba(255,255,255,.3);border-radius:19px;
   padding:16px 34px 16px 17px;color:var(--ink);font-weight:400;font-size:1rem;text-shadow:var(--sh);
-  box-shadow:0 8px 24px -10px rgba(0,0,0,.5);
+  box-shadow:0 14px 34px -16px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);
   /* NIENTE opacity:0 di base: nascondendo e rimostrando la schermata
      l'animazione non riparte, e le schede restavano invisibili per sempre.
      Così, se l'animazione non gira, la scheda si vede lo stesso. */
@@ -332,8 +346,12 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   box-shadow:0 4px 14px -6px rgba(0,0,0,.5);
   background:linear-gradient(rgba(255,255,255,.2),rgba(255,255,255,.12)),rgba(28,16,42,.72)}
 .opt:active:after{transform:translate(5px,-52%);opacity:.95}
-.opt .em{font-size:1.75rem;line-height:1;flex-shrink:0;text-shadow:none;
-  filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
+/* icone disegnate, non emoji: le emoji cambiano faccia da un telefono all'altro */
+.opt .em{flex-shrink:0;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+  color:var(--gold);background:radial-gradient(circle at 50% 30%,rgba(255,216,138,.16),rgba(255,216,138,.04));
+  box-shadow:inset 0 0 0 1px rgba(255,216,138,.32),0 6px 16px -8px rgba(0,0,0,.6)}
+.ico{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;
+  stroke-linecap:round;stroke-linejoin:round;display:block}
 .opt b{display:block;font-weight:600;font-size:1rem;margin-bottom:3px}
 .opt span{display:block;font-size:.86rem;opacity:.94;line-height:1.42}
 /* riga di servizio: quanto dura e che tipo di giornata è — informazioni per
@@ -471,8 +489,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 /* scie di velocità che scattano alla pressione */
 .scie{opacity:0;transition:opacity .12s}
 .pedale:active .scie,.pedale.giu .scie{opacity:1}
-.row .ic{font-size:1.35rem;line-height:1.25;flex-shrink:0;text-shadow:none;
-  filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
+.row .ic{flex-shrink:0;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+  color:var(--gold);background:rgba(255,216,138,.08);box-shadow:inset 0 0 0 1px rgba(255,216,138,.28)}
+.row .ic .ico{width:17px;height:17px;stroke-width:1.6}
 .row b{display:block;font-size:.97rem;margin-bottom:3px}
 .row span{font-size:.88rem;opacity:.94;line-height:1.46}
 /* contratto completo */
@@ -559,7 +578,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 #cv{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
 .xline{position:absolute;left:16px;right:16px;bottom:28px;
   border-bottom:1.5px solid rgba(255,255,255,.35);pointer-events:none}
-.xmark{position:absolute;left:18px;bottom:32px;font-family:Georgia,serif;font-style:italic;
+.xmark{position:absolute;left:18px;bottom:32px;font-family:Fraunces,Georgia,serif;font-style:italic;
   font-size:1.15rem;color:rgba(255,216,138,.85);pointer-events:none}
 .firmahint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-style:italic;font-size:.92rem;opacity:.45;pointer-events:none;transition:opacity .3s;
@@ -590,10 +609,10 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))}
 /* in alto a destra copriva il titolo e il protocollo: sta nello spazio
    libero in fondo, fra la dicitura a sinistra e la firma a destra */
-.stampok{position:absolute;left:50%;bottom:18px;border:2px solid rgba(125,255,168,.8);
-  border-radius:9px;padding:5px 10px;color:#a9ffc6;font-size:.6rem;font-weight:800;
+.stampok{position:absolute;left:50%;bottom:18px;border:2px solid rgba(255,216,138,.85);
+  border-radius:9px;padding:5px 10px;color:#ffe2a6;font-size:.6rem;font-weight:800;
   letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;
-  box-shadow:inset 0 0 0 1px rgba(125,255,168,.35);
+  box-shadow:inset 0 0 0 1px rgba(255,216,138,.35);
   transform:translateX(-50%) rotate(-11deg);
   animation:slamCentro .55s cubic-bezier(.3,1.5,.5,1) .5s both}
 @keyframes slamCentro{
@@ -617,7 +636,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 .steps i.on{background:var(--gold);width:20px;border-radius:3px}
 
 /* ---------- coriandoli ---------- */
-.heart{position:fixed;z-index:12;pointer-events:none;font-size:22px;animation:fly 2.9s ease-out forwards}
+.heart{position:fixed;z-index:12;pointer-events:none;width:14px;height:14px;
+  animation:fly 2.9s cubic-bezier(.2,.7,.3,1) forwards}
+.heart svg{width:100%;height:100%;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
 @keyframes fly{0%{opacity:1;transform:translate(0,0) scale(.4) rotate(0)}
   15%{opacity:1}
   100%{opacity:0;transform:translate(var(--dx),-82vh) scale(1.25) rotate(var(--r))}}
@@ -754,6 +775,27 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
      e tappe bloccate e "Applica la firma" sembravano attive */
   .row.locked{opacity:.24!important}
   .cta.spenta{opacity:.38!important}}
+/* Manrope è un filo più larga del carattere di sistema: col viaggio finito
+   sforava di 2-19 px e il recap di 22 px a 320x568. Si stringono solo quei testi. */
+@media (max-height:900px){
+  .row span{font-size:.79rem;line-height:1.29;letter-spacing:-.01em}
+  .row b{margin-bottom:1px}
+}
+@media (max-height:790px){
+  .row span{line-height:1.24}
+  .plan{gap:5px}
+  .done{margin-top:7px}
+  .vaifirma.on{margin-top:8px}
+}
+@media (max-height:665px){
+  .row span{font-size:.7rem;line-height:1.18}
+  .row{padding:5px 10px}
+  .plan{gap:4px}
+  .vaifirma.on{margin-top:4px}
+  .art5 dd{font-size:.78rem;line-height:1.28}
+  .sigblock{margin-top:5px}.sigimg{height:32px}
+  #s5 .field{padding:3px 0}
+}
 </style>
 </head>
 <body>
@@ -805,7 +847,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
       <div class="stamp">Non firmabile<small>manca l'art. 5</small></div>
     </div>
   </div>
-  <button class="cta" id="apri">Apri l'articolo 5 →</button>
+  <button class="cta" id="apri">Apri l'articolo 5 <i class="fr"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></i></button>
 </section>
 
 <!-- ============ 1. LA DOMANDA ============ -->
@@ -814,7 +856,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   <h1>Il lunedì <em>fuori provincia</em>.</h1>
   <p class="sub">Decidi tu se il contratto si firma.</p>
   <div class="btns" id="btns">
-    <button id="yes">Sì ✨</button>
+    <button id="yes">Sì</button>
     <button id="no">No</button>
   </div>
   <p class="nudge" id="nudge"></p>
@@ -889,10 +931,10 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
     </svg>
     <span id="ped-lab">Accelera</span>
   </button>
-  <div class="done" id="done"><span>✓</span> Allegato A compilato</div>
+  <div class="done" id="done"><svg class="ico" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg> Allegato A compilato</div>
   <p class="ps" id="p-ps"></p>
-  <button class="cta vaifirma" id="vaifirma">Firma il contratto ✍️</button>
-  <button class="back" id="back"><span class="frecciaind">←</span> altre mete</button>
+  <button class="cta vaifirma" id="vaifirma">Firma il contratto <i class="fr"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 7l3 3"/></svg></i></button>
+  <button class="back" id="back"><span class="frecciaind"><svg class="ico" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M19 12H6M11 6l-6 6 6 6"/></svg></span> altre mete</button>
 </section>
 
 <!-- ============ 3b. IL BRINDISI ============ -->
@@ -922,8 +964,8 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
     </div>
     <span class="manina">👈</span>
   </div>
-  <button class="ghostbtn riprova" id="riprova">Rimettiamo a posto 🧹</button>
-  <button class="cta vaifirma2" id="vaifirma2">Firma il contratto ✍️</button>
+  <button class="ghostbtn riprova" id="riprova">Rimettiamo a posto</button>
+  <button class="cta vaifirma2" id="vaifirma2">Firma il contratto <i class="fr"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 7l3 3"/></svg></i></button>
 </section>
 
 <!-- ============ 4. LA FIRMA ============ -->
@@ -939,9 +981,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
   </div>
   <div class="firmarow">
     <button class="ghostbtn" id="pulisci">Pulisci</button>
-    <button class="cta spenta" id="applica" style="margin-top:0">Applica la firma →</button>
+    <button class="cta spenta" id="applica" style="margin-top:0">Applica la firma <i class="fr"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></i></button>
   </div>
-  <button class="back on" id="cambia"><span class="frecciaind">←</span> cambia meta</button>
+  <button class="back on" id="cambia"><span class="frecciaind"><svg class="ico" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M19 12H6M11 6l-6 6 6 6"/></svg></span> cambia meta</button>
 </section>
 
 <!-- ============ 5. COPIA FIRMATA ============ -->
@@ -970,8 +1012,8 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
       <div class="stampok">Firmato</div>
     </div>
   </div>
-  <button class="cta" id="conferma">Manda la conferma 📨</button>
-  <a class="ghostbtn incal" id="incal" href="ics/prosecco.ics">Mettilo in calendario 📅</a>
+  <button class="cta" id="conferma">Manda la conferma <i class="fr"><svg class="ico" viewBox="0 0 24 24"><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></svg></i></button>
+  <a class="ghostbtn incal" id="incal" href="ics/prosecco.ics"><svg class="ico" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg> Mettilo in calendario</a>
 </section>
 
 <div class="toast" id="toast"></div>
@@ -1005,61 +1047,77 @@ var BATTUTE = ['Vai Gianni, portiamolo via!', 'È rotto, non c\'è niente da far
 /* =========================================================================
    ⚙️  3) LE 4 OPZIONI E IL PROGRAMMA DI OGNUNA
    ========================================================================= */
+  /* icone disegnate a mano, tutte con lo stesso tratto sottile */
+  var ICONE={
+    auto:'<path d="M4 15.5V12l1.8-4.2A1.5 1.5 0 0 1 7.2 7h9.6a1.5 1.5 0 0 1 1.4.8L20 12v3.5"/><path d="M4 12h16M4 15.5h16"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/>',
+    uva:'<circle cx="8.5" cy="10.5" r="1.8"/><circle cx="12" cy="10.5" r="1.8"/><circle cx="15.5" cy="10.5" r="1.8"/><circle cx="10.2" cy="13.9" r="1.8"/><circle cx="13.8" cy="13.9" r="1.8"/><circle cx="12" cy="17.3" r="1.8"/><path d="M12 8.6V5.5"/><path d="M12 6c1.6-2 4-2.2 5.2-1.4-1 1.7-3.2 2.4-5.2 1.4z"/>',
+    piatto:'<path d="M7 3v6a2 2 0 0 0 4 0V3M9 9v12"/><path d="M17 21V3c-2 1.7-2.8 4.2-2.8 8H17"/>',
+    tramonto:'<path d="M3 17h18M6 20.5h12"/><path d="M7 17a5 5 0 0 1 10 0"/><path d="M12 7.5v2M5.3 10.8l1.4 1.4M18.7 10.8l-1.4 1.4"/>',
+    vela:'<path d="M3 17h18l-2.6 3.5H5.6z"/><path d="M12 3.5V17"/><path d="M12 4.5L19 15h-7M12 7.5L7 15h5"/>',
+    borgo:'<path d="M3 20.5V11l5-4 5 4v9.5M13 20.5v-8l4-3 4 3v8"/><path d="M2.5 20.5h19"/><path d="M6.5 20.5v-3.5a1.5 1.5 0 0 1 3 0v3.5"/>',
+    scacchi:'<circle cx="12" cy="6.5" r="2.5"/><path d="M9.5 11h5M10.5 11l-.9 6h4.8l-.9-6"/><path d="M7 20.5h10l-1-3.5H8z"/>',
+    ponte:'<path d="M2 9h20M4 9v11M20 9v11"/><path d="M4 15.5c4-4.5 12-4.5 16 0"/><path d="M8 9v3.4M12 9v2.4M16 9v3.4"/>',
+    colle:'<path d="M2 20c3.5-4.5 7-6.5 10-6.5s6.5 2 10 6.5"/><path d="M9 13.5V9.5M15 13.5V9.5M8 9.5h8M12 6l4.5 3.5h-9z"/>',
+    castello:'<path d="M5 20.5V9h2.4v2h2V9h2.4v2h2V9H19v11.5"/><path d="M3 20.5h18"/><path d="M10.5 20.5v-3.5a1.5 1.5 0 0 1 3 0v3.5"/>',
+    portico:'<path d="M3 20.5V9.5h18v11"/><path d="M2.5 9.5L12 4l9.5 5.5"/><path d="M6 20.5v-5a2 2 0 0 1 4 0v5M14 20.5v-5a2 2 0 0 1 4 0v5"/>',
+    gradini:'<path d="M3 20.5h4.5v-4h4v-4h4v-4H20"/><path d="M20 8.5V3.5l3 1.4-3 1.4"/>'
+  };
+  function ico(n){ return ICONE[n] ? '<svg class="ico" viewBox="0 0 24 24">'+ICONE[n]+'</svg>' : ''; }
 var OPZIONI = [
   {
-    em:'🍇', ics:'prosecco', nome:'Le colline del Prosecco',
+    em:'uva', ics:'prosecco', nome:'Le colline del Prosecco',
     dati:'metà mattina · 1h di strada',
     teaser:'Vigneti terrazzati e un tramonto che non ti aspetti',
     titolo:'Colline del <em>Prosecco</em>.',
     sub:'Valdobbiadene. Un\'ora di strada, un altro mondo.',
     ps:'P.S. — il bottone "No" non è mai stato riparato. Era voluto.',
     tappe:[
-      ['🚗','Ti vengo a prendere','Metà mattina. Un\'ora verso nord: si sale tra le colline e si smette di vedere case.'],
-      ['🍇','Tra i filari','Vigneti terrazzati, patrimonio UNESCO. Camminata dentro le vigne.'],
-      ['🍽️','Pranzo in collina','Un\'osteria tra le vigne, senza guardare l\'orologio.'],
-      ['🌅','Colle Colesel','Panchine di legno sulla valle del Cartizze per il tramonto, e un calice.']
+      ['auto','Ti vengo a prendere','Metà mattina. Un\'ora verso nord: si sale tra le colline e si smette di vedere case.'],
+      ['uva','Tra i filari','Vigneti terrazzati, patrimonio UNESCO. Camminata dentro le vigne.'],
+      ['piatto','Pranzo in collina','Un\'osteria tra le vigne, senza guardare l\'orologio.'],
+      ['tramonto','Colle Colesel','Panchine di legno sulla valle del Cartizze per il tramonto, e un calice.']
     ]
   },
   {
-    em:'⛵', ics:'garda', nome:'Il lago al tramonto',
+    em:'vela', ics:'garda', nome:'Il lago al tramonto',
     dati:'metà mattina · 1h15 di strada',
     teaser:'Un promontorio di cipressi sul Garda, e il sole che cade nell\'acqua',
     titolo:'Il <em>lago</em> al tramonto.',
     sub:'Punta San Vigilio. Non il Garda dei lidi: un promontorio con un viale di cipressi e un porticciolo.',
     ps:'P.S. — anche se al lago ci sei già stata, lì probabilmente no.',
     tappe:[
-      ['🚗','Ti vengo a prendere','Metà mattina, un\'ora e un quarto verso ovest. A un certo punto si apre tutto e c\'è l\'acqua.'],
-      ['🏘️','Lazise','Si entra dalla Porta del Lion: vicoli acciottolati, la Dogana Veneta sulla piazza, i cigni sul porto vecchio.'],
-      ['🍽️','Pranzo sul porto','Pesce di lago e un calice di Bardolino, con l\'acqua a due passi.'],
-      ['🌅','Punta San Vigilio','Il viale di cipressi, la baia, il tramonto. Di sera si entra gratis e si fa aperitivo.']
+      ['auto','Ti vengo a prendere','Metà mattina, un\'ora e un quarto verso ovest. A un certo punto si apre tutto e c\'è l\'acqua.'],
+      ['borgo','Lazise','Si entra dalla Porta del Lion: vicoli acciottolati, la Dogana Veneta sulla piazza, i cigni sul porto vecchio.'],
+      ['piatto','Pranzo sul porto','Pesce di lago e un calice di Bardolino, con l\'acqua a due passi.'],
+      ['tramonto','Punta San Vigilio','Il viale di cipressi, la baia, il tramonto. Di sera si entra gratis e si fa aperitivo.']
     ]
   },
   {
-    em:'♟️', ics:'brenta', nome:'Scacchi, ponte e fiume',
+    em:'scacchi', ics:'brenta', nome:'Scacchi, ponte e fiume',
     dati:'mattina · 30 min di strada',
     teaser:'La piazza degli scacchi, il ponte di legno, e poi si sconfina',
     titolo:'Scacchi, ponte e <em>fiume</em>.',
     sub:'Marostica e Bassano, e al tramonto si passa in Treviso.',
     ps:'P.S. — la partita vera con le persone è a settembre. Intanto ci prendiamo la piazza.',
     tappe:[
-      ['🚗','Ti vengo a prendere','In mattinata. Mezz\'ora e siamo sotto le mura di Marostica.'],
-      ['♟️','La piazza degli scacchi','La scacchiera disegnata a terra e il castello che la guarda dall\'alto.'],
-      ['🌉','Bassano e il ponte','Pranzo sul Brenta, il ponte di legno di Palladio, due passi tra le grapperie.'],
-      ['🌄','Possagno al tramonto','Si sconfina in Treviso: il tempio sul colle e tutta la pianura sotto.']
+      ['auto','Ti vengo a prendere','In mattinata. Mezz\'ora e siamo sotto le mura di Marostica.'],
+      ['scacchi','La piazza degli scacchi','La scacchiera disegnata a terra e il castello che la guarda dall\'alto.'],
+      ['ponte','Bassano e il ponte','Pranzo sul Brenta, il ponte di legno di Palladio, due passi tra le grapperie.'],
+      ['colle','Possagno al tramonto','Si sconfina in Treviso: il tempio sul colle e tutta la pianura sotto.']
     ]
   },
   {
-    em:'🏰', ics:'asolo', nome:'Il borgo sul colle',
+    em:'castello', ics:'asolo', nome:'Il borgo sul colle',
     dati:'metà mattina · 1h di strada',
     teaser:'Asolo, i portici, e un verbo inventato apposta per non fare niente',
     titolo:'Il borgo <em>sul colle</em>.',
     sub:'Asolo. Un\'ora, e sei nella città dai cento orizzonti.',
     ps:'P.S. — «asolare» è una parola vera, inventata qui. Vuol dire esattamente questo.',
     tappe:[
-      ['🚗','Ti vengo a prendere','Metà mattina, un\'ora verso est, salendo tra le colline trevigiane.'],
-      ['🏛️','Via Browning','Si passa la porta e cambia l\'aria: portici, palazzi affrescati, botteghe.'],
-      ['🍽️','Pranzo e asolare','Qui hanno inventato un verbo per perdere tempo bene. Lo facciamo a tavola.'],
-      ['⛰️','I 276 gradini','Nel pomeriggio si sale alla Rocca da Porta Colmarion. Panchine a metà, e la vista che si spalanca.']
+      ['auto','Ti vengo a prendere','Metà mattina, un\'ora verso est, salendo tra le colline trevigiane.'],
+      ['portico','Via Browning','Si passa la porta e cambia l\'aria: portici, palazzi affrescati, botteghe.'],
+      ['piatto','Pranzo e asolare','Qui hanno inventato un verbo per perdere tempo bene. Lo facciamo a tavola.'],
+      ['gradini','I 276 gradini','Nel pomeriggio si sale alla Rocca da Porta Colmarion. Panchine a metà, e la vista che si spalanca.']
     ]
   }
 ];
@@ -1521,15 +1579,21 @@ var OPZIONI = [
 
   /* ---------- coriandoli con deriva ---------- */
   function hearts(){
-    var set=['💛','🥂','🌅','✨','🧡','💫'];
+    /* cuori, scintille e puntini disegnati: le emoji sembravano un adesivo */
+    var FORME=['<path d="M12 20.5s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.8a4.2 4.2 0 0 1 7.5 2.5c0 5.6-7.5 10.2-7.5 10.2z"/>',
+               '<path d="M12 2.5l2.1 7.4 7.4 2.1-7.4 2.1-2.1 7.4-2.1-7.4-7.4-2.1 7.4-2.1z"/>',
+               '<circle cx="12" cy="12" r="6"/>'];
+    var TINTE=['#ffd88a','#ffb27a','#ff8f8a','#ff6b8a','#fff1d6'];
     for(var i=0;i<28;i++){
       setTimeout(function(){
         var el=document.createElement('div');
-        el.className='heart'; el.textContent=set[Math.floor(Math.random()*set.length)];
+        el.className='heart';
+        el.innerHTML='<svg viewBox="0 0 24 24" fill="'+TINTE[Math.floor(Math.random()*TINTE.length)]+'">'+
+                     FORME[Math.floor(Math.random()*FORME.length)]+'</svg>';
         el.style.left=(Math.random()*92+4)+'vw'; el.style.top=(Math.random()*20+74)+'vh';
         el.style.setProperty('--r',(Math.random()*140-70)+'deg');
         el.style.setProperty('--dx',(Math.random()*120-60)+'px');
-        el.style.fontSize=(15+Math.random()*22)+'px';
+        var lato=(9+Math.random()*13)+'px'; el.style.width=lato; el.style.height=lato;
         el.style.animationDuration=(2.4+Math.random()*1.1)+'s';
         document.body.appendChild(el);
         setTimeout(function(){el.remove();},3600);
@@ -1561,7 +1625,7 @@ var OPZIONI = [
   OPZIONI.forEach(function(o){
     var b=document.createElement('button');
     b.className='opt';
-    b.innerHTML='<div class="em">'+o.em+'</div><div><b>'+o.nome+'</b><span>'+o.teaser+
+    b.innerHTML='<div class="em">'+ico(o.em)+'</div><div><b>'+o.nome+'</b><span>'+o.teaser+
                 '</span><span class="dati">'+(o.dati||'')+'</span></div>';
     b.addEventListener('click',function(){ scegli(o); });
     box.appendChild(b);
@@ -1765,7 +1829,7 @@ var OPZIONI = [
     var rows=document.getElementById('p-rows'); rows.innerHTML='';
     o.tappe.forEach(function(t){
       var d=document.createElement('div'); d.className='row locked';
-      d.innerHTML='<div class="ic">'+t[0]+'</div><div><b>'+t[1]+'</b><span>'+t[2]+'</span></div>';
+      d.innerHTML='<div class="ic">'+ico(t[0])+'</div><div><b>'+t[1]+'</b><span>'+t[2]+'</span></div>';
       rows.appendChild(d);
     });
     resetViaggio();
