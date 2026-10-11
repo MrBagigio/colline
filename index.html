@@ -1903,7 +1903,9 @@ var OPZIONI = [
       vaifirma2=document.getElementById('vaifirma2');
   var riprova=document.getElementById('riprova');
   var trascino=false, dx0=0, fatto=false, rotto=false, campioni=[];
-  var TROPPO=1.75;      /* px/ms: oltre questa foga i calici si rompono */
+  /* px/ms all'impatto. Il calice fa solo ~64 px prima del contatto: un dito non
+     arriva alla sua velocità piena, e a 1.75 serviva uno strattone innaturale */
+  var TROPPO=0.55;
   /* i tempi della rottura vanno spenti al ripristino, altrimenti i cocci
      spuntavano dopo aver rimesso a posto */
   var bTimer=[];
@@ -1928,7 +1930,11 @@ var OPZIONI = [
      movimenti ravvicinati darebbero valori assurdi */
   function velocita(){
     if(campioni.length<2) return 0;
-    var a=campioni[0], b=campioni[campioni.length-1];
+    /* la spinta all'impatto, non la media del gesto: dal primo campione la
+       partenza da fermo abbassava tutto, e anche una spinta decisa faceva cin */
+    var b=campioni[campioni.length-1], a=b;
+    for(var i=campioni.length-2;i>=0 && b.t-campioni[i].t<=64;i--) a=campioni[i];
+    if(a===b) a=campioni[campioni.length-2];
     var dt=b.t-a.t, dx=Math.abs(b.x-a.x);
     if(dt>=12) return dx/dt;
     /* una sbracciata fulminea produce pochissimi eventi e una finestra di
@@ -1954,7 +1960,7 @@ var OPZIONI = [
   calB.addEventListener('pointermove',function(e){
     if(!trascino||fatto||rotto||e.pointerId!==ditoB) return;
     campioni.push({x:e.clientX,t:performance.now()});
-    if(campioni.length>7) campioni.shift();
+    if(campioni.length>16) campioni.shift();
     var d=Math.min(0,e.clientX-dx0);         /* si muove solo verso sinistra */
     calB.style.transform='translateX('+d+'px) rotate('+Math.max(-16,d/9)+'deg)';
     /* contatto calcolato sul layout + lo spostamento noto, non sui rettangoli */
