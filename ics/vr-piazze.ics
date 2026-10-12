@@ -10,7 +10,7 @@ DTSTART:20261014T080000Z
 DTEND:20261014T190000Z
 SUMMARY:Una giornata fuori - Piazze e torre
 LOCATION:Piazza delle Erbe, Verona
-DESCRIPTION:Torre dei Lamberti, pranzo all'Antica Bottega del Vino, spritz in Piazza delle Erbe.\nArt. 5 del contratto: partenza in mattinata, rientro per cena, con facolta' di prolungare.
+DESCRIPTION:Torre dei Lamberti, pranzo in Veronetta, spritz in Piazza delle Erbe.\nArt. 5 del contratto: partenza in mattinata, rientro per cena, con facolta' di prolungare.
 BEGIN:VALARM
 TRIGGER:-PT2H
 ACTION:DISPLAY
