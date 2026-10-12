@@ -903,13 +903,13 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
 <section class="screen" id="s2">
   <p class="kicker">Art. 5 accettato — resta l'allegato A</p>
   <h1>Ora <em>scegli tu</em>.</h1>
-  <p class="sub">Quattro posti. Ne scegli uno.<br>Quello che tocchi diventa l'allegato A.</p>
+  <p class="sub">Quattro modi di passare mercoledì.<br>Quello che tocchi diventa l'allegato A.</p>
   <div class="opts" id="opts"></div>
 </section>
 
 <!-- ============ 3. IL PROGRAMMA ============ -->
 <section class="screen" id="s3">
-  <p class="kicker">Il programma</p>
+  <p class="kicker">Mercoledì 14</p>
   <h1 id="p-title"></h1>
   <p class="sub" id="p-sub"></p>
   <div class="viaggio">
@@ -1045,7 +1045,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:100px;padding:18px 36p
     </div>
   </div>
   <button class="cta" id="conferma">Manda la conferma <i class="fr"><svg class="ico" viewBox="0 0 24 24"><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></svg></i></button>
-  <a class="ghostbtn incal" id="incal" href="#" style="display:none"><svg class="ico" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg> Mettilo in calendario</a>
+  <a class="ghostbtn incal" id="incal" href="ics/vr-alto.ics"><svg class="ico" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg> Mettilo in calendario</a>
 </section>
 
 <div class="toast" id="toast"></div>
@@ -1098,63 +1098,66 @@ var BATTUTE = ['Vai Gianni, portiamolo via!', 'È rotto, non c\'è niente da far
     mulino:'<circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="1.5"/><path d="M12 4.5v15M4.5 12h15M6.7 6.7l10.6 10.6M17.3 6.7L6.7 17.3"/>',
     faro:'<path d="M9 20.5l1.2-11h3.6l1.2 11"/><path d="M8.5 9.5h7M10 9.5v-3h4v3M12 4.5V3"/><path d="M5 6l3 1.2M19 6l-3 1.2M5 20.5h14"/>',
     rovine:'<path d="M3 20.5h18"/><path d="M5 20.5V10M9 20.5V10M15 20.5v-7M19 20.5V12"/><path d="M4 10h6M14 13.5h2"/>'
+,
+    torre:'<path d="M9 20.5V8h6v12.5"/><path d="M8 8h8M9 5.5h6V8H9z"/><path d="M12 5.5V3"/><path d="M11 12h2M11 15.5h2M5 20.5h14"/>',
+    calice:'<path d="M8 3.5h8c0 5-1.6 7.5-4 7.5S8 8.5 8 3.5z"/><path d="M8.4 6.5h7.2"/><path d="M12 11v8M8.5 20.5h7"/>'
   };
   function ico(n){ return ICONE[n] ? '<svg class="ico" viewBox="0 0 24 24">'+ICONE[n]+'</svg>' : ''; }
 var OPZIONI = [
   {
-    em:'castello', ics:'sirmione', nome:'La penisola',
-    dati:'metà mattina · 40 min da Verona',
-    teaser:'Un castello sull\'acqua e una villa romana sul lago',
-    titolo:'La <em>penisola</em>.',
-    sub:'Sirmione. Si entra da un ponte levatoio, e il lago è da tre lati.',
-    ps:'P.S. — si esce dalla provincia: Sirmione è già Brescia.',
-    tappe:[
-      ['auto','Ti vengo a prendere','Metà mattina. Quaranta minuti e si entra dal ponte levatoio.'],
-      ['castello','La Rocca sull\'acqua','Il castello col porto dentro le mura. Dai camminamenti si vede tutto il lago.'],
-      ['piatto','Pranzo nel borgo','Vicoli stretti, un tavolo all\'aperto, nessuna fretta.'],
-      ['rovine','Le Grotte di Catullo','Una villa romana in punta alla penisola, fra gli ulivi. Si resta fino al tramonto.']
-    ]
-  },
-  {
-    em:'faro', ics:'desenzano', nome:'Il porto vecchio',
-    dati:'metà mattina · 35 min da Verona',
-    teaser:'Il castello, il porto col ponte e il faro al tramonto',
-    titolo:'Il porto <em>vecchio</em>.',
-    sub:'Desenzano. La città più viva del lago, e il suo angolo più bello.',
-    ps:'P.S. — anche questa è fuori provincia: Desenzano è Brescia.',
-    tappe:[
-      ['auto','Ti vengo a prendere','Metà mattina, mezz\'ora abbondante verso ovest, fino all\'acqua.'],
-      ['castello','Il castello','Tre minuti dalla piazza, e dalle mura si vede tutto il lago.'],
-      ['piatto','Pranzo sul porto vecchio','Il ponte alla veneziana, le case colorate, un tavolo lì davanti.'],
-      ['faro','Il faro al tramonto','Lungolago fino al molo, un aperitivo, il lago che cambia colore.']
-    ]
-  },
-  {
-    em:'mulino', ics:'borghetto', nome:'Mulini e giardini',
-    dati:'mattina · 30 min da Verona',
-    teaser:'Un parco enorme in autunno, e i tortellini nodo d\'amore',
-    titolo:'Mulini e <em>giardini</em>.',
-    sub:'Valeggio sul Mincio: il Parco Sigurtà, e sotto il borgo dei mulini.',
-    ps:'P.S. — i tortellini di qui si chiamano «nodo d\'amore». Non l\'ho deciso io, giuro.',
-    tappe:[
-      ['auto','Ti vengo a prendere','In mattinata. Mezz\'ora e siamo al cancello del parco.'],
-      ['foglia','Il Parco Sigurtà','Sessanta ettari di giardino, il labirinto, i viali. In ottobre si colora tutto.'],
-      ['piatto','Tortellini a Borghetto','Il nodo d\'amore fatto a mano, sul fiume. Burro e salvia o in brodo: decidi tu.'],
-      ['mulino','I mulini sul Mincio','Il ponte visconteo, le ruote ad acqua, il fiume sotto le case. Fino al tramonto.']
-    ]
-  },
-  {
-    em:'ponte', ics:'verona', nome:'Verona dall\'alto',
-    dati:'metà mattina · in città',
+    em:'ponte', ics:'vr-alto', nome:'Verona dall\'alto',
+    dati:'metà mattina · tutto a piedi',
     teaser:'Un giardino segreto, e la città ai piedi al tramonto',
     titolo:'Verona <em>dall\'alto</em>.',
     sub:'Non quella del balcone: quella che conosce chi ci vive.',
     ps:'P.S. — al balcone di Giulietta non ci andiamo. È una promessa.',
     tappe:[
-      ['auto','Ti vengo a prendere','Metà mattina, e la macchina resta parcheggiata fino a sera.'],
+      ['auto','Ti vengo a prendere','Metà mattina. La macchina resta in un parcheggio fino a sera.'],
       ['foglia','Il Giardino Giusti','Un giardino del Cinquecento, il labirinto di bosso, un belvedere sulla città.'],
-      ['piatto','Pranzo in osteria','Un\'osteria vera del centro, di quelle senza il menu in quattro lingue.'],
-      ['tramonto','Castel San Pietro','Ponte Pietra, poi la scalinata: dieci minuti e Verona ai piedi al tramonto.']
+      ['piatto','Pranzo in Sottoriva','Un\'osteria sotto i portici più vecchi di Verona, a due passi dal fiume.'],
+      ['tramonto','Castel San Pietro','Ponte Pietra, poi la scalinata: dieci minuti e Verona ai piedi alle 18:35.']
+    ]
+  },
+  {
+    em:'rovine', ics:'vr-romana', nome:'Verona romana',
+    dati:'mattina · tutto a piedi',
+    teaser:'Dentro l\'Arena, e un ponte di duemila anni al tramonto',
+    titolo:'Verona <em>romana</em>.',
+    sub:'Duemila anni sotto i piedi, e quasi nessuno ci fa caso.',
+    ps:'P.S. — sulle gradinate dell\'Arena, a ottobre, siamo quasi soli.',
+    tappe:[
+      ['auto','Ti vengo a prendere','In mattinata, e si parte da Piazza Bra.'],
+      ['rovine','Dentro l\'Arena','Si cammina sulle gradinate dove sedevano in ventimila. Aperta dalle 9 alle 19.'],
+      ['piatto','Pranzo al Pompiere','Trattoria storica a due passi dalla casa di Giulietta: salumi, risotto, nessuna fretta.'],
+      ['ponte','Ponte Pietra al tramonto','Il ponte romano sull\'Adige, quando l\'acqua diventa arancione.']
+    ]
+  },
+  {
+    em:'portico', ics:'vr-fiume', nome:'Verona sul fiume',
+    dati:'metà mattina · a piedi lungo l\'Adige',
+    teaser:'San Zeno, il ponte merlato e l\'Adige',
+    titolo:'Verona <em>sul fiume</em>.',
+    sub:'Il lato tranquillo: chiostri, lungadige, un ponte rosso sull\'acqua.',
+    ps:'P.S. — il portale di San Zeno ha 48 formelle di bronzo. Le contiamo, se vuoi.',
+    tappe:[
+      ['auto','Ti vengo a prendere','Metà mattina, e si parcheggia vicino a San Zeno.'],
+      ['portico','San Zeno','La basilica romanica, il portale di bronzo e il chiostro silenzioso.'],
+      ['piatto','Pranzo e lungadige','Un tavolo vicino al fiume, poi si cammina lungo l\'Adige verso il centro.'],
+      ['ponte','Il ponte di Castelvecchio','Il ponte merlato, rosso, sull\'acqua. Lì si aspetta il tramonto.']
+    ]
+  },
+  {
+    em:'torre', ics:'vr-piazze', nome:'Piazze e torre',
+    dati:'metà mattina · in centro',
+    teaser:'La torre più alta, un\'osteria del 1890, uno spritz',
+    titolo:'Piazze e <em>torre</em>.',
+    sub:'Il cuore di Verona, visto da sotto e da ottantaquattro metri.',
+    ps:'P.S. — 368 gradini o l\'ascensore. Decidi tu, io ti seguo.',
+    tappe:[
+      ['auto','Ti vengo a prendere','Metà mattina, e si entra a piedi da Piazza delle Erbe.'],
+      ['torre','La Torre dei Lamberti','Ottantaquattro metri, e tutta Verona sotto: tetti, fiume, colline.'],
+      ['piatto','Antica Bottega del Vino','Un\'osteria del 1890 nel vicolo dietro Via Mazzini. Pranzo con calma.'],
+      ['calice','Spritz in Piazza delle Erbe','Sotto i palazzi affrescati, quando si accendono le luci.']
     ]
   }
 ];
@@ -2163,9 +2166,10 @@ var OPZIONI = [
     buzz([12,50,12]);
     var o=sceltaCorrente||OPZIONI[0];
     document.getElementById('r-art5').textContent=
-      'Una giornata fuori: '+o.nome+
+      'Mercoledì 14, una giornata fuori: '+o.nome+
       '. Partenza in mattinata, rientro per cena — con facoltà di prolungare a cena inclusa.';
     document.getElementById('sigimg').src=cv.toDataURL('image/png');
+    document.getElementById('incal').href='ics/'+o.ics+'.ics';
     show(s5); hearts(document.getElementById('applica'));
     /* il segnale che conta: ha firmato, e cosa ha scelto */
     if(window.__firmaSegnalata!==o.nome){
@@ -2249,7 +2253,7 @@ var OPZIONI = [
     if(condividendo) return;
     buzz([14,60,14]);
     var o=sceltaCorrente||OPZIONI[0];
-    var testo='✍️ Contratto firmato!\nArt. 5 — la destinazione: '+o.nome+
+    var testo='✍️ Contratto firmato!\nArt. 5 — mercoledì 14: '+o.nome+
               '.\nSi parte in mattinata, si rientra per cena… salvo prolungare 😏';
     if(navigator.share){
       condividendo=true;
