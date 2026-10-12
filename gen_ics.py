@@ -3,13 +3,13 @@ BACKSLASH_N = chr(92) + "n"          # la sequenza letterale che vuole il format
 
 mete = [
     ("vr-alto", "Verona dall'alto", "Giardino Giusti, Verona",
-     "Giardino Giusti, pranzo in Sottoriva, tramonto a Castel San Pietro (18:35)."),
+     "Giardino Giusti, cicchetti in Sottoriva, tramonto a Castel San Pietro (18:35) e aperitivo in Veronetta."),
     ("vr-romana", "Verona romana", "Arena di Verona, Piazza Bra",
-     "Dentro l'Arena, pranzo al Pompiere, Ponte Pietra al tramonto."),
+     "Dentro l'Arena, pranzo in osteria, Ponte Pietra al tramonto e spritz sotto Porta Borsari."),
     ("vr-fiume", "Verona sul fiume", "Basilica di San Zeno, Verona",
-     "San Zeno, pranzo e lungadige, tramonto sul ponte di Castelvecchio."),
+     "San Zeno, pranzo e lungadige, tramonto sul ponte di Castelvecchio e aperitivo sul Corso."),
     ("vr-piazze", "Piazze e torre", "Piazza delle Erbe, Verona",
-     "Torre dei Lamberti, pranzo all'Antica Bottega del Vino, spritz in Piazza delle Erbe."),
+     "Torre dei Lamberti, pranzo in Veronetta, spritz in Piazza delle Erbe."),
 ]
 
 for slug, nome, luogo, desc in mete:
