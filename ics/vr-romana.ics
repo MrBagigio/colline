@@ -10,7 +10,7 @@ DTSTART:20261014T080000Z
 DTEND:20261014T190000Z
 SUMMARY:Una giornata fuori - Verona romana
 LOCATION:Arena di Verona, Piazza Bra
-DESCRIPTION:Dentro l'Arena, pranzo al Pompiere, Ponte Pietra al tramonto.\nArt. 5 del contratto: partenza in mattinata, rientro per cena, con facolta' di prolungare.
+DESCRIPTION:Dentro l'Arena, pranzo in osteria, Ponte Pietra al tramonto e spritz sotto Porta Borsari.\nArt. 5 del contratto: partenza in mattinata, rientro per cena, con facolta' di prolungare.
 BEGIN:VALARM
 TRIGGER:-PT2H
 ACTION:DISPLAY
