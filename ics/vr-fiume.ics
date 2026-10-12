@@ -10,7 +10,7 @@ DTSTART:20261014T080000Z
 DTEND:20261014T190000Z
 SUMMARY:Una giornata fuori - Verona sul fiume
 LOCATION:Basilica di San Zeno, Verona
-DESCRIPTION:San Zeno, pranzo e lungadige, tramonto sul ponte di Castelvecchio.\nArt. 5 del contratto: partenza in mattinata, rientro per cena, con facolta' di prolungare.
+DESCRIPTION:San Zeno, pranzo e lungadige, tramonto sul ponte di Castelvecchio e aperitivo sul Corso.\nArt. 5 del contratto: partenza in mattinata, rientro per cena, con facolta' di prolungare.
 BEGIN:VALARM
 TRIGGER:-PT2H
 ACTION:DISPLAY
