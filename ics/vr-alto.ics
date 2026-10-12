@@ -10,7 +10,7 @@ DTSTART:20261014T080000Z
 DTEND:20261014T190000Z
 SUMMARY:Una giornata fuori - Verona dall'alto
 LOCATION:Giardino Giusti, Verona
-DESCRIPTION:Giardino Giusti, pranzo in Sottoriva, tramonto a Castel San Pietro (18:35).\nArt. 5 del contratto: partenza in mattinata, rientro per cena, con facolta' di prolungare.
+DESCRIPTION:Giardino Giusti, cicchetti in Sottoriva, tramonto a Castel San Pietro (18:35) e aperitivo in Veronetta.\nArt. 5 del contratto: partenza in mattinata, rientro per cena, con facolta' di prolungare.
 BEGIN:VALARM
 TRIGGER:-PT2H
 ACTION:DISPLAY
